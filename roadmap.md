@@ -1,0 +1,89 @@
+### 2022/2023 Roadmap
+- [x] Monta Authentication
+    - [x] Login
+    - [x] Logout
+- [x] Monta User
+    - [x] User Profiles
+    - [x] Job Titles
+    - [x] User Permissions
+    - [x] User Groups
+    - [x] User Roles
+    - [x] User Management
+- [x] Monta Organization
+    - [x] Organization Management
+    - [x] Organization Settings Management
+    - [x] Integration Management
+        - Supported Integrations - Google API
+- [x] Monta Billing
+    - [x] Transfer to Billing
+    - [x] Single & All Order Billing
+    - [x] Order Re-billing
+        - [x] Automated Credit Memo Creation
+    - [x] Order Billing History
+    - [x] Billing Exceptions
+        - Only created if Customer Billing Profile is active
+    - [ ] Automated Billing
+        - [ ] Automated Billing Exceptions
+- [x] Monta Customer
+    - [x] Customer Management
+    - [x] Customer Billing Profile
+    - [x] Customer Billing History
+    - [x] Document Classifications
+- [x] Monta Driver
+    - [x] Driver Management
+    - [x] Driver Profiles
+    - [x] Driver Qualification Files
+    - [x] Driver Comments
+    - [x] Driver Hours (Driver Hours of Service)
+        - Can be manually entered or automatically entered via integration
+- [x] Monta Equipment
+    - [x] Equipment Management
+    - [x] Equipment Types
+    - [x] Equipment Permits
+- [x] Monta Fleet
+    - [x] Fleet Management
+- [x] Monta Hazardous Material
+    - [x] Hazardous Class Management
+- [x] Monta Learning
+    - [ ] Knowledge Base
+    - [ ] Courses
+    - [ ] Quizzes
+    - [ ] Certifications
+- [x] Monta Location
+    - [x] Location Management
+    - [x] Automated Location Geo-Coding
+    - [x] Location Profiles
+    - [x] Location Comments
+- [ ] Monta Manager Profiles
+- [ ] Monta Manifest
+    - [ ] Partial Shipments
+    - [ ] Manifest Management
+    - [ ] Manifest Profiles
+- [ ] Monta Order
+    - [x] Order Management
+        - [x] Movement Management
+        - [x] Stop Management
+    - [x] Commodity CRUD
+        - [x] Hazmat Commodities (Hazardous Materials)
+    - [x] Order Types
+        - [x] CRUD
+    - [x] Service Incidents
+    - [x] Order Documentation (Images, PDFs, etc.)
+    - [ ] Recurring Order Templates
+    - [ ] Scheduled Order Creation
+- [ ] Monta Payroll
+    - [ ] Payroll Management
+    - [ ] Automated Payroll
+- [ ] Monta Quote
+    - [ ] Quote Management
+    - [ ] Quote Profiles
+    - [ ] Quote Comments
+- [ ] Monta Reporting
+- [ ] Monta Route
+    - [x] Route Management
+    - [x] Automated Route Creation
+    - [ ] Route Optimization
+- [ ] Monta Safety
+    - [ ] Safety Management
+    - [ ] Incident Management
+- [ ] Monta Telematics (TBD)
