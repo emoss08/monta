@@ -293,8 +293,8 @@ class Profile(TimeStampedModel):
         Returns:
             str: The address of the user
         """
-        if self.address:
-            return self.address
+        if self.address_line_1:
+            return self.address_line_1
         return ""
 
     def get_user_city_state(self) -> str:
