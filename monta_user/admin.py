@@ -48,7 +48,7 @@ class ProfileUserInline(admin.ModelAdmin):
     list_display = (
         "user",
         "organization",
-        "address",
+        "address_line_1",
         "city",
         "state",
         "zip_code",

@@ -133,9 +133,16 @@ class Profile(TimeStampedModel):
         blank=True,
         help_text=_("The bio of the user"),
     )
-    address = models.CharField(
+    address_line_1 = models.CharField(
         _("Address"),
         max_length=100,
+        help_text=_("The address of the user"),
+    )
+    address_line_2 = models.CharField(
+        _("Address Line 2"),
+        max_length=100,
+        null=True,
+        blank=True,
         help_text=_("The address of the user"),
     )
     city = models.CharField(
