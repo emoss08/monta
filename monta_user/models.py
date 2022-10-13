@@ -64,8 +64,8 @@ class MontaUser(AbstractBaseUser, PermissionsMixin):
         """
         String representation of the user
 
-        Returns:
-            str: The username of the user
+        :return: The username of the user
+        :rtype: str
         """
         return self.username
 
@@ -192,21 +192,21 @@ class Profile(TimeStampedModel):
         """
         String representation of the profile
 
-        Returns:
-            str: The username of the user
+        :return: The username of the user
+        :rtype: str
         """
         return self.user.username
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: list, **kwargs: dict) -> None:
         """
-        Save the profile
+        Save the profile instance to the database
 
-        Args:
-            *args: Variable length argument list
-            **kwargs: Arbitrary keyword arguments
-
-        Returns:
-            None
+        :param args: The arguments
+        :type args: list
+        :param kwargs: The keyword arguments
+        :type kwargs: dict
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         return super(Profile, self).save(**kwargs)
@@ -215,8 +215,8 @@ class Profile(TimeStampedModel):
         """
         Get the absolute url of the profile
 
-        Returns:
-            str: The absolute url of the profile
+        :return: The absolute url of the profile
+        :rtype: str
         """
         return reverse("user_profile_overview", args=[self.user.id])
 
@@ -224,8 +224,8 @@ class Profile(TimeStampedModel):
         """
         Get the profile picture of the user
 
-        Returns:
-            str: The profile picture of the user
+        :return: The profile picture of the user
+        :rtype: str
         """
         if self.profile_picture:
             return self.profile_picture.url
@@ -235,8 +235,8 @@ class Profile(TimeStampedModel):
         """
         Get the organization name of the user
 
-        Returns:
-            str: The organization name of the user
+        :return: The organization name of the user
+        :rtype: str
         """
         if self.organization:
             return self.organization.name
@@ -246,8 +246,8 @@ class Profile(TimeStampedModel):
         """
         Get the phone number of the user
 
-        Returns:
-            str: The phone number of the user
+        :return: The phone number of the user
+        :rtype: str
         """
         if self.phone:
             return self.phone
@@ -257,8 +257,8 @@ class Profile(TimeStampedModel):
         """
         Get the zip code of the user
 
-        Returns:
-            USZipCodeField | str: The zip code of the user
+        :return: The zip code of the user
+        :rtype: str
         """
         if self.zip_code:
             return self.zip_code
@@ -268,8 +268,8 @@ class Profile(TimeStampedModel):
         """
         Get the city of the user
 
-        Returns:
-            str: The city of the user
+        :return: The city of the user
+        :rtype: str
         """
         if self.city:
             return self.city
@@ -279,8 +279,8 @@ class Profile(TimeStampedModel):
         """
         Get the state of the user
 
-        Returns:
-            USStateField | str: The state of the user
+        :return: The state of the user
+        :rtype: str
         """
         if self.state:
             return self.state
@@ -290,8 +290,8 @@ class Profile(TimeStampedModel):
         """
         Get the address of the user
 
-        Returns:
-            str: The address of the user
+        :return: The address of the user
+        :rtype: str
         """
         if self.address_line_1:
             return self.address_line_1
@@ -301,8 +301,8 @@ class Profile(TimeStampedModel):
         """
         Get the city and state of the user
 
-        Returns:
-            str: The city and state of the user
+        :return: The city and state of the user
+        :rtype: str
         """
         if self.city and self.state:
             return f"{self.city}, {self.state}"
@@ -312,8 +312,8 @@ class Profile(TimeStampedModel):
         """
         Get the email verification status of the user
 
-        Returns:
-            bool: The email verification status of the user
+        :return: The email verification status of the user
+        :rtype: bool
         """
         return self.email_verified
 
@@ -321,8 +321,8 @@ class Profile(TimeStampedModel):
         """
         Get the full name of the user
 
-        Returns:
-            str: The full name of the user
+        :return: The full name of the user
+        :rtype: str
         """
         return f"{self.first_name} {self.last_name}"
 
@@ -363,21 +363,21 @@ class JobTitle(TimeStampedModel):
         """
         String representation of the job title
 
-        Returns:
-            str: The name of the job title
+        :return: The name of the job title
+        :rtype: str
         """
         return self.name
 
-    def save(self, *args, **kwargs) -> None:
+    def save(self, *args: list, **kwargs: dict) -> None:
         """
-        Save the job title
+        Save the job title instance to the database
 
-        Args:
-            *args: Variable length argument list
-            **kwargs: Arbitrary keyword arguments
-
-        Returns:
-            None
+        :param args: The arguments
+        :type args: list
+        :param kwargs: The keyword arguments
+        :type kwargs: dict
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         if not self.title_id:
@@ -388,8 +388,8 @@ class JobTitle(TimeStampedModel):
         """
         Get the absolute url of the job title
 
-        Returns:
-            str: The absolute url of the job title
+        :return: The absolute url of the job title
+        :rtype: str
         """
         return reverse("job-title", kwargs={"pk": self.pk})
 
@@ -434,21 +434,21 @@ class Organization(TimeStampedModel):
         """
         String representation of the organization
 
-        Returns:
-            str: The name of the organization
+        :return: The name of the organization
+        :rtype: str
         """
         return self.name
 
-    def save(self, *args, **kwargs) -> None:
+    def save(self, *args: list, **kwargs: dict) -> None:
         """
         Save the organization
 
-        Args:
-            *args: Variable length argument list
-            **kwargs: Arbitrary keyword arguments
-
-        Returns:
-            None
+        :param args: The arguments
+        :type args: list
+        :param kwargs: The keyword arguments
+        :type kwargs: dict
+        :return: None
+        :rtype: None
         """
         if not self.org_id:
             self.org_id = slugify(self.name)
@@ -459,8 +459,8 @@ class Organization(TimeStampedModel):
         """
         Get the absolute url of the organization
 
-        Returns:
-            str: The absolute url of the organization
+        :return: The absolute url of the organization
+        :rtype: str
         """
         return reverse("", kwargs={"pk": self.pk})
 
@@ -468,7 +468,7 @@ class Organization(TimeStampedModel):
         """
         Get the organization id and name combo
 
-        Returns:
-            str: The organization id and name combo
+        :return: The organization id and name combo
+        :rtype: str
         """
         return f"{self.org_id} - {self.name}"
