@@ -27,8 +27,3 @@ from monta import views
 urlpatterns = [
     path("", views.HomePage.as_view(), name="index"),
 ]
-
-# Django Auth URLs
-urlpatterns += [
-    path("accounts/", include("django.contrib.auth.urls")),
-]
