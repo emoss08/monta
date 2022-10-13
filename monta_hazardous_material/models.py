@@ -123,15 +123,21 @@ class HazardousMaterial(TimeStampedModel):
         max_length=255,
         choices=PackingGroupChoices.choices,
         help_text=_("Packing Group of the Hazardous Material"),
+        null=True,
+        blank=True,
     )
     erg_number = models.CharField(
         _("ERG Number"),
         max_length=255,
         help_text=_("ERG Number of the Hazardous Material"),
+        null=True,
+        blank=True,
     )
     proper_shipping_name = models.TextField(
         _("Proper Shipping Name"),
         help_text=_("Proper Shipping Name of the Hazardous Material"),
+        null=True,
+        blank=True,
     )
 
     class Meta:
