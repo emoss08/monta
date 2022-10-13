@@ -23,7 +23,7 @@ from typing import Type
 
 # Core Django Imports
 from django.views.generic import UpdateView, ListView
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Model
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
@@ -114,47 +114,30 @@ class UpdateUserProfile(LoginRequiredMixin, UpdateView):
     ] = forms.UpdateProfileGeneralInformationForm
     success_url = "/"
 
-    def dispatch(
-        self,
-        request: ASGIRequest,
-        *args: list,
-        **kwargs: dict,
-    ) -> None:
+    def post(self, request: ASGIRequest, *args: any, **kwargs: any) -> JsonResponse:
         """
-        Method to check if the user is authenticated, if the user is not authenticated, raise a
-
-        PermissionDenied exception. After the user is authenticated, call the default dispatch
-        method. After the default dispatch method is called, check if the request method is POST,
-        if the request method is not POST, raise a PermissionDenied exception.
+        Method to handle POST requests.
 
         :param request: Request object.
         :type request: ASGIRequest
         :param args: Arguments.
-        :type args: Any=
+        :type args: list
+        :param kwargs: Keyword arguments.
+        :type kwargs: dict
+        :return: Response object.
+        :rtype: JsonResponse
         """
-        super().dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form: forms.UpdateProfileGeneralInformationForm) -> None:
-        """
-        Method to check if the form is valid, if the form is not valid, call the default form_invalid
-        method. If the form is valid, call the default form_valid method.
-
-        :param form: Form object.
-        :type form: forms.UpdateProfileGeneralInformationForm
-        """
-        form.instance.user = self.request.user
-        super().form_valid(form)
-
-    def form_invalid(self, form: forms.UpdateProfileGeneralInformationForm) -> None:
-        """
-        Method to check if the form is valid, if the form is not valid, call the default form_invalid
-        method. If the form is valid, call the default form_valid method.
-
-        :param form: Form object.
-        :type form: forms.UpdateProfileGeneralInformationForm
-        """
-        form.instance.user = self.request.user
-        super().form_invalid(form)
+        form = self.form_class(data=request.POST, instance=self.get_object())
+        if form.is_valid():
+            form.save()
+            return JsonResponse(
+                {"result": "success", "message": "Profile Updates Posted Successfully"},
+                status=201,
+            )
+        return JsonResponse(
+            {"result": "error", "message": form.errors},
+            status=400,
+        )
 
 
 @method_decorator(require_POST, name="dispatch")
@@ -172,16 +155,10 @@ class UpdateUserEmail(LoginRequiredMixin, UpdateView):
 
     model: Type[models.MontaUser] = models.MontaUser
     form_class: Type[forms.UpdateUserEmailForm] = forms.UpdateUserEmailForm
-    success_url = "/"
 
-    def dispatch(
-        self,
-        request: ASGIRequest,
-        *args: list,
-        **kwargs: dict,
-    ) -> None | JsonResponse:
+    def post(self, request: ASGIRequest, *args: any, **kwargs: any) -> JsonResponse:
         """
-        Method to check if the password is correct.
+        Method to handle POST requests.
 
         :param request: Request object.
         :type request: ASGIRequest
@@ -189,30 +166,20 @@ class UpdateUserEmail(LoginRequiredMixin, UpdateView):
         :type args: list
         :param kwargs: Keyword arguments.
         :type kwargs: dict
+        :return: Response object.
+        :rtype: JsonResponse
         """
-        user = self.get_object()
-        if check_password(request.POST["password"], user.password):
-            super().dispatch(request, *args, **kwargs)
+        form = self.form_class(data=request.POST, instance=self.get_object())
+        if form.is_valid():
+            form.save()
+            return JsonResponse(
+                {"result": "success", "message": "Email Updated Successfully"},
+                status=201,
+            )
         return JsonResponse(
-            {
-                "result": "error",
-                "message": "Please check your password.",
-            },
+            {"result": "error", "message": form.errors},
             status=400,
         )
-
-    def form_valid(self, form: forms.UpdateUserEmailForm) -> None:
-        """
-        Method to check if the form is valid.
-
-        Args:
-            form (forms.UpdateUserEmailForm): Form to update the user email.
-
-        Returns:
-            None
-        """
-        form.instance.user = self.request.user
-        super().form_valid(form)
 
 
 @method_decorator(require_POST, name="dispatch")

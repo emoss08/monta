@@ -21,7 +21,7 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 # Core Django Imports
 from django.db.models.base import ModelBase
 from django.contrib.auth import get_user_model
-from django.contrib.auth.backends import BaseBackend, ModelBackend
+from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.base_user import AbstractBaseUser
 
 # Monta Imports

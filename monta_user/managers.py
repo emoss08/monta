@@ -18,13 +18,12 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+# Standard Library Imports
+import unicodedata
+
 # Core Django Imports
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
-
-""" NOTE:
-Do not import MontaUser it will cause circular import exception
-"""
 
 
 class MontaUserManager(BaseUserManager):
@@ -33,7 +32,7 @@ class MontaUserManager(BaseUserManager):
     for authentication instead of usernames.
     """
 
-    def create_user(self, user_name, email, password, **extra_fields):
+    def create_user(self, user_name: str, email: str, password: str, **extra_fields):
         """
         Create and save a User with the given email and password.
         """
@@ -46,7 +45,7 @@ class MontaUserManager(BaseUserManager):
         user.save()
         return user
 
-    def create_superuser(self, username, email, password, **extra_fields):
+    def create_superuser(self, username: str, email: str, password: str, **extra_fields: any):
         """
         Create and save a SuperUser with the given email and password.
         """
@@ -58,3 +57,22 @@ class MontaUserManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Superuser must have is_superuser=True."))
         return self.create_user(username, email, password, **extra_fields)
+
+    @classmethod
+    def normalize_username(cls, username: str) -> str:
+        """
+        Normalize the username by removing any non-ASCII characters and
+        converting to lowercase.
+
+        Taken from django.contrib.auth.models.AbstractUser.normalize_username
+
+        :param username: The username to normalize
+        :type username: str
+        :return: The normalized username
+        :rtype: str
+        """
+        return (
+            unicodedata.normalize("NFKC", username)
+            if isinstance(username, str)
+            else username
+        )

@@ -17,6 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+
 # Core Django Imports
 from django.db import models
 from django.template.defaultfilters import slugify
@@ -25,6 +26,7 @@ from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
@@ -50,9 +52,17 @@ class MontaUser(AbstractBaseUser, PermissionsMixin):
     """
 
     username = models.CharField(
-        _("Username"), max_length=30, unique=True, db_index=True
+        _("Username"),
+        max_length=30,
+        unique=True,
+        db_index=True,
+        help_text=_("Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."),
     )
-    email = models.EmailField(_("Email Address"), unique=True)
+    email = models.EmailField(
+        _("Email Address"),
+        unique=True,
+        help_text=_("Required. A valid email address."),
+    )
     is_staff = models.BooleanField(_("Is Staff"), default=False)
     date_joined = models.DateTimeField(_("Date Joined"), default=timezone.now)
 
@@ -69,6 +79,20 @@ class MontaUser(AbstractBaseUser, PermissionsMixin):
         :rtype: str
         """
         return self.username
+
+    def clean(self) -> None:
+        """
+        Override the clean method to clean the user object
+
+        :return: None
+        :rtype: None
+        """
+        # Normalize the email address implemented in the MontaUserManager
+        setattr(self, self.USERNAME_FIELD, self.normalize_username(self.get_username()))
+        if self.email:
+            # Ensure the user is not updating their email to the same email as they already have.
+            if self.email == self.__class__.objects.get(id=self.id).email:
+                raise ValidationError(_("This email is already in use by you."))
 
 
 class Profile(TimeStampedModel):
@@ -198,7 +222,7 @@ class Profile(TimeStampedModel):
         """
         return self.user.username
 
-    def save(self, *args: list, **kwargs: dict) -> None:
+    def save(self, *args: any, **kwargs: any) -> None:
         """
         Save the profile instance to the database
 
@@ -369,14 +393,14 @@ class JobTitle(TimeStampedModel):
         """
         return self.name
 
-    def save(self, *args: list, **kwargs: dict) -> None:
+    def save(self, *args: any, **kwargs: any) -> None:
         """
         Save the job title instance to the database
 
         :param args: The arguments
-        :type args: list
+        :type args: any
         :param kwargs: The keyword arguments
-        :type kwargs: dict
+        :type kwargs: any
         :return: None
         :rtype: None
         """
@@ -440,14 +464,14 @@ class Organization(TimeStampedModel):
         """
         return self.name
 
-    def save(self, *args: list, **kwargs: dict) -> None:
+    def save(self, *args: any, **kwargs: any) -> None:
         """
         Save the organization
 
         :param args: The arguments
-        :type args: list
+        :type args: any
         :param kwargs: The keyword arguments
-        :type kwargs: dict
+        :type kwargs: any
         :return: None
         :rtype: None
         """
