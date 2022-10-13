@@ -22,16 +22,12 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 from django.urls import path, include
 from rest_framework import routers
 
-# Rest Framework Imports
-from rest_framework_simplejwt.views import (
-    TokenRefreshView,
-)
-
 # Monta Imports
 from monta_rest_api.users import views as user_views
 from monta_rest_api.charge_types import views as charge_type_views
 from monta_rest_api.locations import views as location_views
 from monta_rest_api.delay_codes import views as delay_code_views
+from monta_rest_api.revenue_codes import views as revenue_code_views
 from monta_rest_api.auth.views import (
     auth_token_view,
     refresh_auth_token_view,
@@ -45,6 +41,7 @@ router.register(r"charge_types", charge_type_views.ChargeTypeViewSet)
 router.register(r"locations", location_views.LocationViewSet)
 router.register(r"location_contacts", location_views.LocationContactViewSet)
 router.register(r"delay_codes", delay_code_views.DelayCodeViewSet)
+router.register(r"revenue_codes", revenue_code_views.RevenueCodeView)
 
 urlpatterns = [
     path("", include(router.urls)),
