@@ -29,7 +29,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
 from django.http import (
     JsonResponse,
-    HttpResponse,
 )
 from django.utils.decorators import method_decorator
 from django.views.decorators.debug import sensitive_post_parameters

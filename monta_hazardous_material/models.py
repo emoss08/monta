@@ -147,7 +147,6 @@ class HazardousMaterial(TimeStampedModel):
         verbose_name: Hazardous Material
         verbose_name_plural: Hazardous Materials
         ordering: the ordering of the Hazardous Material Model
-        indexes: indexes for the Hazardous Material Model
         """
 
         verbose_name = "Hazardous Material"
@@ -163,12 +162,12 @@ class HazardousMaterial(TimeStampedModel):
         """
         return self.name
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: any) -> None:
         """
         Save HazardousClass Model
 
         :param kwargs: Keyword Arguments
-        :type kwargs: dict
+        :type kwargs: any
         :return: None
         """
         self.name = self.name.upper()

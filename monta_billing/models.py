@@ -104,7 +104,7 @@ class ChargeType(TimeStampedModel):
         """
         return self.name
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: any):
         """
         Save the Charge Type Model
 
@@ -219,7 +219,7 @@ class AdditionalCharge(TimeStampedModel):
         """
         return self.name
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: any) -> None:
         """
         Save the Additional Charge Object.
 
@@ -326,7 +326,7 @@ class BillingQueue(TimeStampedModel):
             raise ValidationError(_("Order is not marked ready to bill."))
         super(BillingQueue, self).clean()
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: any) -> None:
         """
         Save the Billing Queue Object.
 
@@ -524,7 +524,7 @@ class BillingHistory(TimeStampedModel):
 
         return batch_name
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: any) -> None:
         """
         Save the Billing History Object.
 

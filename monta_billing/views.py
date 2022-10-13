@@ -68,11 +68,11 @@ class InteractiveBillingView(
     permission_required: str = "monta_billing.view_billingqueue"
     http_method_names: list[str] = ["get"]
 
-    def get_context_data(self, **kwargs: dict) -> dict:
+    def get_context_data(self, **kwargs: any) -> dict:
         """Get Context Data for Interactive Billing
 
         :param kwargs: Keyword Arguments
-        :type kwargs: dict
+        :type kwargs: any
         :return: Context Data
 
         """
@@ -259,7 +259,7 @@ class ChargeTypeCreateView(
     ] = "monta_billing/charge_types/index.html"
 
     @transaction.atomic
-    def post(self, request: ASGIRequest, *args, **kwargs) -> JsonResponse:
+    def post(self, request: ASGIRequest, *args: any, **kwargs: any) -> JsonResponse:
         """
         Method to create a new Charge Type
 
@@ -305,7 +305,7 @@ class ChargeTypeDeleteView(
     ] = "monta_billing/charge_types/index.html"
     permission_required: str = "monta_billing.delete_chargetype"
 
-    def delete(self, request: ASGIRequest, *args, **kwargs) -> JsonResponse:
+    def delete(self, request: ASGIRequest, *args: any, **kwargs: any) -> JsonResponse:
         """
         Delete the charge type
 

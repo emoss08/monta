@@ -24,6 +24,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
@@ -90,7 +91,7 @@ class Profile(TimeStampedModel):
     """
 
     user = models.OneToOneField(
-        MontaUser,
+        settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
         related_name="profile",
         related_query_name="profile",

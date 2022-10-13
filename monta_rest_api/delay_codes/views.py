@@ -53,7 +53,7 @@ class DelayCodeViewSet(viewsets.ModelViewSet):
             organization=self.request.user.profile.organization
         )
 
-    def create(self, request: Request, *args, **kwargs) -> Response:
+    def create(self, request: Request, *args: any, **kwargs: any) -> Response:
         """
         Create a new Delay Code
 
@@ -75,7 +75,7 @@ class DelayCodeViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(
-        self, request: Request, pk: int | None = None, *args, **kwargs
+        self, request: Request, pk: int | None = None, *args: any, **kwargs: any
     ) -> Response:
         """
         Get a Delay Code by id
@@ -94,7 +94,7 @@ class DelayCodeViewSet(viewsets.ModelViewSet):
         serializer: serializers.DelayCodeSerializer = self.serializer_class(delay_code)
         return Response(serializer.data)
 
-    def update(self, request: Request, *args, **kwargs) -> Response:
+    def update(self, request: Request, *args: any, **kwargs: any) -> Response:
         """
         Update a Delay Code
 
@@ -117,7 +117,7 @@ class DelayCodeViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(
-        self, request, pk: int | None = None, *args, **kwargs
+        self, request: Request, pk: int | None = None, *args: any, **kwargs: any
     ) -> Response:
         """
         Update a Delay Code

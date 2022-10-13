@@ -115,7 +115,7 @@ class Driver(TimeStampedModel):
         """
         return f"{self.driver_id} - {self.last_name}"
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: any) -> None:
         """
         Save the driver
 

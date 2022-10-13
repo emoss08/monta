@@ -6,28 +6,87 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('monta_hazardous_material', '0005_delete_hazardousclass_hazardousmaterial_organization'),
+        (
+            "monta_hazardous_material",
+            "0005_delete_hazardousclass_hazardousmaterial_organization",
+        ),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='hazardousmaterial',
-            name='erg_number',
-            field=models.CharField(blank=True, help_text='ERG Number of the Hazardous Material', max_length=255, null=True, verbose_name='ERG Number'),
+            model_name="hazardousmaterial",
+            name="erg_number",
+            field=models.CharField(
+                blank=True,
+                help_text="ERG Number of the Hazardous Material",
+                max_length=255,
+                null=True,
+                verbose_name="ERG Number",
+            ),
         ),
         migrations.AlterField(
-            model_name='hazardousmaterial',
-            name='hazard_class',
-            field=models.CharField(choices=[('1.1', 'Division 1.1: Mass Explosive Hazard'), ('1.2', 'Division 1.2: Projection Hazard'), ('1.3', 'Division 1.3: Fire and/or Minor Blast/Minor Projection Hazard'), ('1.4', 'Division 1.4: Minor Explosion Hazard'), ('1.5', 'Division 1.5: Very Insensitive With Mass Explosion Hazard'), ('1.6', 'Division 1.6: Extremely Insensitive; No Mass Explosion Hazard'), ('2.1', 'Division 2.1: Flammable Gases'), ('2.2', 'Division 2.2: Non-Flammable Gases'), ('2.3', 'Division 2.3: Poisonous Gases'), ('3', 'Division 3: Flammable Liquids'), ('4.1', 'Division 4.1: Flammable Solids'), ('4.2', 'Division 4.2: Spontaneously Combustible Solids'), ('4.3', 'Division 4.3: Dangerous When Wet'), ('5.1', 'Division 5.1: Oxidizing Substances'), ('5.2', 'Division 5.2: Organic Peroxides'), ('6.1', 'Division 6.1: Toxic Substances'), ('6.2', 'Division 6.2: Infectious Substances'), ('7', 'Division 7: Radioactive Material'), ('8', 'Division 8: Corrosive Substances'), ('9', 'Division 9: Miscellaneous Hazardous Substances and Articles')], help_text='Hazard Class of the Hazardous Material', max_length=255, verbose_name='Hazard Class'),
+            model_name="hazardousmaterial",
+            name="hazard_class",
+            field=models.CharField(
+                choices=[
+                    ("1.1", "Division 1.1: Mass Explosive Hazard"),
+                    ("1.2", "Division 1.2: Projection Hazard"),
+                    (
+                        "1.3",
+                        "Division 1.3: Fire and/or Minor Blast/Minor Projection Hazard",
+                    ),
+                    ("1.4", "Division 1.4: Minor Explosion Hazard"),
+                    (
+                        "1.5",
+                        "Division 1.5: Very Insensitive With Mass Explosion Hazard",
+                    ),
+                    (
+                        "1.6",
+                        "Division 1.6: Extremely Insensitive; No Mass Explosion Hazard",
+                    ),
+                    ("2.1", "Division 2.1: Flammable Gases"),
+                    ("2.2", "Division 2.2: Non-Flammable Gases"),
+                    ("2.3", "Division 2.3: Poisonous Gases"),
+                    ("3", "Division 3: Flammable Liquids"),
+                    ("4.1", "Division 4.1: Flammable Solids"),
+                    ("4.2", "Division 4.2: Spontaneously Combustible Solids"),
+                    ("4.3", "Division 4.3: Dangerous When Wet"),
+                    ("5.1", "Division 5.1: Oxidizing Substances"),
+                    ("5.2", "Division 5.2: Organic Peroxides"),
+                    ("6.1", "Division 6.1: Toxic Substances"),
+                    ("6.2", "Division 6.2: Infectious Substances"),
+                    ("7", "Division 7: Radioactive Material"),
+                    ("8", "Division 8: Corrosive Substances"),
+                    (
+                        "9",
+                        "Division 9: Miscellaneous Hazardous Substances and Articles",
+                    ),
+                ],
+                help_text="Hazard Class of the Hazardous Material",
+                max_length=255,
+                verbose_name="Hazard Class",
+            ),
         ),
         migrations.AlterField(
-            model_name='hazardousmaterial',
-            name='packing_group',
-            field=models.CharField(blank=True, choices=[('I', 'I'), ('II', 'II'), ('III', 'III')], help_text='Packing Group of the Hazardous Material', max_length=255, null=True, verbose_name='Packing Group'),
+            model_name="hazardousmaterial",
+            name="packing_group",
+            field=models.CharField(
+                blank=True,
+                choices=[("I", "I"), ("II", "II"), ("III", "III")],
+                help_text="Packing Group of the Hazardous Material",
+                max_length=255,
+                null=True,
+                verbose_name="Packing Group",
+            ),
         ),
         migrations.AlterField(
-            model_name='hazardousmaterial',
-            name='proper_shipping_name',
-            field=models.TextField(blank=True, help_text='Proper Shipping Name of the Hazardous Material', null=True, verbose_name='Proper Shipping Name'),
+            model_name="hazardousmaterial",
+            name="proper_shipping_name",
+            field=models.TextField(
+                blank=True,
+                help_text="Proper Shipping Name of the Hazardous Material",
+                null=True,
+                verbose_name="Proper Shipping Name",
+            ),
         ),
     ]
