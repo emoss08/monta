@@ -21,8 +21,11 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 # Standard Python Libraries
 from typing import Type, Literal
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 # Core Django Imports
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -36,15 +39,67 @@ from django.views import generic, View
 from django.contrib.auth import mixins
 from django.db import transaction
 from django.db.models import QuerySet
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 
 # Third Party Imports
 from braces import views
 from ajax_datatable import AjaxDatatableView
 
 # Monta Imports
+from monta_driver.forms import SearchForm
 from monta_order.models import Order
 from monta_billing import models, forms
 from monta_customer.models import CustomerBillingProfile, CustomerContact
+
+
+@method_decorator(require_safe, name="dispatch")
+@method_decorator(cache_control(max_age=60 * 60 * 24), name="dispatch")
+@method_decorator(vary_on_cookie, name="dispatch")
+class InteractiveBillingView(
+    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.TemplateView
+):
+    """View for Interactive Billing
+
+    Typical Usage Example:
+        >>> InteractiveBillingView.as_view()
+    """
+
+    template_name = "monta_billing/interactive/index.html"
+    permission_required: str = "monta_billing.view_billingqueue"
+    http_method_names: list[str] = ["get"]
+
+    def get_context_data(self, **kwargs: dict) -> dict:
+        """Get Context Data for Interactive Billing
+
+        :param kwargs: Keyword Arguments
+        :type kwargs: dict
+        :return: Context Data
+
+        """
+
+        # Queryset for orders ready to be billed out.
+        ready_to_bill_orders: QuerySet[models.Order] = (
+            Order.objects.filter(
+                ready_to_bill=True,
+                billed=False,
+                status="COMPLETED",
+                organization=self.request.user.profile.organization,
+            )
+            .select_related("customer", "commodity")
+            .only(
+                "id",
+                "order_id",
+                "commodity__name",
+                "status",
+                "customer__customer_id",
+                "customer__name",
+            )
+            .order_by("customer__customer_id")
+        )
+
+        context: dict = super().get_context_data(**kwargs)
+        context["orders"] = ready_to_bill_orders
+        return context
 
 
 @method_decorator(require_safe, name="dispatch")
@@ -56,20 +111,11 @@ class ChargeTypeListView(
     """
     Class to render the Charge Type List View
 
-    Args:
-        mixins.LoginRequiredMixin (class): Django Login Required Mixin
-        generic.TemplateView (class): Django List View
-
-    Returns:
-        Template: Charge Type List View
-
     Typical Usage Example:
         >>> ChargeTypeListView.as_view()
     """
 
-    template_name: Literal[
-        "monta_billing/charge_types/index.html"
-    ] = "monta_billing/charge_types/index.html"
+    template_name = "monta_billing/charge_types/index.html"
     http_method_names: list[str] = ["get"]
     permission_required: str = "monta_billing.view_chargetype"
 
@@ -451,3 +497,55 @@ def re_bill_order(request: ASGIRequest, order_id: str) -> JsonResponse:
         {"result": "success", "message": "Order set back to ready to bill"},
         status=201,
     )
+
+
+class ChargeTypeSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, View):
+    """
+    Class to delete a driver.
+
+    Typical Usage Example:
+        >>> ChargeTypeSearchView.as_view()
+    """
+
+    permission_required: str = "monta_billing.view_chargetypes"
+
+    def get(self, request: ASGIRequest) -> HttpResponse:
+        """
+        Get request for getting results from the search with params.
+
+        :param request
+        :type request: ASGIRequest
+        :return HttpResponse of the Charge Type search form
+        :rtype HttpResponse
+        """
+        form: SearchForm = SearchForm()
+        query = request.GET["query"] if "query" in request.GET else None
+        results: QuerySet[models.ChargeType] | list = []
+        if query:
+            form: SearchForm = SearchForm({"query": query})
+            search_vector: SearchVector = SearchVector(
+                "organization__name",
+                "name",
+                "description",
+            )
+            search_query: SearchQuery = SearchQuery(query)
+            results: QuerySet[models.ChargeType] = (
+                models.ChargeType.objects.annotate(
+                    search=search_vector, rank=SearchRank(search_vector, search_query)
+                )
+                .filter(
+                    search=search_query, organization=request.user.profile.organization
+                )
+                .select_related("profile")
+                .order_by("-rank")
+            )
+
+        return render(
+            request,
+            "monta_driver/search.html",
+            {
+                "form": form,
+                "query": query,
+                "results": results,
+            },
+        )

@@ -35,7 +35,7 @@ import googlemaps
 # Monta Imports
 from monta_customer.models import Customer, DocumentClassification
 from monta_driver.models import Driver
-from monta_hazardous_material.models import HazardousClass
+from monta_hazardous_material.models import HazardousMaterial
 from monta_locations.models import Location
 from monta_organization.models import Integration, OrganizationSettings
 from monta_routes.models import Route
@@ -217,7 +217,7 @@ class Commodity(TimeStampedModel):
         default=False,
     )
     hazmat_class = models.ForeignKey(
-        HazardousClass,
+        HazardousMaterial,
         on_delete=models.CASCADE,
         related_name="commodities",
         verbose_name=_("Hazardous Class"),
@@ -356,8 +356,8 @@ class Order(TimeStampedModel):
     """
     Order Model Fields
 
-    organization(ForeignKey): The organization the order belongs to.
-    order_id(: The order id.
+    organization: The organization the order belongs to.
+    order_id: The order id.
     order_type: The order type.
     status: The status of the order.
     customer: The customer the order belongs to.
@@ -372,6 +372,11 @@ class Order(TimeStampedModel):
     equipment_type: The equipment type of the order.
     order_type: The order type of the order.
     commodity: The commodity of the order.
+    hazmat_id: The hazmat id of the order.
+    temperature_min: The minimum temperature of the order.
+    temperature_max: The maximum temperature of the order.
+    bol_number: The bill of lading number of the order.
+    consignee_ref_num: The consignee reference number of the order.
     """
 
     organization = models.ForeignKey(
@@ -563,6 +568,46 @@ class Order(TimeStampedModel):
         null=True,
         blank=True,
         help_text=_("Billing Transfer Date"),
+    )
+    hazmat_id = models.ForeignKey(
+        HazardousMaterial,
+        on_delete=models.PROTECT,
+        related_name="orders",
+        related_query_name="order",
+        verbose_name=_("Hazardous Class"),
+        null=True,
+        blank=True,
+        help_text=_("Hazardous Class"),
+    )
+    temperature_min = models.DecimalField(
+        _("Minimum Temperature"),
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_("Minimum Temperature"),
+    )
+    temperature_max = models.DecimalField(
+        _("Maximum Temperature"),
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_("Maximum Temperature"),
+    )
+    bol_number = models.CharField(
+        _("BOL Number"),
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=_("BOL Number"),
+    )
+    consignee_ref_num = models.CharField(
+        _("Consignee Reference Number"),
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=_("Consignee Reference Number"),
     )
 
     class Meta:
@@ -983,21 +1028,21 @@ class Movement(TimeStampedModel):
             #             _("You can't put movement status available if the movement stops are in progress.")
             #         )
 
-            # If the movement status is changed from completed to something else, raise an error.
-            if self.stops.filter(status=StatusChoices.COMPLETED):
-                raise ValidationError(
-                    _(
-                        "You can't put movement status available if the movement stops are completed."
-                    )
-                )
-
-            # If the movement is in progress, make sure the stops are in progress.
-            if self.stops.filter(status=StatusChoices.IN_PROGRESS):
-                raise ValidationError(
-                    _(
-                        "You can't put movement status available if the movement stops are in progress."
-                    )
-                )
+            # If the movement status is changed from completed to something else, raise an error
+            # if self.stops.filter(status=StatusChoices.COMPLETED):
+            #     raise ValidationError(
+            #         _(
+            #             "You can't put movement status available if the movement stops are completed."
+            #         )
+            #     )
+            #
+            #  If the movement is in progress, make sure the stops are in progress.
+            # if self.stops.filter(status=StatusChoices.IN_PROGRESS):
+            #     raise ValidationError(
+            #         _(
+            #             "You can't put movement status available if the movement stops are in progress."
+            #         )
+            #     )
 
             # If the primary driver and the secondary driver are the same, raise an error.
             if self.assigned_driver == self.assigned_driver_2:
@@ -1024,7 +1069,6 @@ class Movement(TimeStampedModel):
             self.order.save()
 
         # if a driver is assigned to the movement, autopopulate the equipment.
-        # TODO(WOLF): Figure out a way to do this without having to write out Equipment query.
         if self.assigned_driver:
             self.equipment = self.assigned_driver.equipment.first()
         super(Movement, self).save(**kwargs)
@@ -1278,6 +1322,12 @@ class Stop(TimeStampedModel):
                     raise ValidationError(
                         _("Stop status cannot be changed back to available")
                     )
+        if self.movement.assigned_driver and self.movement.equipment is None:
+            raise ValidationError(
+                _(
+                    "Movement must have a driver and equipment to be in progress or completed"
+                )
+            )
 
         if self.sequence > 1:
             # If the stop appointment time is before the previous stop appointment time, raise an error.
@@ -1331,10 +1381,14 @@ class Stop(TimeStampedModel):
         """
         self.full_clean()
 
-        # If the status changes to in progress, change the movement status to in progress.
+        # If the status changes to in progress, change the movement status associated to this stop to in progress.
         if self.status == StatusChoices.IN_PROGRESS:
             self.movement.status = StatusChoices.IN_PROGRESS
-            self.movement.save()
+            try:
+                self.movement.save()
+            except Exception as e:
+                raise ValidationError(str(e))
+            print("Movement status changed to in progress")
 
         # if the last stop is completed, change the movement status to complete.
         if self.status == StatusChoices.COMPLETED:
@@ -1343,7 +1397,11 @@ class Stop(TimeStampedModel):
                 == self.movement.stops.count()
             ):
                 self.movement.status = StatusChoices.COMPLETED
-                self.movement.save()
+                try:
+                    self.movement.save()
+                except Exception as e:
+                    raise ValidationError(str(e))
+                print("Movement status changed to completed")
 
         # If the arrival time is set, change the status to in progress.
         if self.arrival_time:

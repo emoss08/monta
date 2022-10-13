@@ -476,10 +476,17 @@ class DriverSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, View):
     permission_required: str = "monta_driver.search_drivers"
 
     def get(self, request: ASGIRequest) -> HttpResponse:
-        """ """
+        """
+        Get request for getting results from the search with params.
+
+        :param request
+        :type request: ASGIRequest
+        :return HttpResponse of the Charge Type search form
+        :rtype HttpResponse
+        """
         form: forms.SearchForm = forms.SearchForm()
         query = request.GET["query"] if "query" in request.GET else None
-        results = []
+        results: QuerySet[models.Driver] | list = []
         if query:
             form: forms.SearchForm = forms.SearchForm({"query": query})
             search_vector: SearchVector = SearchVector(
@@ -491,7 +498,7 @@ class DriverSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, View):
                 "profile__license_expiration",
             )
             search_query: SearchQuery = SearchQuery(query)
-            results = (
+            results: QuerySet[models.Driver] = (
                 models.Driver.objects.annotate(
                     search=search_vector, rank=SearchRank(search_vector, search_query)
                 )
@@ -501,6 +508,7 @@ class DriverSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, View):
                 .select_related("profile")
                 .order_by("-rank")
             )
+            print(type(results))
 
         return render(
             request,
