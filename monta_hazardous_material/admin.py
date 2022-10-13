@@ -24,7 +24,7 @@ from django.contrib import admin
 from monta_hazardous_material import models
 
 
-@admin.register(models.HazardousClass)
+@admin.register(models.HazardousMaterial)
 class HazardousClassAdmin(admin.ModelAdmin):
     """Hazardous Class Admin"""
 
