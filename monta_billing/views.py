@@ -281,11 +281,9 @@ class ChargeTypeDeleteView(
     """
 
     model: Type[models.ChargeType] = models.ChargeType
-    success_url = "charge_type/"
-    template_name = "monta_billing/charge_types/index.html"
     permission_required = "monta_billing.delete_chargetype"
 
-    def delete(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
+    def get(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
         Delete the charge type
 

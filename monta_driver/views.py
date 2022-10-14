@@ -113,10 +113,10 @@ class DriverCreateView(LoginRequiredMixin, views.PermissionRequiredMixin, Create
     template_name = "monta_driver/index.html"
 
     def post(
-        self,
-        request: ASGIRequest,
-        *args: Any,
-        **kwargs: Any,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Method to handle the POST request.
@@ -208,10 +208,10 @@ class DriverUpdateView(UpdateView, views.PermissionRequiredMixin, LoginRequiredM
     success_url = "/driver/"
 
     def post(
-        self,
-        request: ASGIRequest,
-        *args: Any,
-        **kwargs: Any,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Overwrites the post method to check if the form is valid. If the form is valid, request the user's organization
@@ -245,8 +245,6 @@ class DriverDeleteView(LoginRequiredMixin, views.PermissionRequiredMixin, Delete
     """
 
     model: Type[models.Driver] = models.Driver
-    template_name: Literal["monta_driver/index.html"] = "monta_driver/index.html"
-    success_url: Literal["/driver/"] = "/driver/"
     permission_required: str = "monta_driver.delete_driver"
 
     def get(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
@@ -262,10 +260,11 @@ class DriverDeleteView(LoginRequiredMixin, views.PermissionRequiredMixin, Delete
         :return: A JSON response with a success value.
         :rtype: JsonResponse
         """
-        self.delete(request, *args, **kwargs)
+        driver: models.Driver = self.get_object()
+        driver.delete()
         return JsonResponse(
             {"result": "success", "message": "Driver Deleted Successfully"},
-            status=200,
+            status=204,
         )
 
 
@@ -500,8 +499,8 @@ def validate_license_number(request: ASGIRequest) -> HttpResponse:
                 "license_number"
             ]
             if models.Driver.objects.filter(
-                profile__license_number=license_number,
-                organization=request.user.profile.organization,
+                    profile__license_number=license_number,
+                    organization=request.user.profile.organization,
             ).exists():
                 return HttpResponse(
                     "<div class='text-danger ease_in_5' id='license_error'>License is already "
