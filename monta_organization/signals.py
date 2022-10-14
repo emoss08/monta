@@ -18,18 +18,19 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Core Django Imports
+# Core Django Libraries
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
 # Monta Imports
-from monta_user import models
+from monta_organization import models
 
 
-@receiver(post_save, sender=models.Profile)
-def create_profile(sender, instance, created, **kwargs) -> None:
+@receiver(post_save, sender=models.Organization)
+def create_settings(sender, instance, created, **kwargs) -> None:
     """
-    Create a profile for the user
+    Create Organization settings for an organization
     """
     if created:
-        models.Profile.objects.create(user=instance)
+        models.OrganizationSettings.objects.create(organization=instance)
+

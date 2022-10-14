@@ -26,6 +26,7 @@ import decimal
 # Core Django Imports
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.aggregates import Sum
 from django.urls import reverse
 from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
@@ -697,7 +698,7 @@ class Order(TimeStampedModel):
         Function to get or create route for the order.
 
         **********************************************************************************************************************
-        * NOTE: If the Organization does not have generate routes active, and a google api key is not provided, the
+        * NOTE: If the Organization does not have generated routes active, and a Google api key is not provided, the
         function will not create a route. *
         **********************************************************************************************************************
 
@@ -734,7 +735,7 @@ class Order(TimeStampedModel):
                 if integration_api:
                     # If the API key exists, start the process of creating the route
                     try:
-                        gmaps: googlemaps.Client = googlemaps.Client(
+                        gmaps = googlemaps.Client(
                             key=integration_api
                         )
                     except googlemaps.exceptions.ApiError as ApiError:
@@ -751,6 +752,7 @@ class Order(TimeStampedModel):
                         traffic_model=organization_settings.traffic_model,
                     )
 
+                    print(direction_result)
                     # Create the route and return the distance.
                     created_route = Route.objects.create(
                         organization=self.organization,
@@ -759,9 +761,9 @@ class Order(TimeStampedModel):
                         distance=direction_result["rows"][0]["elements"][0]["distance"][
                             "text"
                         ].split(" ")[0],
-                        duration=direction_result["rows"][0]["elements"][0]["duration"][
-                            "text"
-                        ],
+                        # duration=direction_result["rows"][0]["elements"][0]["duration"][
+                        #     "text"
+                        # ].split(" ")[0],
                     )
                     return created_route.distance
 
@@ -781,11 +783,33 @@ class Order(TimeStampedModel):
         if self.rate_method == RateMethodChoices.PER_MILE:
             if self.other_charge_amount:
                 self.sub_total = (
-                    self.freight_charge_amount * self.mileage + self.other_charge_amount
+                        self.freight_charge_amount * self.mileage + self.other_charge_amount
                 )
             else:
                 self.sub_total = self.freight_charge_amount * self.mileage
             return self.sub_total
+
+    def total_pieces(self) -> int:
+        """
+        get the pieces for the order.
+
+        :return: Pieces for the order
+        :rtype: int
+        """
+        return Stop.objects.filter(movement__order__exact=self).aggregate(
+            Sum("pieces")
+        )["pieces__sum"]
+
+    def total_weight(self) -> int:
+        """
+        Get the weight for the order.
+
+        :return: Weight for the order
+        :rtype: int
+        """
+        return Stop.objects.filter(movement__order__exact=self).aggregate(
+            Sum("weight")
+        )["weight__sum"]
 
     def clean(self) -> None:
         """
@@ -837,6 +861,13 @@ class Order(TimeStampedModel):
         self.destination_address = (
             f"{self.destination_location.get_address_combination}"
         )
+
+        # If the order status is complete, add the piece and weight from each stop to the order.
+        if self.status == StatusChoices.COMPLETED:
+            # Only total the pieces and weight if the existing total is not set.
+            if self.pieces and self.weight is None:
+                self.pieces = self.total_pieces()
+                self.weight = self.total_weight()
 
         if self.ready_to_bill:
             self.sub_total = self.calculate_total()
@@ -957,11 +988,11 @@ class Movement(TimeStampedModel):
         # If the sequence is not ordered currently order it.
         # add to fix maximum recursion depth exceeded in comparison
         if (
-            not self.stops.order_by("sequence")
-            .values_list("sequence", flat=True)
-            .distinct()
-            .count()
-            == self.stops.count()
+                not self.stops.order_by("sequence")
+                            .values_list("sequence", flat=True)
+                            .distinct()
+                            .count()
+                    == self.stops.count()
         ):
             stops = self.stops.order_by("created")
             for index, stop in enumerate(stops, start=1):
@@ -981,8 +1012,8 @@ class Movement(TimeStampedModel):
                 old_status = Movement.objects.get(pk=self.pk).status
                 # If the movement status is changed from available to something else, raise an error.
                 if (
-                    old_status == StatusChoices.IN_PROGRESS
-                    or old_status == StatusChoices.COMPLETED
+                        old_status == StatusChoices.IN_PROGRESS
+                        or old_status == StatusChoices.COMPLETED
                 ):
                     raise ValidationError(
                         _("Movement status cannot be changed back to available")
@@ -1054,13 +1085,13 @@ class Movement(TimeStampedModel):
 
         # if a driver is assigned to the movement, autopopulate the equipment.
         if self.assigned_driver:
-            self.equipment = self.assigned_driver.equipment.first()
+            self.equipment = self.assigned_driver.equipments.first()
         super(Movement, self).save(**kwargs)
 
         # Set the order status to complete if all the movements are completed.
         if self.status == StatusChoices.COMPLETED:
             if not self.order.movements.filter(
-                status=StatusChoices.IN_PROGRESS
+                    status=StatusChoices.IN_PROGRESS
             ).exists():
                 self.order.status = StatusChoices.COMPLETED
                 self.order.save()
@@ -1295,8 +1326,8 @@ class Stop(TimeStampedModel):
                 old_status = Stop.objects.get(pk__exact=self.pk).status
                 # If the stop is in progress or completed, it cannot be changed to available.
                 if (
-                    old_status == StatusChoices.IN_PROGRESS
-                    or old_status == StatusChoices.COMPLETED
+                        old_status == StatusChoices.IN_PROGRESS
+                        or old_status == StatusChoices.COMPLETED
                 ):
                     raise ValidationError(
                         _("Stop status cannot be changed back to available")
@@ -1323,8 +1354,8 @@ class Stop(TimeStampedModel):
                 # If the previous stop is not complete do not allow the next stop to be put in progress or completed
                 if previous_stop.status != StatusChoices.COMPLETED:
                     if (
-                        self.status == StatusChoices.IN_PROGRESS
-                        or self.status == StatusChoices.COMPLETED
+                            self.status == StatusChoices.IN_PROGRESS
+                            or self.status == StatusChoices.COMPLETED
                     ):
                         raise ValidationError(
                             _(
@@ -1362,24 +1393,16 @@ class Stop(TimeStampedModel):
         # If the status changes to in progress, change the movement status associated to this stop to in progress.
         if self.status == StatusChoices.IN_PROGRESS:
             self.movement.status = StatusChoices.IN_PROGRESS
-            try:
-                self.movement.save()
-            except Exception as e:
-                raise ValidationError(str(e))
-            print("Movement status changed to in progress")
+            self.movement.save()
 
         # if the last stop is completed, change the movement status to complete.
         if self.status == StatusChoices.COMPLETED:
             if (
-                self.movement.stops.filter(status=StatusChoices.COMPLETED).count()
-                == self.movement.stops.count()
+                    self.movement.stops.filter(status=StatusChoices.COMPLETED).count()
+                    == self.movement.stops.count()
             ):
                 self.movement.status = StatusChoices.COMPLETED
-                try:
-                    self.movement.save()
-                except Exception as e:
-                    raise ValidationError(str(e))
-                print("Movement status changed to completed")
+                self.movement.save()
 
         # If the arrival time is set, change the status to in progress.
         if self.arrival_time:
