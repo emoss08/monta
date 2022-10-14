@@ -17,13 +17,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-from django.core.exceptions import ValidationError
+
+# Standard library imports
+from typing import Any
 
 # Core Django Models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
 # Third Party Imports
 from localflavor.us.models import USStateField, USZipCodeField
@@ -73,22 +76,19 @@ class DocumentClassification(TimeStampedModel):
         """
         Return the string representation of the classification
 
-        Returns:
-            str: The string representation of the classification
+        :return: The string representation of the classification
+        :rtype: str
         """
         return self.name
 
-    def save(self, **kwargs: any) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the document classification object
 
-        1. Uppercase the name before inserting into the database.
-
-        Args:
-            **kwargs: Arbitrary keyword arguments
-
-        Returns:
-            None
+        :param kwargs: The keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         self.name = self.name.upper()
@@ -98,8 +98,7 @@ class DocumentClassification(TimeStampedModel):
         """
         Return the absolute url of the classification
 
-        Returns:
-            str: The absolute url of the classification
+        :return: The absolute url of the classification
         """
         return reverse("document-classification", kwargs={"pk": self.pk})
 
@@ -163,11 +162,11 @@ class Customer(TimeStampedModel):
         """
         return self.customer_id
 
-    def save(self, **kwargs: any) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the customer object
         :param kwargs
-        :type kwargs: any
+        :type kwargs: Any
         :rtype: None
         """
         if not self.customer_id:
@@ -254,12 +253,12 @@ class CustomerBillingProfile(TimeStampedModel):
         """
         return self.name
 
-    def save(self, **kwargs: any) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the Customer Billing Profile
 
         :param kwargs: Arbitrary keyword arguments
-        :type kwargs: any
+        :type kwargs: Any
         :return: None
         :rtype: None
         """
@@ -369,12 +368,12 @@ class CustomerContact(TimeStampedModel):
         """
         return self.contact_name
 
-    def save(self, **kwargs: any) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the CustomerContact model
 
         :param kwargs: Arbitrary keyword arguments
-        :type kwargs: any
+        :type kwargs: Any
         :return: None
         :rtype: None
         """

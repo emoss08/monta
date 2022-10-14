@@ -27,6 +27,9 @@ from monta_billing import models
 
 
 class AddChargeTypeForm(forms.ModelForm):
+    """
+    Form for adding a new charge type.
+    """
     name = forms.CharField(
         max_length=100,
         help_text=_("Name of the Charge Type"),
@@ -53,11 +56,17 @@ class AddChargeTypeForm(forms.ModelForm):
     )
 
     class Meta:
+        """
+        Meta class for AddChargeTypeForm.
+        """
         model = models.ChargeType
         fields = ("name", "description")
 
 
 class AdditionalChargeForm(forms.ModelForm):
+    """
+    Form for adding a new additional charge.
+    """
     order = forms.ModelChoiceField(
         queryset=models.Order.objects.all(),
     )
@@ -75,6 +84,9 @@ class AdditionalChargeForm(forms.ModelForm):
     )
 
     class Meta:
+        """
+        Meta class for AdditionalChargeForm.
+        """
         model = models.ChargeType
         fields = (
             "order",

@@ -33,12 +33,6 @@ from monta_driver.models import Driver, DriverProfile, DriverContact
 class AddDriverForm(forms.ModelForm):
     """
     Form for adding a driver to the database.
-
-    Args:
-        forms.ModelForm (ModelForm): Django ModelForm class.
-
-    Returns:
-        None
     """
 
     first_name = forms.CharField(
@@ -74,12 +68,6 @@ class AddDriverForm(forms.ModelForm):
 class AddDriverProfileForm(forms.ModelForm):
     """
     Form for adding a driver profile to the database.
-
-    Args:
-        forms.ModelForm (ModelForm): Django ModelForm class.
-
-    Returns:
-        None
     """
 
     driver = forms.ModelChoiceField(
@@ -109,6 +97,9 @@ class AddDriverProfileForm(forms.ModelForm):
     is_passenger = forms.BooleanField(help_text="Is Passenger for driver")
 
     class Meta:
+        """
+        Metaclass for AddDriverProfileForm.
+        """
         model: Type[DriverProfile] = DriverProfile
         fields = (
             "driver",
@@ -145,6 +136,9 @@ class AddDriverContactForm(forms.ModelForm):
     )
 
     class Meta:
+        """
+        Metaclass for AddDriverContactForm.
+        """
         model: Type[DriverContact] = DriverContact
         fields: list[str] = [
             "driver",

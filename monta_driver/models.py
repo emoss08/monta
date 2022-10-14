@@ -18,7 +18,9 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+# Standard Python Libraries
 from __future__ import annotations
+from typing import Any
 
 # Core Django Imports
 from django.db import models
@@ -97,12 +99,12 @@ class Driver(TimeStampedModel):
             ("search_drivers", "Can search drivers"),
         ]
 
-    def get_driver_fleets(self):
+    def get_driver_fleets(self) -> list[Fleet]:
         """
         Get the fleets for the driver
 
-        Returns:
-            list[Fleet]: The fleets for the driver
+        :return: The fleets for the driver
+        :rtype: list[Fleet]
         """
         return self.fleet.all()
 
@@ -115,19 +117,21 @@ class Driver(TimeStampedModel):
         """
         return f"{self.driver_id} - {self.last_name}"
 
-    def save(self, **kwargs: any) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the driver
 
-        Args:
-            **kwargs: Arbitrary keyword arguments
+        :param kwargs: Arbitrary keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         if not self.driver_id:
             self.driver_id = (
-                self.first_name[:1].upper()
-                + self.last_name[:4].upper()
-                + str(int(Driver.objects.count() + 1))
+                    self.first_name[:1].upper()
+                    + self.last_name[:4].upper()
+                    + str(int(Driver.objects.count() + 1))
             )
         self.driver_id = self.driver_id.upper()
         super(Driver, self).save(**kwargs)
@@ -136,8 +140,8 @@ class Driver(TimeStampedModel):
         """
         Get the absolute url for the driver
 
-        Returns:
-            str: The absolute url for the driver
+        :return: The absolute url for the driver
+        :rtype: str
         """
         return reverse("driver_edit", kwargs={"pk": self.pk})
 
@@ -146,8 +150,8 @@ class Driver(TimeStampedModel):
         """
         Get the full name of the driver
 
-        Returns:
-            str: The full name of the driver
+        :return: The full name of the driver
+        :rtype: str
         """
         return f"{self.first_name} {self.last_name}"
 
@@ -155,11 +159,10 @@ class Driver(TimeStampedModel):
         """
         Create a driver profile for the driver
 
-        Args:
-            **kwargs: Arbitrary keyword arguments
-
-        Returns:
-            DriverProfile: The driver profile for the driver
+        :param kwargs: Arbitrary keyword arguments
+        :type kwargs: Any
+        :return: The driver profile for the driver
+        :rtype: DriverProfile
         """
         return DriverProfile.objects.create(
             driver=self,
@@ -269,8 +272,8 @@ class DriverProfile(TimeStampedModel):
         """
         String representation of the driver profile
 
-        Returns:
-            str: The string representation of the driver profile
+        :return: The string representation of the driver profile
+        :rtype: str
         """
         return f"Driver Profile for {self.driver}"
 
@@ -278,12 +281,12 @@ class DriverProfile(TimeStampedModel):
         """
         Save the driver profile
 
-        Args:
-            *args: Variable length argument list
-            **kwargs: Arbitrary keyword arguments
-
-        Returns:
-            DriverProfile: The driver profile
+        :param args: Arbitrary positional arguments
+        :type args: Any
+        :param kwargs: Arbitrary keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         super(DriverProfile, self).save(**kwargs)
@@ -293,8 +296,8 @@ class DriverProfile(TimeStampedModel):
         """
         Get the full address of the driver
 
-        Returns:
-            str: The full address of the driver
+        :return: The full address of the driver
+        :rtype: str
         """
         return f"{self.address_line_1} {self.address_line_2} {self.city} {self.state} {self.zip_code}"
 
@@ -302,8 +305,8 @@ class DriverProfile(TimeStampedModel):
         """
         Get the profile picture of the driver
 
-        Returns:
-            str: The profile picture of the driver
+        :return: The profile picture of the driver
+        :rtype: str
         """
         if self.profile_picture:
             return self.profile_picture.url
@@ -369,8 +372,8 @@ class DriverContact(TimeStampedModel):
         """
         String representation of the driver contact
 
-        Returns:
-            str: The string representation of the driver contact
+        :return: The string representation of the driver contact
+        :rtype: str
         """
         return f"Contact {self.contact_name} for {self.driver}"
 
@@ -378,11 +381,9 @@ class DriverContact(TimeStampedModel):
         """
         Clean the driver contact
 
-        Raises:
-            ValidationError: If the contact is both primary and emergency
-
-        Returns:
-            None
+        :raises ValidationError
+        :return: None
+        :rtype: None
         """
         # If the contact is primary, make sure there is only one primary contact
         if self.is_primary:
@@ -402,8 +403,8 @@ class DriverContact(TimeStampedModel):
         """
         Get the absolute url for the driver contact
 
-        Returns:
-            str: The absolute url for the driver contact
+        :return: The absolute url for the driver contact
+        :rtype: str
         """
         return reverse("driver-contact", kwargs={"pk": self.pk})
 
@@ -412,8 +413,8 @@ class DriverContact(TimeStampedModel):
         """
         Get the full contact information for the contact
 
-        Returns:
-            str: The full contact information for the contact
+        :return: The full contact information for the contact
+        :rtype: str
         """
         return f"{self.contact_name} {self.contact_email} {self.contact_phone}"
 
@@ -482,8 +483,8 @@ class DriverQualification(TimeStampedModel):
         """
         String representation of the driver qualification
 
-        Returns:
-            str: The string representation of the driver qualification
+        :return: The string representation of the driver qualification
+        :rtype: str
         """
         return f"{self.name} with doc class {self.doc_class} for {self.driver}"
 
@@ -491,8 +492,8 @@ class DriverQualification(TimeStampedModel):
         """
         Get the absolute url for the driver qualification
 
-        Returns:
-            str: The absolute url for the driver qualification
+        :return: The absolute url for the driver qualification
+        :rtype: str
         """
         return reverse("driver-qualification", kwargs={"pk": self.pk})
 
@@ -500,8 +501,8 @@ class DriverQualification(TimeStampedModel):
         """
         Get the size of the driver qualification file
 
-        Returns:
-            str: The size of the driver qualification file
+        :return: The size of the driver qualification file
+        :rtype: str
         """
         return f"{self.dq_file_size} bytes"
 
@@ -538,8 +539,8 @@ class CommentType(TimeStampedModel):
         """
         String representation of the comment type
 
-        Returns:
-            str: The string representation of the comment type
+        :return: The string representation of the comment type
+        :rtype: str | None
         """
         return self.name
 
@@ -547,8 +548,8 @@ class CommentType(TimeStampedModel):
         """
         Get the absolute url for the comment type
 
-        Returns:
-            str: The absolute url for the comment type
+        :return: The absolute url for the comment type
+        :rtype: str
         """
         return reverse("comment-type", kwargs={"pk": self.pk})
 
@@ -593,9 +594,6 @@ class DriverComment(TimeStampedModel):
         verbose_name: The verbose name for the model
         verbose_name_plural: The plural verbose name for the model
         indexes: The indexes for the model
-
-        Returns:
-            DriverComment: The driver comment
         """
 
         ordering: list[str] = ["driver", "comment_type"]
@@ -607,8 +605,8 @@ class DriverComment(TimeStampedModel):
         """
         String representation of the driver comment
 
-        Returns:
-            str: The string representation of the driver comment
+        :return: The string representation of the driver comment
+        :rtype: str
         """
         return f"{self.driver} {self.comment_type}"
 
@@ -719,8 +717,8 @@ class DriverHour(TimeStampedModel):
         """
         String representation of the driver hour
 
-        Returns:
-            str: The string representation of the driver hour
+        :return: The string representation of the driver hour
+        :rtype: str
         """
         return f"{self.driver} {self.last_known_duty_status}"
 
@@ -728,7 +726,7 @@ class DriverHour(TimeStampedModel):
         """
         Get the absolute url for the driver hour
 
-        Returns:
-            str: The absolute url for the driver hour
+        :return:  str: The absolute url for the driver hour
+        :rtype:  str
         """
         return reverse("driver_hour", kwargs={"pk": self.pk})

@@ -19,6 +19,8 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Standard Python Libraries
+from __future__ import annotations
+from typing import Any
 import decimal
 
 # Core Django Imports
@@ -43,16 +45,16 @@ from monta_user.models import MontaUser, Organization
 from monta_equipment.models import EquipmentType, Equipment
 
 
-def order_documentation_upload_to(instance, filename: str) -> str:
+def order_documentation_upload_to(instance: Order, filename: str) -> str:
     """
     Upload the order documentation to the correct location.
 
-    Args:
-        instance (Order): The order object
-        filename (str): The name of the file
-
-    Returns:
-        str: The path to the file
+    :param instance: The instance of the order.
+    :type instance: Order
+    :param filename: The name of the file.
+    :type filename: str
+    :return: The path to the file.
+    :rtype: str
     """
     return f"order_documentation/{instance.order_id}/{filename}"
 
@@ -147,20 +149,19 @@ class DelayCode(TimeStampedModel):
         """
         String representation of the delay code.
 
-        Returns:
-            str: String representation of the delay code.
+        :return: The name of the delay code.
+        :rtype: str
         """
         return f"{self.delay_code_id} - {self.name}"
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the delay code.
 
-        Args:
-            **kwargs: Keyword arguments
-
-        Returns:
-            None
+        :param kwargs: Keyword arguments.
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         if not self.delay_code_id:
@@ -172,8 +173,8 @@ class DelayCode(TimeStampedModel):
         """
         Get the absolute url for the delay code.
 
-        Returns:
-            str: Absolute url for the delay code.
+        :return: The absolute url for the delay code.
+        :rtype: str
         """
         return reverse("delay_code_detail", kwargs={"pk": self.pk})
 
@@ -246,20 +247,19 @@ class Commodity(TimeStampedModel):
         """
         String representation of the commodity.
 
-        Returns:
-            str: String representation of the commodity.
+        :return: The name of the commodity.
+        :rtype: str
         """
         return f"{self.commodity_id} - {self.name}"
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the commodity.
 
-        Args:
-            **kwargs: Keyword arguments
-
-        Returns:
-            None
+        :param kwargs: Keyword arguments.
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         if not self.commodity_id:
@@ -271,8 +271,8 @@ class Commodity(TimeStampedModel):
         """
         Get the absolute url for the commodity.
 
-        Returns:
-            str: Absolute url for the commodity.
+        :return: The absolute url for the commodity.
+        :rtype: str
         """
         return reverse("commodity_detail", kwargs={"pk": self.pk})
 
@@ -322,20 +322,19 @@ class OrderType(TimeStampedModel):
         """
         String representation of the Order Type
 
-        Returns:
-            str: String representation of the Order Type
+        :return: The name of the Order Type
+        :rtype: str
         """
         return f"{self.order_type_id} - {self.name}"
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the Order Type
 
-        Args:
-            **kwargs: Keyword arguments
-
-        Returns:
-            None
+        :param kwargs: Keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         if not self.order_type_id:
@@ -346,8 +345,8 @@ class OrderType(TimeStampedModel):
         """
         Get the absolute url of the Order Type
 
-        Returns:
-            str: Absolute url of the Order Type
+        :return: The absolute url of the Order Type
+        :rtype: str
         """
         return reverse("order_type_detail", kwargs={"pk": self.pk})
 
@@ -627,25 +626,21 @@ class Order(TimeStampedModel):
             models.Index(fields=["order_id"]),
         ]
 
-    def __repr__(self) -> str:
-        return "<Order #%r>" % self.order_id
-
     def __str__(self) -> str:
         """
         String representation of the Order
 
-        Returns:
-            str: String representation of the Order
+        :return: Order ID & Customer Name
+        :rtype: str
         """
-        return f"{self.order_id} - {self.customer}"
+        return f"{self.order_id} - {self.customer.name}"
 
     def generate_order_id(self) -> str:
-        # TODO: Add the ability to add orders with the same ID ,but for different organizations
         """
         Generate Order ID
 
-        Returns:
-            str: Order ID
+        :return: Order ID
+        :rtype: str
         """
         last_order = Order.objects.filter(organization=self.organization).last()
         if last_order:
@@ -661,12 +656,8 @@ class Order(TimeStampedModel):
         """
         Create stops for the order.
 
-        Returns:
-            tuple: Tuple containing the origin and destination stops.
-
-        Typical Usage Exmaple:
-            >>> order = Order.objects.get(order_id="S1")
-            >>> order.create_stops()
+        :return: Tuple of stops
+        :rtype: tuple
         """
 
         origin_stop = Stop.objects.create(
@@ -692,12 +683,8 @@ class Order(TimeStampedModel):
         """
         Function to create movement for the order.
 
-        returns:
-            None
-
-        Typical Usage Example:
-            >>> order = Order.objects.get(pk=1)
-            >>> order.create_movement()
+        :return: None
+        :rtype: None
         """
         Movement.objects.create(
             organization=self.organization,
@@ -714,12 +701,9 @@ class Order(TimeStampedModel):
         function will not create a route. *
         **********************************************************************************************************************
 
-        Returns:
-            decimal.Decimal: Distance between origin and destination
+        :return: Distance of the route
+        :rtype: decimal.Decimal
 
-        Typical Usage Example
-            >>> import googlemaps
-            >>> get_or_create_route()
         """
         # Check if the organization has generating routes enabled
         organization_settings = OrganizationSettings.objects.filter(
@@ -785,8 +769,8 @@ class Order(TimeStampedModel):
         """
         Function to calculate the total for the order.
 
-        Returns:
-            decimal.Decimal: Total for the order.
+        :return: Total for the order
+        :rtype: decimal.Decimal
         """
         if self.rate_method == RateMethodChoices.FLAT:
             if self.other_charge_amount:
@@ -807,8 +791,9 @@ class Order(TimeStampedModel):
         """
         Clean the Order model.
 
-        Raises:
-            ValidationError.
+        :return: None
+        :rtype: None
+        :raises ValidationError
         """
         # If the rate method for the order if flat, and the charge amount is not set, raise an error.
         if self.rate_method == RateMethodChoices.FLAT:
@@ -833,15 +818,14 @@ class Order(TimeStampedModel):
                     )
                 )
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the Order
 
-        Args:
-            **kwargs: Keyword arguments
-
-        Returns:
-            None
+        :param kwargs: Any
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         if not self.order_id:
             # If the order ID is not set, generate one.
@@ -871,8 +855,8 @@ class Order(TimeStampedModel):
         """
         Get the absolute url for the order.
 
-        Returns:
-            str: Absolute url for the order.
+        :return: Absolute url for the order
+        :rtype: str
         """
         return reverse("order_detail", kwargs={"pk": self.pk})
 
@@ -958,8 +942,8 @@ class Movement(TimeStampedModel):
         """
         String representation of the Movement
 
-        Returns:
-            str: String representation of the Movement
+        :return: String representation of the Movement
+        :rtype: str
         """
         return f"{self.order} - {self.assigned_driver}"
 
@@ -967,8 +951,8 @@ class Movement(TimeStampedModel):
         """
         Set the stop sequence number for the stops in the movement based on when the stops were created.
 
-        Returns:
-            None
+        :return: None
+        :rtype: None
         """
         # If the sequence is not ordered currently order it.
         # add to fix maximum recursion depth exceeded in comparison
@@ -988,8 +972,9 @@ class Movement(TimeStampedModel):
         """
         Clean the Movement object
 
-        Raises:
-            ValidationError
+        :return: None
+        :rtype: None
+        :raises ValidationError
         """
         if self.status == StatusChoices.AVAILABLE:
             if self.pk:
@@ -1052,15 +1037,14 @@ class Movement(TimeStampedModel):
 
         super(Movement, self).clean()
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the Movement object
 
-        Args:
-            **kwargs
-
-        Returns:
-            None
+        :param kwargs: Keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         # If a movement is put in progress, make sure the order is in progress.
@@ -1149,20 +1133,17 @@ class ServiceIncident(TimeStampedModel):
         """
         String representation of the Service Incident
 
-        Returns:
-            str: String representation of the Service Incident
+        :return: Service Incident string representation
+        :rtype: str
         """
         return f"{self.movement} - {self.stop} - {self.delay_code}"
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the Service Incident object
 
-        Args:
-            **kwargs
-
-        Returns:
-            None
+        :param kwargs: Keyword arguments
+        :type kwargs: Any
         """
         if not self.delay_reason:
             self.delay_reason = self.delay_code.description
@@ -1172,8 +1153,8 @@ class ServiceIncident(TimeStampedModel):
         """
         Get the absolute url for the Service Incident
 
-        Returns:
-            str: Absolute url for the Service Incident
+        :return: Absolute url for the Service Incident
+        :rtype: str
         """
         return reverse("service_incident-detail", kwargs={"pk": self.pk})
 
@@ -1296,8 +1277,8 @@ class Stop(TimeStampedModel):
         """
         String representation of the Stop
 
-        Returns:
-            str: String representation of the Stop
+        :return: Stop string representation
+        :rtype: str
         """
         return f"{self.movement} - {self.sequence}"
 
@@ -1305,11 +1286,9 @@ class Stop(TimeStampedModel):
         """
         Clean the Stop object
 
-        Raises:
-            ValidationError
-
-        Returns:
-            None
+        :return: None
+        :rtype: None
+        :raises ValidationError
         """
         if self.status == StatusChoices.AVAILABLE:
             if self.pk:
@@ -1369,15 +1348,14 @@ class Stop(TimeStampedModel):
         #         _("Cannot add new stop if the order status is completed")
         #     )
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the Stop object
 
-        Args:
-            **kwargs
-
-        Returns:
-            None
+        :param kwargs: Keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
 
@@ -1427,8 +1405,8 @@ class Stop(TimeStampedModel):
         """
         Get the absolute url of the Stop object
 
-        Returns:
-            str: The absolute url of the Stop object
+        :return: Absolute url of the Stop object
+        :rtype: str
         """
         return reverse("stop_detail", kwargs={"pk": self.pk})
 
@@ -1490,20 +1468,19 @@ class OrderDocumentation(TimeStampedModel):
         """
         String representation of the OrderDocumentation
 
-        Returns:
-            str: String representation of the OrderDocumentation
+        :return: String representation of the OrderDocumentation
+        :rtype: str
         """
         return f"{self.order} - {self.document_class}"
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the OrderDocumentation object
 
-        Args:
-            **kwargs
-
-        Returns:
-            None
+        :param kwargs: Keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         super(OrderDocumentation, self).save(**kwargs)
 
@@ -1511,8 +1488,8 @@ class OrderDocumentation(TimeStampedModel):
         """
         Get the absolute url for the OrderDocumentation object
 
-        Returns:
-            str: Absolute url for the OrderDocumentation object
+        :return: Absolute url for the OrderDocumentation object
+        :rtype: str
         """
         return reverse("order_documentation_detail", kwargs={"pk": self.pk})
 
@@ -1564,20 +1541,19 @@ class RevenueCode(TimeStampedModel):
         """
         String representation of the Revenue Code Model
 
-        Returns:
-            str: Name of the Revenue Code
+        :return: String representation of the Revenue Code Model
+        :rtype: str
         """
         return self.code
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the Revenue Code Object.
 
-        Args:
-            **kwargs: Keyword Arguments
-
-        Returns:
-            None
+        :param kwargs: Keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         if self.code:
             self.code = self.code.upper()
