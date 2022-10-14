@@ -24,9 +24,9 @@ from django.urls import path
 from monta_fleet import views
 
 urlpatterns = [
-    # path("", views.FleetListView.as_view(), name="fleet_overview"),
-    # path("create/", views.CreateFleet.as_view(), name="fleet_create"),
-    # path("<int:pk>/edit/", views.FleetEditView.as_view(), name="fleet_edit"),
-    # path("<int:pk>/delete/", views.delete_fleet, name="fleet_delete"),
-    # path("table/", views.FleetOverviewList.as_view(), name="fleet_table"),
+    path("", views.FleetListView.as_view(), name="fleet_overview"),
+    path("create/", views.CreateFleet.as_view(), name="fleet_create"),
+    path("<int:pk>/edit/", views.FleetEditView.as_view(), name="fleet_edit"),
+    path("<int:pk>/delete/", views.delete_fleet, name="fleet_delete"),
+    path("table/", views.FleetOverviewList.as_view(), name="fleet_table"),
 ]
