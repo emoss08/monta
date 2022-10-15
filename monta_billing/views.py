@@ -19,7 +19,7 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Standard Python Libraries
-from typing import Type, Literal, Any
+from typing import Type, Any
 
 # Core Django Imports
 from django.http import JsonResponse, HttpResponse
@@ -244,7 +244,6 @@ class ChargeTypeCreateView(
     success_url = "/charge_type/"
     template_name = "monta_billing/charge_types/index.html"
 
-    @transaction.atomic
     def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
         Method to create a new Charge Type
