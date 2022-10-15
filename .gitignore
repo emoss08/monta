@@ -22,3 +22,5 @@ untitled.iml
 /static/
 /templates/
 /backend/
+tsconfig.json
+webpack.config.js
