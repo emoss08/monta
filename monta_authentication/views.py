@@ -30,12 +30,14 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.views.decorators.http import require_POST
-from rest_framework.authtoken.models import Token
+
+# Monta Imports
+from monta_authentication.exceptions import AuthenticationError
 
 
 @require_POST
 @sensitive_post_parameters("password")
-def monta_authenticate_user(request: ASGIRequest,) -> JsonResponse:
+def monta_authenticate_user(request: ASGIRequest) -> JsonResponse:
     """
     Function to authenticate user.
 
@@ -51,14 +53,12 @@ def monta_authenticate_user(request: ASGIRequest,) -> JsonResponse:
             username=username, password=password
         )
         if user is not None and user.is_active:
-            token = Token.objects.get_or_create(user=user)
             auth_login(request, user)
-            return JsonResponse({"token": token[0].key}, status=200)
         return JsonResponse(
             {"message": "Invalid credentials or account is no longer active"},
             status=400,
         )
-    except Exception as login_error:
+    except AuthenticationError as login_error:
         return JsonResponse(login_error, status=400)
 
 
