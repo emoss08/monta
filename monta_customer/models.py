@@ -17,13 +17,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-from django.core.exceptions import ValidationError
+
+# Standard library imports
+from typing import Any
 
 # Core Django Models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
 # Third Party Imports
 from localflavor.us.models import USStateField, USZipCodeField
@@ -73,22 +76,19 @@ class DocumentClassification(TimeStampedModel):
         """
         Return the string representation of the classification
 
-        Returns:
-            str: The string representation of the classification
+        :return: The string representation of the classification
+        :rtype: str
         """
         return self.name
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the document classification object
 
-        1. Uppercase the name before inserting into the database.
-
-        Args:
-            **kwargs: Arbitrary keyword arguments
-
-        Returns:
-            None
+        :param kwargs: The keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         self.name = self.name.upper()
@@ -98,13 +98,26 @@ class DocumentClassification(TimeStampedModel):
         """
         Return the absolute url of the classification
 
-        Returns:
-            str: The absolute url of the classification
+        :return: The absolute url of the classification
         """
         return reverse("document-classification", kwargs={"pk": self.pk})
 
 
 class Customer(TimeStampedModel):
+    """
+    Customer Model Fields
+
+    organization: The organization that the customer belongs to
+    customer_id: The customer id of the customer
+    name: The name of the customer
+    customer_id: The customer id of the customer
+    address_line_1: The first line of the address of the customer
+    address_line_2: The second line of the address of the customer
+    city: The city of the customer
+    state: The state of the customer
+    zip_code: The zip code of the customer
+    """
+
     organization = models.ForeignKey(
         Organization,
         on_delete=models.PROTECT,
@@ -141,14 +154,32 @@ class Customer(TimeStampedModel):
         ]
 
     def __str__(self) -> str:
+        """
+        Return the string representation of the customer
+
+        :return: The string representation of the customer
+        :rtype: str
+        """
         return self.customer_id
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: Any) -> None:
+        """
+        Save the customer object
+        :param kwargs
+        :type kwargs: Any
+        :rtype: None
+        """
         if not self.customer_id:
             self.customer_id = slugify(self.name)
         super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
+        """
+        Return the absolute url of the customer
+
+        :return: The absolute url of the customer
+        :rtype: str
+        """
         return reverse("customer_detail", kwargs={"pk": self.pk})
 
 
@@ -217,22 +248,19 @@ class CustomerBillingProfile(TimeStampedModel):
         """
         String representation of the Customer Billing Profile
 
-        Returns:
-            str: String representation of the Customer Billing Profile
+        :return: The string representation of the Customer Billing Profile
+        :rtype: str
         """
         return self.name
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: Any) -> None:
         """
         Save the Customer Billing Profile
 
-        1. Uppercase the profile name before inserting into the database
-
-        Args:
-            **kwargs: Keyword arguments
-
-        Returns:
-            None
+        :param kwargs: Arbitrary keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.name = self.name.upper()
         super().save(**kwargs)
@@ -241,8 +269,8 @@ class CustomerBillingProfile(TimeStampedModel):
         """
         Get the absolute url for the Customer Billing Profile
 
-        Returns:
-            str: Absolute url for the Customer Billing Profile
+        :return: The absolute url for the Customer Billing Profile
+        :rtype: str
         """
         return reverse("customer-billing-profile", kwargs={"pk": self.pk})
 
@@ -323,8 +351,7 @@ class CustomerContact(TimeStampedModel):
         """
         Clean the CustomerContact model
 
-        Returns:
-            None
+        :return: None
         """
         if self.primary_contact:
             if self.customer.contacts.filter(primary_contact=True).exists():
@@ -336,20 +363,19 @@ class CustomerContact(TimeStampedModel):
         """
         String representation of the CustomerContact model
 
-        Returns:
-            str: String representation of the CustomerContact model
+        :return: The string representation of the CustomerContact model
+        :rtype: str
         """
         return self.contact_name
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the CustomerContact model
 
-        Args:
-            **kwargs: Keyword arguments
-
-        Returns:
-            None
+        :param kwargs: Arbitrary keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         super().save(**kwargs)
 
@@ -357,7 +383,7 @@ class CustomerContact(TimeStampedModel):
         """
         Get the absolute url for the CustomerContact model
 
-        Returns:
-            str: Absolute url for the CustomerContact model
+        :return: The absolute url for the CustomerContact model
+        :rtype: str
         """
         return reverse("customer-contact", kwargs={"pk": self.pk})

@@ -30,14 +30,10 @@ from django.views.decorators.cache import cache_control
 @method_decorator(cache_control(max_age=60 * 60 * 24), name="dispatch")
 @method_decorator(vary_on_cookie, name="dispatch")
 class HomePage(LoginRequiredMixin, TemplateView):
-    """Class to render overview page for the user profile app.
+    """
+    Class to render homepage.
 
-    Args:
-        LoginRequiredMixin (class): Mixin to check if user is logged in.
-        TemplateView (class): Class to render a template.
-
-    Returns:
-        HttpResponse | JsonResponse: Rendered template or JSON response.
+    # TODO: Pop the cache if something changes.
     """
 
     template_name = "homepage/index.html"

@@ -29,11 +29,19 @@ from monta_customer import models
 
 
 class CustomerContactInline(admin.StackedInline):
+    """
+    CustomerContactInline class
+    """
+
     model: Type[models.CustomerContact] = models.CustomerContact
 
 
 @admin.register(models.Customer)
 class CustomerAdmin(admin.ModelAdmin):
+    """
+    CustomerAdmin class
+    """
+
     list_display = (
         "customer_id",
         "name",
@@ -59,6 +67,10 @@ class CustomerAdmin(admin.ModelAdmin):
 
 @admin.register(models.DocumentClassification)
 class DocumentClassificationAdmin(admin.ModelAdmin):
+    """
+    DocumentClassificationAdmin class
+    """
+
     list_display = ("name", "description")
     search_fields = ("name", "description")
     ordering = ("name",)
@@ -66,6 +78,10 @@ class DocumentClassificationAdmin(admin.ModelAdmin):
 
 @admin.register(models.CustomerBillingProfile)
 class CustomerBillingProfileAdmin(admin.ModelAdmin):
+    """
+    CustomerBillingProfileAdmin class
+    """
+
     list_display = ("customer", "name")
     search_fields = ("customer", "name")
     ordering = ("customer",)

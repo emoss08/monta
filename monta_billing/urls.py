@@ -24,7 +24,13 @@ from django.urls import path
 # Monta Core Imports
 from monta_billing import views
 
-urlpatterns = []
+urlpatterns = [
+    path(
+        "interactive/",
+        views.InteractiveBillingView.as_view(),
+        name="interactive_billing_index",
+    ),
+]
 
 # Charge Type Urls
 urlpatterns += [

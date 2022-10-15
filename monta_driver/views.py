@@ -54,7 +54,6 @@ from django.contrib.postgres.search import (
     SearchQuery,
     SearchRank,
 )
-from django.db import transaction
 
 # Third Party Imports
 from ajax_datatable import AjaxDatatableView
@@ -71,21 +70,14 @@ class DriverListView(LoginRequiredMixin, views.PermissionRequiredMixin, Template
     """
     Class to render the driver Index page.
 
-    Args:
-        LoginRequiredMixin (class): Django class to check if user is logged in.
-        TemplateView (class): Django class to render a template.
-
-    Returns:
-        Template: Returns the driver index page.
-
     Typical Usage Example:
         >>> DriverListView.as_view()
     """
 
-    template_name: Literal["monta_driver/index.html"] = "monta_driver/index.html"
-    permission_required: str = "monta_driver.view_driver"
+    template_name = "monta_driver/index.html"
+    permission_required = "monta_driver.view_driver"
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         """
         Method to get the context data for the driver index page.
 
@@ -110,40 +102,33 @@ class DriverCreateView(LoginRequiredMixin, views.PermissionRequiredMixin, Create
     Overwrites the post method to check if the form is valid. If the form is valid, request the user's organization
     and save the form. If the form is not valid, return a JSON response with a success value of False.
 
-    Args:
-        LoginRequiredMixin (class): Django class to check if user is logged in.
-        CreateView (class): Django class to create a new object.
-
     Typical Usage Example:
         >>> DriverCreateView.as_view()
     """
 
     model: Type[models.Driver] = models.Driver
     form_class: Type[forms.AddDriverForm] = forms.AddDriverForm
-    permission_required: str = "monta_driver.add_driver"
-    success_url: Literal["/driver/"] = "/driver/"
-    template_name: Literal["monta_driver/index.html"] = "monta_driver/index.html"
+    permission_required = "monta_driver.add_driver"
+    success_url = "/driver/"
+    template_name = "monta_driver/index.html"
 
-    @transaction.atomic
     def post(
-        self,
-        request: ASGIRequest,
-        *args,
-        **kwargs,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Method to handle the POST request.
 
-        Args:
-            request (ASGIRequest): The request object.
-            *args: Any arguments.
-            **kwargs: Any keyword arguments.
-
-        Returns:
-            JsonResponse: Returns a JSON response with a success value of True or False.
-
-        Typical Usage Example:
-            >>> DriverCreateView.post(request)
+        :param request: The request object.
+        :type request: ASGIRequest
+        :param args: Any arguments.
+        :type args: Any
+        :param kwargs: Any keyword arguments.
+        :type kwargs: Any
+        :return: A JSON response with a success value of True or False.
+        :rtype: JsonResponse
         """
         add_driver_form: forms.AddDriverForm = self.form_class(data=request.POST)
         contact_name: None = None
@@ -182,27 +167,20 @@ class DriverEditView(LoginRequiredMixin, views.PermissionRequiredMixin, DetailVi
     """
     Class to render the driver edit page.
 
-    Args:
-        LoginRequiredMixin (class): Django class to check if user is logged in.
-        DetailView (class): Django class to render a detail view.
-
-    Returns:
-        Template: Returns the driver edit page.
-
     Typical Usage Example:
         >>> DriverEditView.as_view()
     """
 
     model: Type[models.Driver] = models.Driver
-    template_name: Literal["monta_driver/edit.html"] = "monta_driver/edit.html"
-    permission_required: str = "monta_driver.change_driver"
+    template_name = "monta_driver/edit.html"
+    permission_required = "monta_driver.change_driver"
 
     def get_queryset(self) -> QuerySet[models.Driver] | None:
         """
         Method to get the queryset for the driver edit page.
 
-        Returns:
-            QuerySet[models.Driver]: Returns the queryset for the driver edit page.
+        :return: The queryset for the driver edit page.
+        :rtype: QuerySet[models.Driver] | None
         """
         return (
             super(DriverEditView, self)
@@ -220,43 +198,33 @@ class DriverUpdateView(UpdateView, views.PermissionRequiredMixin, LoginRequiredM
     """
     Class to update the driver profile.
 
-    Args:
-        UpdateView (class): Django class to update an object.
-        LoginRequiredMixin (class): Django class to check if user is logged in.
-
-    Returns:
-        JsonResponse: Returns a JSON response with a success value of True or False.
-
     Typical Usage Example:
         >>> DriverUpdateView.as_view()
     """
 
     model: Type[models.Driver] = models.Driver
     form_class: Type[forms.UpdateDriverForm] = forms.UpdateDriverForm
-    template_name: Literal["monta_driver/edit.html"] = "monta_driver/edit.html"
-    success_url: Literal["/driver/"] = "/driver/"
+    template_name = "monta_driver/edit.html"
+    success_url = "/driver/"
 
-    @transaction.atomic
     def post(
-        self,
-        request: ASGIRequest,
-        *args,
-        **kwargs,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Overwrites the post method to check if the form is valid. If the form is valid, request the user's organization
         and save the form. If the form is not valid, return a JSON response with a success value of False.
 
-        Args:
-            request (ASGIRequest): Django request object.
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-
-        Returns:
-            JsonResponse: Returns a JSON response with a success value of True or False.
-
-        Typical Usage Example:
-            >>> DriverUpdateView.post(request)
+        :param request: The request object.
+        :type request: ASGIRequest
+        :param args: Any arguments.
+        :type args: Any
+        :param kwargs: Any keyword arguments.
+        :type kwargs: Any
+        :return: A JSON response with a success value of True or False.
+        :rtype: JsonResponse
         """
         form: forms.UpdateDriverForm = self.form_class(data=request.POST)
         if form.is_valid():
@@ -274,37 +242,29 @@ class DriverUpdateView(UpdateView, views.PermissionRequiredMixin, LoginRequiredM
 class DriverDeleteView(LoginRequiredMixin, views.PermissionRequiredMixin, DeleteView):
     """
     Class to delete a driver.
-
-    Args:
-        LoginRequiredMixin (class): Django class to check if user is logged in.
-        views.PermissionRequiredMixin (class): Django class to check if user has permission.
-        DeleteView (class): Django class to delete an object.
     """
 
     model: Type[models.Driver] = models.Driver
-    template_name: Literal["monta_driver/index.html"] = "monta_driver/index.html"
-    success_url: Literal["/driver/"] = "/driver/"
     permission_required: str = "monta_driver.delete_driver"
 
-    def get(self, request: ASGIRequest, *args, **kwargs) -> JsonResponse:
+    def get(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
         Method to handle the GET request.
 
-        Args:
-            request (ASGIRequest): Django request object.
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-
-        Returns:
-            JsonResponse: Returns a JSON response with a success value of True or False.
-
-        Typical Usage Example:
-            >>> DriverDeleteView.get(request)
+        :param request: The request object.
+        :type request: ASGIRequest
+        :param args: Any arguments.
+        :type args: Any
+        :param kwargs: Any keyword arguments.
+        :type kwargs: Any
+        :return: A JSON response with a success value.
+        :rtype: JsonResponse
         """
-        self.delete(request, *args, **kwargs)
+        driver: models.Driver = self.get_object()
+        driver.delete()
         return JsonResponse(
             {"result": "success", "message": "Driver Deleted Successfully"},
-            status=200,
+            status=204,
         )
 
 
@@ -313,13 +273,6 @@ class DriverOverviewList(AjaxDatatableView, LoginRequiredMixin):
     Class to render the driver overview page.
 
     Driver Overview list is a subclass of AjaxDatatableView. This class is used to render the driver overview page.
-
-    Args:
-        AjaxDatatableView (class): Django class to render a datatable.
-        LoginRequiredMixin (class): Django class to check if user is logged in.
-
-    Returns:
-        Template: Returns the driver overview page.
 
     Typical Usage Example:
         >>> DriverOverviewList.as_view()
@@ -373,19 +326,18 @@ class DriverOverviewList(AjaxDatatableView, LoginRequiredMixin):
         },
     ]
 
-    def optimize_queryset(self, qs):
+    def optimize_queryset(self, qs: QuerySet) -> QuerySet[models.Driver]:
         """
         Optimize the queryset by prefetching related objects.
 
-        Args:
-            qs (Driver.objects): Driver queryset.
-
-        Returns:
-            Driver.objects: Returns the optimized queryset.
+        :param qs: The queryset to optimize.
+        :type qs: QuerySet[models.Driver]
+        :return: The optimized queryset.
+        :rtype: QuerySet[models.Driver]
         """
         return qs.select_related("profile")
 
-    def customize_row(self, row, obj) -> dict:
+    def customize_row(self, row: dict, obj: models.Driver) -> dict:
         """
         Customize the row by adding the driver information, license number, license state, license expiration, and actions.
 
@@ -464,11 +416,6 @@ class DriverSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, View):
     """
     Class to delete a driver.
 
-    Args:
-        LoginRequiredMixin (class): Django class to check if user is logged in.
-        views.PermissionRequiredMixin (class): Django class to check if user has permission.
-        View (class): Django class.
-
     Typical Usage Example:
         >>> DriverSearchView.as_view()
     """
@@ -476,10 +423,17 @@ class DriverSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, View):
     permission_required: str = "monta_driver.search_drivers"
 
     def get(self, request: ASGIRequest) -> HttpResponse:
-        """ """
+        """
+        Get request for getting results from the search with params.
+
+        :param request
+        :type request: ASGIRequest
+        :return HttpResponse of the Charge Type search form
+        :rtype HttpResponse
+        """
         form: forms.SearchForm = forms.SearchForm()
         query = request.GET["query"] if "query" in request.GET else None
-        results = []
+        results: QuerySet[models.Driver] | list = []
         if query:
             form: forms.SearchForm = forms.SearchForm({"query": query})
             search_vector: SearchVector = SearchVector(
@@ -491,7 +445,7 @@ class DriverSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, View):
                 "profile__license_expiration",
             )
             search_query: SearchQuery = SearchQuery(query)
-            results = (
+            results: QuerySet[models.Driver] = (
                 models.Driver.objects.annotate(
                     search=search_vector, rank=SearchRank(search_vector, search_query)
                 )
@@ -501,7 +455,6 @@ class DriverSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, View):
                 .select_related("profile")
                 .order_by("-rank")
             )
-
         return render(
             request,
             "monta_driver/search.html",
@@ -526,11 +479,10 @@ def validate_license_number(request: ASGIRequest) -> HttpResponse:
      on every keystroke *
     **********************************************************************************************************************
 
-    Args:
-        request: The request object.
-
-    Returns:
-        JsonResponse: A success or error response.
+    :param request
+    :type request: ASGIRequest
+    :return HttpResponse
+    :rtype HttpResponse
 
     Typical usage example:
         >>> validate_license_number(request)
@@ -547,8 +499,8 @@ def validate_license_number(request: ASGIRequest) -> HttpResponse:
                 "license_number"
             ]
             if models.Driver.objects.filter(
-                profile__license_number=license_number,
-                organization=request.user.profile.organization,
+                    profile__license_number=license_number,
+                    organization=request.user.profile.organization,
             ).exists():
                 return HttpResponse(
                     "<div class='text-danger ease_in_5' id='license_error'>License is already "

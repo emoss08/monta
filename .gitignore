@@ -21,3 +21,6 @@ untitled.iml
 /htmlcov/
 /static/
 /templates/
+/backend/
+tsconfig.json
+webpack.config.js

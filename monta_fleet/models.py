@@ -18,6 +18,9 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+# Standard library imports
+from typing import Any
+
 # Core Django Imports
 from django.db import models
 from django.urls import reverse
@@ -103,20 +106,19 @@ class Fleet(TimeStampedModel):
         """
         Return the string representation of the fleet.
 
-        Returns:
-            str: String representation of the fleet.
+        :return: String representation of the fleet.
+        :rtype: str
         """
         return f"Fleet {self.fleet_id}, {self.name} for managed by {self.fleet_manager}"
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the fleet.
 
-        Args:
-            **kwargs: Keyword arguments.
-
-        Returns:
-            None
+        :param kwargs: Keyword arguments.
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         if not self.fleet_id:
@@ -130,7 +132,7 @@ class Fleet(TimeStampedModel):
         """
         Return the absolute url for the fleet.
 
-        Returns:
-            str: Absolute url for the fleet.
+        :return: Absolute url for the fleet.
+        :rtype: str
         """
         return reverse("fleet", kwargs={"pk": self.pk})

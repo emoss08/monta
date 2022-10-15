@@ -17,6 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+
 # Standard Python Imports
 from typing import Type
 
@@ -28,6 +29,10 @@ from monta_customer import models
 
 
 class AddDocumentClassificationsForm(forms.ModelForm):
+    """
+    AddDocumentClassificationsForm class
+    """
+
     name = forms.CharField(
         max_length=255, help_text="Name of the document classification"
     )
@@ -38,5 +43,9 @@ class AddDocumentClassificationsForm(forms.ModelForm):
     )
 
     class Meta:
+        """
+        Metaclass for AddDocumentClassificationsForm
+        """
+
         model: Type[models.DocumentClassification] = models.DocumentClassification
         fields: list[str] = ["name", "description"]

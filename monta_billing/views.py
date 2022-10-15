@@ -19,10 +19,11 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Standard Python Libraries
-from typing import Type, Literal
+from typing import Type, Any
 
 # Core Django Imports
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -36,15 +37,69 @@ from django.views import generic, View
 from django.contrib.auth import mixins
 from django.db import transaction
 from django.db.models import QuerySet
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Third Party Imports
 from braces import views
 from ajax_datatable import AjaxDatatableView
 
 # Monta Imports
+from monta_driver.forms import SearchForm
 from monta_order.models import Order
 from monta_billing import models, forms
 from monta_customer.models import CustomerBillingProfile, CustomerContact
+
+
+@method_decorator(require_safe, name="dispatch")
+@method_decorator(cache_control(max_age=60 * 60 * 24), name="dispatch")
+@method_decorator(vary_on_cookie, name="dispatch")
+class InteractiveBillingView(
+    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.TemplateView
+):
+    """
+    View for Interactive Billing
+
+    Typical Usage Example:
+        >>> InteractiveBillingView.as_view()
+    """
+
+    template_name = "monta_billing/interactive/index.html"
+    permission_required: str = "monta_billing.view_billingqueue"
+    http_method_names: list[str] = ["get"]
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        """
+        Get Context Data for Interactive Billing
+
+        :param kwargs: Keyword Arguments
+        :type kwargs: Any
+        :return: Context Data
+        """
+
+        # Queryset for orders ready to be billed out.
+        ready_to_bill_orders: QuerySet[models.Order] = (
+            Order.objects.filter(
+                ready_to_bill=True,
+                billed=False,
+                status="COMPLETED",
+                organization=self.request.user.profile.organization,
+            )
+            .select_related("customer", "commodity")
+            .only(
+                "id",
+                "order_id",
+                "commodity__name",
+                "status",
+                "customer__customer_id",
+                "customer__name",
+            )
+            .order_by("customer__customer_id")
+        )
+
+        context: dict = super().get_context_data(**kwargs)
+        context["orders"] = ready_to_bill_orders
+        return context
 
 
 @method_decorator(require_safe, name="dispatch")
@@ -56,20 +111,11 @@ class ChargeTypeListView(
     """
     Class to render the Charge Type List View
 
-    Args:
-        mixins.LoginRequiredMixin (class): Django Login Required Mixin
-        generic.TemplateView (class): Django List View
-
-    Returns:
-        Template: Charge Type List View
-
     Typical Usage Example:
         >>> ChargeTypeListView.as_view()
     """
 
-    template_name: Literal[
-        "monta_billing/charge_types/index.html"
-    ] = "monta_billing/charge_types/index.html"
+    template_name = "monta_billing/charge_types/index.html"
     http_method_names: list[str] = ["get"]
     permission_required: str = "monta_billing.view_chargetype"
 
@@ -77,12 +123,6 @@ class ChargeTypeListView(
 class ChargeTypeOverviewListView(AjaxDatatableView, mixins.LoginRequiredMixin):
     """
     Class to render the Charge Type overview page.
-
-    Charge Type Overview list is a subclass of AjaxDatatableView. This class is used to render the driver overview page.
-
-    Args:
-        ajax_datatable.AjaxDatatableView (class): Django class to render a datatable.
-        mixins.LoginRequiredMixin (class): Django class to check if user is logged in.
 
     Typical Usage Example:
         >>> ChargeTypeOverviewListView.as_view()
@@ -115,29 +155,28 @@ class ChargeTypeOverviewListView(AjaxDatatableView, mixins.LoginRequiredMixin):
         },
     ]
 
-    def optimize_queryset(self, qs):
+    def optimize_queryset(self, qs: QuerySet) -> QuerySet[models.ChargeType]:
         """
         Optimize the queryset by prefetching related objects.
 
-        Args:
-            qs (Driver.objects): Driver queryset.
-
-        Returns:
-            Driver.objects: Returns the optimized queryset.
+        :param qs: Queryset to optimize
+        :type qs: QuerySet
+        :return: Optimized Queryset
+        :rtype: QuerySet
         """
         return qs.order_by("-name")
 
-    def customize_row(self, row, obj) -> dict:
+    def customize_row(self, row: Any, obj: Any) -> dict:
         """
         Customize the row by adding the driver information, license number, license state, license expiration, and
         actions.
 
-        Args:
-            row (dict): Row dictionary.
-            obj (Driver): Driver object.
-
-        Returns:
-            dict: Returns the customized row.
+        :param row: Row to customize
+        :type row: dict
+        :param obj: Object to customize
+        :type obj: models.ChargeType
+        :return: Customized Row
+        :rtype: dict
         """
         row[
             "actions"
@@ -196,34 +235,27 @@ class ChargeTypeCreateView(
     """
     Class to create the Charge Type
 
-    Args:
-        mixins.LoginRequiredMixin (class): Django class to check if user is logged in.
-        views.PermissionRequiredMixin(Class): Check to see if the user has proper permissions
-        generic.CreateView (class): Django class to create a new object.
-
     Typical Usage Example:
         >>> ChargeTypeCreateView.as_view()
     """
 
     permission_required: str = "monta_billing.add_chargetype"
     form_class: Type[forms.AddChargeTypeForm] = forms.AddChargeTypeForm
-    success_url: Literal["/charge_type/"] = "/charge_type/"
-    template_name: Literal[
-        "monta_billing/charge_types/index.html"
-    ] = "monta_billing/charge_types/index.html"
+    success_url = "/charge_type/"
+    template_name = "monta_billing/charge_types/index.html"
 
-    @transaction.atomic
-    def post(self, request: ASGIRequest, *args, **kwargs) -> JsonResponse:
+    def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
         Method to create a new Charge Type
 
-        Args:
-            request (ASGIRequest): Django request object
-            *args (list): List of arguments
-            **kwargs (dict): Dictionary of arguments
-
-        Returns:
-            JsonResponse: JSON response with the new Charge Type
+        :param request
+        :type request: ASGIRequest
+        :param args
+        :type args: Any
+        :param kwargs
+        :type kwargs: Any
+        :return: JsonResponse
+        :rtype: JsonResponse
         """
         form = self.form_class(data=request.POST)
         if form.is_valid():
@@ -245,31 +277,23 @@ class ChargeTypeDeleteView(
 ):
     """
     Class to delete the Charge Type
-
-    Args:
-        mixins.LoginRequiredMixin (class): Django class to check if user is logged in.
-        views.PermissionRequiredMixin(Class): Check to see if the user has proper permissions
-        generic.DeleteView (class): Django class to delete an object.
     """
 
     model: Type[models.ChargeType] = models.ChargeType
-    success_url: Literal["charge_type/"] = "charge_type/"
-    template_name: Literal[
-        "monta_billing/charge_types/index.html"
-    ] = "monta_billing/charge_types/index.html"
-    permission_required: str = "monta_billing.delete_chargetype"
+    permission_required = "monta_billing.delete_chargetype"
 
-    def delete(self, request: ASGIRequest, *args, **kwargs) -> JsonResponse:
+    def get(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
         Delete the charge type
 
-        Args:
-            request (ASGIRequest): Django request object
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-
-        Returns:
-            JsonResponse: JSON response with the result of to delete.
+        :param request
+        :type request: ASGIRequest
+        :param args
+        :type args: Any
+        :param kwargs
+        :type kwargs: Any
+        :return: JsonResponse
+        :rtype: JsonResponse
         """
         charge_type: models.ChargeType = self.get_object()
         charge_type.delete()
@@ -281,12 +305,7 @@ class ChargeTypeDeleteView(
 
 class OrderTransferView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, View):
     """
-    Class to list the Transfer Orders
-
-    Args:
-        mixins.LoginRequiredMixin (class): Django class to check if user is logged in.
-        views.PermissionRequiredMixin(Class): Check to see if the user has proper permissions
-        views.View (class): Django class to render a view.
+    Class to list the Transfer Order
     """
 
     permission_required: str = "monta_billing.transfer_to_billing"
@@ -295,11 +314,10 @@ class OrderTransferView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin
         """
         Transfer the order to bill
 
-        Args:
-            request (ASGIRequest): Django request object
-
-        Returns:
-            JsonResponse: JSON response with the result of the transfer.
+        :param request
+        :type request: ASGIRequest
+        :return: JsonResponse
+        :rtype: JsonResponse
         """
         orders: QuerySet[Order] = Order.objects.filter(
             organization=request.user.profile.organization,
@@ -335,15 +353,13 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
     keep the order in the billing queue, and create a billing exception based on the BillingExceptionChoices(PAPERWORK,
     CHARGE, CREDIT, OTHER)
 
-    Args:
-        request(ASGIRequest): Django request object
-
-    Returns:
-        JsonResponse: Response to the request
+    :param request
+    :type request: ASGIRequest
+    :return: JsonResponse
+    :rtype: JsonResponse
 
     Typical Usage Example:
         >>> bill_orders(request)
-
     """
     order_document = []
     billing_requirements = []
@@ -420,12 +436,12 @@ def re_bill_order(request: ASGIRequest, order_id: str) -> JsonResponse:
     """
     Rebill Order
 
-    Args:
-        request(ASGIRequest): Django request object
-        order_id(str): Order ID
-
-    Returns:
-        JsonResponse: Response to the request
+    :param request
+    :type request: ASGIRequest
+    :param order_id
+    :type order_id: str
+    :return: JsonResponse
+    :rtype: JsonResponse
 
     Typical Usage Example:
         >>> re_bill_order(request, order_id)
@@ -451,3 +467,55 @@ def re_bill_order(request: ASGIRequest, order_id: str) -> JsonResponse:
         {"result": "success", "message": "Order set back to ready to bill"},
         status=201,
     )
+
+
+class ChargeTypeSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, View):
+    """
+    Class to delete a driver.
+
+    Typical Usage Example:
+        >>> ChargeTypeSearchView.as_view()
+    """
+
+    permission_required: str = "monta_billing.view_chargetypes"
+
+    def get(self, request: ASGIRequest) -> HttpResponse:
+        """
+        Get request for getting results from the search with params.
+
+        :param request
+        :type request: ASGIRequest
+        :return HttpResponse of the Charge Type search form
+        :rtype HttpResponse
+        """
+        form: SearchForm = SearchForm()
+        query = request.GET["query"] if "query" in request.GET else None
+        results: QuerySet[models.ChargeType] | list = []
+        if query:
+            form: SearchForm = SearchForm({"query": query})
+            search_vector: SearchVector = SearchVector(
+                "organization__name",
+                "name",
+                "description",
+            )
+            search_query: SearchQuery = SearchQuery(query)
+            results: QuerySet[models.ChargeType] = (
+                models.ChargeType.objects.annotate(
+                    search=search_vector, rank=SearchRank(search_vector, search_query)
+                )
+                .filter(
+                    search=search_query, organization=request.user.profile.organization
+                )
+                .select_related("profile")
+                .order_by("-rank")
+            )
+
+        return render(
+            request,
+            "monta_driver/search.html",
+            {
+                "form": form,
+                "query": query,
+                "results": results,
+            },
+        )

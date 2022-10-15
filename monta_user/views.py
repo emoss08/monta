@@ -21,16 +21,14 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 # Standard Library Imports
 from typing import Type
 
-
 # Core Django Imports
 from django.views.generic import UpdateView, ListView
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Model
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
 from django.http import (
     JsonResponse,
-    HttpResponse,
 )
 from django.utils.decorators import method_decorator
 from django.views.decorators.debug import sensitive_post_parameters
@@ -50,10 +48,8 @@ class UserProfileView(LoginRequiredMixin, ModelUserFieldPermissionMixin, ListVie
     """
     Class to render overview page for the user profile app.
 
-    Args:
-        LoginRequiredMixin (class): Mixin to check if user is logged in.
-        ModelUserFieldPermissionMixin (class): Mixin to check if user has permission to access the view.
-        ListView (class): Class to render a list of objects.
+    Typical Usage:
+        >>> UserProfileView.as_view()
     """
 
     model: Type[models.Profile] = models.Profile
@@ -64,8 +60,8 @@ class UserProfileView(LoginRequiredMixin, ModelUserFieldPermissionMixin, ListVie
         """
         Method to get the queryset for the view.
 
-        Returns:
-            QuerySet[models.Profile]: Queryset of the model.
+        :return: Queryset for the view.
+        :rtype: QuerySet[models.Profile]
         """
         return models.Profile.objects.filter(user=self.request.user).select_related(
             "user"
@@ -78,14 +74,8 @@ class UserProfileSettings(LoginRequiredMixin, ModelUserFieldPermissionMixin, Lis
     """
     Class to render settings page for the user profile app.
 
-    Args:
-        LoginRequiredMixin (class): Mixin to check if user is logged in.
-        ModelUserFieldPermissionMixin (class): Mixin to check if user is trying to view their own settings page.
-        ListView (class): Class to render a list of objects.
-
-
     Typical usage example:
-        UserProfileSettings.as_view()
+        >>> UserProfileSettings.as_view()
     """
 
     model: Type[models.Profile] = models.Profile
@@ -96,8 +86,8 @@ class UserProfileSettings(LoginRequiredMixin, ModelUserFieldPermissionMixin, Lis
         """
         Method to get the queryset for the view.
 
-        Returns:
-            QuerySet[models.Profile]: Queryset of the model.
+        :return: Queryset for the view.
+        :rtype: QuerySet[models.Profile]
         """
         return models.Profile.objects.filter(user=self.request.user).select_related(
             "user"
@@ -114,17 +104,8 @@ class UpdateUserProfile(LoginRequiredMixin, UpdateView):
     default dispatch method. After the default dispatch method is called, check if the request method
     is POST, if the request method is not POST, raise a PermissionDenied exception.
 
-    Args:
-        LoginRequiredMixin (class): Mixin to check if user is logged in.
-        UpdateView (class): Class to update a model instance.
-
-    Returns:
-        HttpResponse | JsonResponse
-
-
     Typical usage example:
-        UpdateUserProfile(request, user_id)
-        UpdateUserProfile.as_view()
+        >>> UpdateUserProfile.as_view()
     """
 
     model: Type[models.Profile] = models.Profile
@@ -133,36 +114,30 @@ class UpdateUserProfile(LoginRequiredMixin, UpdateView):
     ] = forms.UpdateProfileGeneralInformationForm
     success_url = "/"
 
-    def dispatch(
-        self,
-        request: ASGIRequest,
-        *args,
-        **kwargs,
-    ) -> None:
+    def post(self, request: ASGIRequest, *args: any, **kwargs: any) -> JsonResponse:
         """
-        Method to check if the user is authenticated, if the user is not authenticated, raise a
+        Method to handle POST requests.
 
-        PermissionDenied exception. After the user is authenticated, call the default dispatch
-        method. After the default dispatch method is called, check if the request method is POST,
-        if the request method is not POST, raise a PermissionDenied exception.
-
-        Args:
-            request (ASGIRequest): Request object.
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-
-        Returns:
-            None
+        :param request: Request object.
+        :type request: ASGIRequest
+        :param args: Arguments.
+        :type args: list
+        :param kwargs: Keyword arguments.
+        :type kwargs: dict
+        :return: Response object.
+        :rtype: JsonResponse
         """
-        super().dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form: UpdateView) -> HttpResponse:
-        form.instance.user = self.request.user
-        return super().form_valid(form)
-
-    def form_invalid(self, form: UpdateView) -> HttpResponse:
-        form.instance.user = self.request.user
-        return super().form_invalid(form)
+        form = self.form_class(data=request.POST, instance=self.get_object())
+        if form.is_valid():
+            form.save()
+            return JsonResponse(
+                {"result": "success", "message": "Profile Updates Posted Successfully"},
+                status=201,
+            )
+        return JsonResponse(
+            {"result": "error", "message": form.errors},
+            status=400,
+        )
 
 
 @method_decorator(require_POST, name="dispatch")
@@ -174,62 +149,37 @@ class UpdateUserEmail(LoginRequiredMixin, UpdateView):
     the form_valid method is called. If the password is incorrect, a JsonResponse is returned with
     the error message.
 
-    Args:
-        LoginRequiredMixin (class): Mixin to check if user is logged in.
-        UpdateView (class): Class to update a model instance.
-
-    Returns:
-        HttpResponse | JsonResponse
-
     Typical usage example:
-        UpdateUserEmail(request, user_id)
-        UpdateUserEmail.as_view()
+        >>> UpdateUserEmail.as_view()
     """
 
     model: Type[models.MontaUser] = models.MontaUser
     form_class: Type[forms.UpdateUserEmailForm] = forms.UpdateUserEmailForm
-    success_url = "/"
 
-    def dispatch(
-        self,
-        request: ASGIRequest,
-        *args,
-        **kwargs,
-    ) -> None | JsonResponse:
+    def post(self, request: ASGIRequest, *args: any, **kwargs: any) -> JsonResponse:
         """
-        Method to check if the password is correct.
+        Method to handle POST requests.
 
-        Args:
-            request (ASGIRequest): Request object.
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-
-        Returns:
-            None | JsonResponse: None if the password is correct, JsonResponse if the password is incorrect.
+        :param request: Request object.
+        :type request: ASGIRequest
+        :param args: Arguments.
+        :type args: list
+        :param kwargs: Keyword arguments.
+        :type kwargs: dict
+        :return: Response object.
+        :rtype: JsonResponse
         """
-        user = self.get_object()
-        if check_password(request.POST["password"], user.password):
-            super().dispatch(request, *args, **kwargs)
+        form = self.form_class(data=request.POST, instance=self.get_object())
+        if form.is_valid():
+            form.save()
+            return JsonResponse(
+                {"result": "success", "message": "Email Updated Successfully"},
+                status=201,
+            )
         return JsonResponse(
-            {
-                "result": "error",
-                "message": "Please check your password.",
-            },
+            {"result": "error", "message": form.errors},
             status=400,
         )
-
-    def form_valid(self, form: forms.UpdateUserEmailForm) -> None:
-        """
-        Method to check if the form is valid.
-
-        Args:
-            form (forms.UpdateUserEmailForm): Form to update the user email.
-
-        Returns:
-            None
-        """
-        form.instance.user = self.request.user
-        super().form_valid(form)
 
 
 @method_decorator(require_POST, name="dispatch")

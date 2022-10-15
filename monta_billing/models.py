@@ -18,6 +18,9 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+# Standard library imports
+from typing import Any
+
 # Core Django Imports
 from django.db import models
 from django.urls import reverse
@@ -104,15 +107,14 @@ class ChargeType(TimeStampedModel):
         """
         return self.name
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: Any):
         """
         Save the Charge Type Model
 
-        Args:
-            **kwargs: Keyword Arguments
-
-        Returns:
-            None
+        :param kwargs: Keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         self.name = self.name.upper()
@@ -124,8 +126,8 @@ class ChargeType(TimeStampedModel):
         """
         Get the absolute url for the order.
 
-        Returns:
-            str: Absolute url for the order.
+        :return: Absolute url for the order
+        :rtype: str
         """
         return reverse("charge_type_edit", kwargs={"pk": self.pk})
 
@@ -214,21 +216,19 @@ class AdditionalCharge(TimeStampedModel):
         """
         String representation of the Additional Charge Model
 
-        Returns:
-            str: Name of the Additional Charge
+        :return: Name of the Additional Charge
+        :rtype: str
         """
         return self.name
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the Additional Charge Object.
 
-        Args:
-            **kwargs: Keyword Arguments
-
-        Returns:
-            None
-
+        :param kwargs: Keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.name = self.name.upper()
         self.total_amount = self.unit * self.amount
@@ -313,8 +313,8 @@ class BillingQueue(TimeStampedModel):
         """
         Clean the Billing Queue Model
 
-        Returns:
-            None
+        :return: None
+        :rtype: None
         """
         if self.order.billed is True:
             raise ValidationError(_("Order is already billed."))
@@ -326,15 +326,14 @@ class BillingQueue(TimeStampedModel):
             raise ValidationError(_("Order is not marked ready to bill."))
         super(BillingQueue, self).clean()
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the Billing Queue Object.
 
-        Args:
-            **kwargs: Keyword Arguments
-
-        Returns:
-            None
+        :param kwargs: Keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         if not self.bill_type:
@@ -347,8 +346,8 @@ class BillingQueue(TimeStampedModel):
         """
         String representation of the Billing Queue Model
 
-        Returns:
-            str: Name of the Billing Queue
+        :return: Name of the Billing Queue
+        :rtype: str
         """
         return f"{self.organization} - {self.order}"
 
@@ -409,8 +408,8 @@ class BillingException(TimeStampedModel):
         """
         String representation of the Billing Exception Model
 
-        Returns:
-            str: Name of the Billing Exception
+        :return: Name of the Billing Exception
+        :rtype: str
         """
         return self.exception_type
 
@@ -481,8 +480,8 @@ class BillingHistory(TimeStampedModel):
         """
         Clean the Billing History Model
 
-        Returns:
-            None
+        :return: None
+        :rtype: None
         """
         if not self.order.billed:
             raise ValidationError(
@@ -494,8 +493,8 @@ class BillingHistory(TimeStampedModel):
         """
         String representation of the Billing History Model
 
-        Returns:
-            str: Name of the Billing History
+        :return: Name of the Billing History
+        :rtype: str
         """
         return str(self.batch_name)
 
@@ -504,8 +503,8 @@ class BillingHistory(TimeStampedModel):
         """
         Generate the batch name for the billing history.
 
-        Returns:
-            str: Batch Name
+        :return: Batch Name
+        :rtype: str
         """
         last_batch_name = (
             BillingHistory.objects.filter(
@@ -524,15 +523,14 @@ class BillingHistory(TimeStampedModel):
 
         return batch_name
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the Billing History Object.
 
-        Args:
-            **kwargs: Keyword Arguments
-
-        Returns:
-            None
+        :param kwargs: Keyword Arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         self.batch_name = self.generate_batch_name

@@ -25,7 +25,6 @@ from django.core.handlers.asgi import ASGIRequest
 from django.http import (
     HttpResponseRedirect,
     JsonResponse,
-    HttpResponse,
 )
 from django.views.decorators.debug import sensitive_post_parameters
 from django.contrib.auth import login as auth_login
@@ -36,24 +35,14 @@ from rest_framework.authtoken.models import Token
 
 @require_POST
 @sensitive_post_parameters("password")
-def monta_authenticate_user(
-    request: ASGIRequest,
-) -> HttpResponseRedirect | JsonResponse | HttpResponse:
-    """Function to authenticate user.
+def monta_authenticate_user(request: ASGIRequest,) -> JsonResponse:
+    """
+    Function to authenticate user.
 
-    Pass the request from authenticate_user view. After the request is passed, the user is
-    retrieved from the database. After the user is retrieved, the user's password is checked
-    against the password in the database. If the password is correct, the user is authenticated.
-    If the password is incorrect, the user is not authenticated.
-
-    Args:
-        request: ASGIRequest
-
-    Returns:
-        HttpResponseRedirect | JsonResponse
-
-    Typical usage example:
-        monta_authenticate_user(request)
+    :param request: The request object
+    :type request: ASGIRequest
+    :return: The user object or None if the user does not exist
+    :rtype: JsonResponse
     """
     try:
         username = request.POST["username"]
@@ -74,19 +63,13 @@ def monta_authenticate_user(
 
 
 def monta_logout_user(request: ASGIRequest) -> HttpResponseRedirect | JsonResponse:
-    """Function to log out user.
+    """
+    Function to log out user.
 
-    Pass the request from logout_user view. After the request is passed, the user is
-    retrieved from the database. After the user is retrieved, the user is logged out.
-
-    Args:
-        request: ASGIRequest
-
-    Returns:
-        JsonResponse | HttpResponseRedirect
-
-    Typical usage example:
-        monta_logout_user(request)
+    :param request: The request object
+    :type request: ASGIRequest
+    :return: The user object or None if the user does not exist
+    :rtype: HttpResponseRedirect | JsonResponse
     """
     try:
         auth_logout(request)

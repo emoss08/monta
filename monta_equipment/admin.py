@@ -51,11 +51,9 @@ class EquipmentAdmin(admin.ModelAdmin):
         "created",
         "modified",
     )
-    list_filter: tuple[Literal["organization"], Literal["is_active"]] = (
+    list_filter = (
         "organization",
         "is_active",
     )
-    search_fields: tuple[
-        Literal["equip_id"], Literal["description"], Literal["vin_number"]
-    ] = ("equip_id", "description", "vin_number")
+    search_fields = ("equip_id", "description", "vin_number")
     list_select_related: Literal[True] = True

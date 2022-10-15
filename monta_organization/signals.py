@@ -17,20 +17,20 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-# Core Django imports
-from django.contrib import admin
+
+# Core Django Libraries
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 # Monta Imports
-from monta_hazardous_material import models
+from monta_organization import models
 
 
-@admin.register(models.HazardousMaterial)
-class HazardousClassAdmin(admin.ModelAdmin):
-    """Hazardous Class Admin"""
+@receiver(post_save, sender=models.Organization)
+def create_settings(sender, instance, created, **kwargs) -> None:
+    """
+    Create Organization settings for an organization
+    """
+    if created:
+        models.OrganizationSettings.objects.create(organization=instance)
 
-    list_display = (
-        "name",
-        "description",
-        "created",
-        "modified",
-    )
