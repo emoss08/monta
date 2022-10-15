@@ -23,7 +23,7 @@ from typing import Any, Type
 
 # Core Django Imports
 from django.views.generic import UpdateView, ListView
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Model
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
@@ -157,6 +157,7 @@ class UpdateUserEmail(LoginRequiredMixin, UpdateView):
     form_class: Type[forms.UpdateUserEmailForm] = forms.UpdateUserEmailForm
 
     def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
+
         """
         Method to handle POST requests.
 

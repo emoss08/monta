@@ -38,6 +38,7 @@ from monta_authentication.exceptions import AuthenticationError
 @require_POST
 @sensitive_post_parameters("password")
 def monta_authenticate_user(request: ASGIRequest) -> JsonResponse:
+
     """
     Function to authenticate user.
 
