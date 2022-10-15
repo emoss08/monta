@@ -28,9 +28,16 @@ from django.core.handlers.asgi import ASGIRequest
 
 # Django Ninja Imports
 from ninja import ModelSchema, NinjaAPI
+from ninja.pagination import paginate
 
 # Monta Imports
 from monta_billing import models
+
+"""
+NOTE: Do not add docstrings to this file. Docstrings are added to the generated
+documentation for the API. If you add docstrings to this file, they will be
+included in the documentation.
+"""
 
 api = NinjaAPI(csrf=True, version='1.0.0')
 
@@ -48,65 +55,45 @@ class ChargeTypeSchema(ModelSchema):
         model_fields: list[str] = ['id', 'name', 'description']
 
 
-@api.post("/charge_types")
+@api.post("/charge_types", tags=["Charge Types"])
 def create_charge_type(request: ASGIRequest, payload: ChargeTypeSchema) -> ChargeTypeSchema:
     """
     Create a new charge type
 
-    :param request: Django request object
-    :type request: Request
-    :param payload: Incoming payload
-    :type payload: ChargeTypeIn
-    :return: Outgoing payload
-    :rtype: ChargeTypeOut
+    Note:
+    - **Organization** is set to the organization of the user making the request
     """
     charge_type = models.ChargeType.objects.create(organization=request.user.profile.organization, **payload.dict())
     return ChargeTypeSchema.from_orm(charge_type)
 
 
-@api.get("/charge_types/{charge_id}", response=ChargeTypeSchema)
+@api.get("/charge_types/{charge_id}", response=ChargeTypeSchema, tags=["Charge Types"])
 def get_charge_type(request: ASGIRequest, charge_id: int) -> models.ChargeType:
     """
     Get a charge type by id
-
-    :param request: Django request object
-    :type request: Request
-    :param charge_id: Charge type id
-    :type charge_id: int
-    :return: Charge type object
-    :rtype: models.ChargeType
     """
     charge_type: models.ChargeType = get_object_or_404(models.ChargeType, pk=charge_id)
     return charge_type
 
 
-@api.get("/charge_types", response=List[ChargeTypeSchema])
+@api.get("/charge_types", response=List[ChargeTypeSchema], tags=["Charge Types"])
+@paginate
 def list_charge_types(request: ASGIRequest) -> QuerySet[models.ChargeType] | QuerySet:
     """
-    List Charge Types
+    List charge types
 
-    :param request: Django request object
-    :type request: Request
-    :return: QuerySet of Charge Types
-    :rtype: QuerySet[models.ChargeType] | QuerySet
+    Note:
+    - **Organization** is set to the organization of the user making the request
+    - **Charge Types** are paginated
     """
     qs: QuerySet[models.ChargeType] = models.ChargeType.objects.filter(organization=request.user.profile.organization)
     return qs
 
 
-@api.put("/charge_types/{charge_id}")
+@api.put("/charge_types/{charge_id}", tags=["Charge Types"])
 def update_charge_type(request: ASGIRequest, charge_id: int, payload: ChargeTypeSchema) -> ChargeTypeSchema:
     """
     Update a charge type
-
-    :param request: Django request object
-    :type request: Request
-    :param charge_id: Charge type id
-    :type charge_id: int
-    :param payload: Incoming payload
-    :type payload: ChargeTypeIn
-    :return: Outgoing payload
-    :rtype: ChargeTypeOut
     """
     charge_type: models.ChargeType = get_object_or_404(models.ChargeType, pk=charge_id)
     for attr, value in payload.dict().items():
@@ -115,17 +102,10 @@ def update_charge_type(request: ASGIRequest, charge_id: int, payload: ChargeType
     return ChargeTypeSchema.from_orm(charge_type)
 
 
-@api.delete("/charge_types/{charge_id}")
+@api.delete("/charge_types/{charge_id}", tags=["Charge Types"])
 def delete_charge_type(request: ASGIRequest, charge_id: int) -> dict[str, str]:
     """
     Delete a charge type
-
-    :param request: Django request object
-    :type request: Request
-    :param charge_id: Charge type id
-    :type charge_id: int
-    :return: None
-    :rtype: None
     """
     charge_type: models.ChargeType = get_object_or_404(models.ChargeType, pk=charge_id)
     charge_type.delete()
