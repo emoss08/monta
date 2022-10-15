@@ -55,7 +55,7 @@ class MontaBackend(BaseBackend):
         if username is None or password is None:
             return
         try:
-            user = UserModel._default_manager.get_by_natural_key(username)
+            user: MontaUser = UserModel._default_manager.get_by_natural_key(username)
         except MontaUser.DoesNotExist:
             return None
         else:
@@ -92,9 +92,10 @@ class MontaBackend(BaseBackend):
         :rtype: AbstractBaseUser | None
         """
         try:
-            user = UserModel._default_manager.select_related(
+            user: MontaUser = UserModel._default_manager.select_related(
                 "profile", "profile__title", "profile__organization"
             ).get(pk__exact=user_id)
         except MontaUser.DoesNotExist:
             return None
         return user if self.user_can_authenticate(user) else None
+
