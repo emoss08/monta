@@ -19,6 +19,7 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Standard Library Imports
+from typing import Any
 import unicodedata
 
 # Core Django Imports
@@ -45,7 +46,7 @@ class MontaUserManager(BaseUserManager):
         user.save()
         return user
 
-    def create_superuser(self, username: str, email: str, password: str, **extra_fields: any):
+    def create_superuser(self, username: str, email: str, password: str, **extra_fields: Any):
         """
         Create and save a SuperUser with the given email and password.
         """

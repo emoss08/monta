@@ -19,11 +19,11 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Standard Library Imports
-from typing import Type
+from typing import Any, Type
 
 # Core Django Imports
 from django.views.generic import UpdateView, ListView
-from django.db.models import QuerySet, Model
+from django.db.models import QuerySet
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
@@ -114,7 +114,7 @@ class UpdateUserProfile(LoginRequiredMixin, UpdateView):
     ] = forms.UpdateProfileGeneralInformationForm
     success_url = "/"
 
-    def post(self, request: ASGIRequest, *args: any, **kwargs: any) -> JsonResponse:
+    def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
         Method to handle POST requests.
 
@@ -156,7 +156,7 @@ class UpdateUserEmail(LoginRequiredMixin, UpdateView):
     model: Type[models.MontaUser] = models.MontaUser
     form_class: Type[forms.UpdateUserEmailForm] = forms.UpdateUserEmailForm
 
-    def post(self, request: ASGIRequest, *args: any, **kwargs: any) -> JsonResponse:
+    def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
         Method to handle POST requests.
 
@@ -169,7 +169,7 @@ class UpdateUserEmail(LoginRequiredMixin, UpdateView):
         :return: Response object.
         :rtype: JsonResponse
         """
-        form = self.form_class(data=request.POST, instance=self.get_object())
+        form: forms.UpdateUserEmailForm = self.form_class(data=request.POST, instance=self.get_object())
         if form.is_valid():
             form.save()
             return JsonResponse(
