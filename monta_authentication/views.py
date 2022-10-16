@@ -59,6 +59,7 @@ def monta_authenticate_user(request: ASGIRequest) -> JsonResponse:
             return JsonResponse(
                 {"message": "Invalid username or password"}, status=400
             )
+
     except AuthenticationError as login_error:
         return JsonResponse(login_error, status=400)
 
