@@ -23,3 +23,6 @@ from django.apps import AppConfig
 class MontaUserConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "monta_user"
+
+    # def ready(self):
+    #     import monta_user.signals
