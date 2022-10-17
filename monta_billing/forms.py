@@ -18,9 +18,16 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+# Standard Library Imports
+from typing import Any, Type
+
 # Core Django Imports
 from django import forms
 from django.utils.translation import gettext_lazy as _
+
+# Third Party Imports
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Div, Field
 
 # Monta Imports
 from monta_billing import models
@@ -30,9 +37,9 @@ class AddChargeTypeForm(forms.ModelForm):
     """
     Form for adding a new charge type.
     """
+
     name = forms.CharField(
         max_length=100,
-        help_text=_("Name of the Charge Type"),
         error_messages={
             "required": _("Please enter a name for the Charge Type"),
             "max_length": _("Charge Type name must be less than 100 characters"),
@@ -43,30 +50,91 @@ class AddChargeTypeForm(forms.ModelForm):
                 "duplicate_key": _("A Charge Type with this name already exists"),
             },
         },
+        widget=forms.TextInput(attrs={"placeholder": "Enter Name"}),
     )
     description = forms.CharField(
         max_length=255,
-        help_text=_("Description of the Charge Type"),
         required=False,
         error_messages={
             "max_length": _(
                 "Charge Type description must be less than 255 characters."
             ),
         },
+        widget=forms.Textarea(attrs={"placeholder": "Enter Description", "rows": 2}),
     )
 
     class Meta:
         """
-        Meta class for AddChargeTypeForm.
+        Metaclass for AddChargeTypeForm.
         """
-        model = models.ChargeType
+
+        model: Type[models.ChargeType] = models.ChargeType
         fields = ("name", "description")
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        super(AddChargeTypeForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        self.helper.form_show_labels = False
+        self.helper.form_show_errors = False
+        self.helper.error_text_inline = False
+        self.helper.layout = Layout(
+            Div(
+                Div(
+                    Field("name", css_class="form-control", id="charge_type_name"),
+                    css_class="col-md-6",
+                ),
+                Div(
+                    Field("description", css_class="form-control"),
+                    css_class="col-md-6",
+                ),
+                css_class="row",
+            )
+        )
+
+        # Set the form's error messages
+        self.error_messages = {
+            "NON_FIELD_ERRORS": {
+                "unique": _("A Charge Type with this name already exists"),
+                "unique_together": _("A Charge Type with this name already exists"),
+                "duplicate_key": _("A Charge Type with this name already exists"),
+            },
+        }
+
+    def clean(self) -> None:
+        """
+        Clean the form.
+        """
+        super(AddChargeTypeForm, self).clean()
+
+        # Check if the charge type already exists
+        if models.ChargeType.objects.filter(name=self.cleaned_data["name"]).exists():
+            self.add_error(
+                "name",
+                forms.ValidationError(
+                    self.error_messages["NON_FIELD_ERRORS"]["unique"],
+                    code="unique",
+                ),
+            )
+
+    def save(self, commit: bool = True) -> models.ChargeType:
+        """
+        Save the form.
+        """
+        charge_type = super(AddChargeTypeForm, self).save(commit=False)
+        charge_type.name = self.cleaned_data["name"]
+        charge_type.description = self.cleaned_data["description"]
+        if commit:
+            charge_type.save()
+        return charge_type
 
 
 class AdditionalChargeForm(forms.ModelForm):
     """
     Form for adding a new additional charge.
     """
+
     order = forms.ModelChoiceField(
         queryset=models.Order.objects.all(),
     )
@@ -85,9 +153,10 @@ class AdditionalChargeForm(forms.ModelForm):
 
     class Meta:
         """
-        Meta class for AdditionalChargeForm.
+        Metaclass for AdditionalChargeForm.
         """
-        model = models.ChargeType
+
+        model: Type[models.ChargeType] = models.ChargeType
         fields = (
             "order",
             "name",
