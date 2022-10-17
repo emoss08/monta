@@ -23,11 +23,12 @@ from typing import Type, Any
 
 # Core Django Imports
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_safe
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.handlers.asgi import ASGIRequest
@@ -116,8 +117,20 @@ class ChargeTypeListView(
     """
 
     template_name = "monta_billing/charge_types/index.html"
-    http_method_names: list[str] = ["get"]
     permission_required: str = "monta_billing.view_chargetype"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        """
+        Get Context Data for Charge Type List View
+
+        :param kwargs: Keyword Arguments
+        :type kwargs: Any
+        :return: Context Data
+        """
+
+        context: dict = super().get_context_data(**kwargs)
+        context["form"] = forms.AddChargeTypeForm()
+        return context
 
 
 class ChargeTypeOverviewListView(AjaxDatatableView, mixins.LoginRequiredMixin):
@@ -264,6 +277,51 @@ class ChargeTypeCreateView(
             charge_type.save()
             return JsonResponse(
                 {"result": "success", "message": "Charge Type Posted Successfully"},
+                status=201,
+            )
+        return JsonResponse(
+            {"result": "error", "message": form.errors},
+            status=400,
+        )
+
+
+class ChargeTypeUpdateView(
+    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.UpdateView
+):
+    """
+    Class to update the Charge Type
+
+    Typical Usage Example:
+        >>> ChargeTypeUpdateView.as_view()
+    """
+
+    permission_required: str = "monta_billing.change_chargetype"
+    form_class: Type[forms.AddChargeTypeForm] = forms.AddChargeTypeForm
+
+    def post(
+        self,
+        request: ASGIRequest,
+        *args: Any,
+        **kwargs: Any,
+    ) -> JsonResponse:
+        """
+        Method to update a Charge Type
+
+        :param request
+        :type request: ASGIRequest
+        :param args
+        :type args: Any
+        :param kwargs
+        :type kwargs: Any
+        :return: JsonResponse
+        :rtype: JsonResponse
+        """
+        charge_type = get_object_or_404(models.ChargeType, pk=kwargs["pk"])
+        form = self.form_class(data=request.POST, instance=charge_type)
+        if form.is_valid():
+            form.save()
+            return JsonResponse(
+                {"result": "success", "message": "Charge Type Updated Successfully"},
                 status=201,
             )
         return JsonResponse(
@@ -471,6 +529,7 @@ def re_bill_order(request: ASGIRequest, order_id: str) -> JsonResponse:
 
 class ChargeTypeSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, View):
     """
+
     Class to delete a driver.
 
     Typical Usage Example:

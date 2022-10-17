@@ -100,6 +100,7 @@ class AddDriverProfileForm(forms.ModelForm):
         """
         Metaclass for AddDriverProfileForm.
         """
+
         model: Type[DriverProfile] = DriverProfile
         fields = (
             "driver",
@@ -139,6 +140,7 @@ class AddDriverContactForm(forms.ModelForm):
         """
         Metaclass for AddDriverContactForm.
         """
+
         model: Type[DriverContact] = DriverContact
         fields: list[str] = [
             "driver",

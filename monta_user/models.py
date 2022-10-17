@@ -56,7 +56,9 @@ class MontaUser(AbstractBaseUser, PermissionsMixin):
         max_length=30,
         unique=True,
         db_index=True,
-        help_text=_("Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."),
+        help_text=_(
+            "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+        ),
     )
     email = models.EmailField(
         _("Email Address"),

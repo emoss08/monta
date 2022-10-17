@@ -112,13 +112,14 @@ def list_charge_types(request: ASGIRequest) -> QuerySet[models.ChargeType] | Que
 @decorators.check_organization(models.ChargeType)
 @api.put("/charge_types/{charge_id}", tags=["Charge Types"])
 def update_charge_type(
-        request: ASGIRequest, charge_id: int, payload: ChargeTypeSchema
+    request: ASGIRequest, charge_id: int, payload: ChargeTypeSchema
 ) -> Response | ChargeTypeSchema:
     """
     Update a charge type
     """
-    charge_type: models.ChargeType = models.ChargeType.objects.get(pk__exact=charge_id,
-                                                                   organization=request.user.profile.organization)
+    charge_type: models.ChargeType = models.ChargeType.objects.get(
+        pk__exact=charge_id, organization=request.user.profile.organization
+    )
     for attr, value in payload.dict().items():
         setattr(charge_type, attr, value)
     charge_type.save()
@@ -131,7 +132,8 @@ def delete_charge_type(request: ASGIRequest, charge_id: int) -> Response:
     """
     Delete a charge type
     """
-    charge_type: models.ChargeType = models.ChargeType.objects.get(pk__exact=charge_id,
-                                                                   organization=request.user.profile.organization)
+    charge_type: models.ChargeType = models.ChargeType.objects.get(
+        pk__exact=charge_id, organization=request.user.profile.organization
+    )
     charge_type.delete()
     return Response({"detail": "Charge type deleted."}, status=204)

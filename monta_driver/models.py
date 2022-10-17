@@ -129,9 +129,9 @@ class Driver(TimeStampedModel):
         self.full_clean()
         if not self.driver_id:
             self.driver_id = (
-                    self.first_name[:1].upper()
-                    + self.last_name[:4].upper()
-                    + str(int(Driver.objects.count() + 1))
+                self.first_name[:1].upper()
+                + self.last_name[:4].upper()
+                + str(int(Driver.objects.count() + 1))
             )
         self.driver_id = self.driver_id.upper()
         super(Driver, self).save(**kwargs)

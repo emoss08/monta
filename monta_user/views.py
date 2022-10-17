@@ -170,7 +170,9 @@ class UpdateUserEmail(LoginRequiredMixin, UpdateView):
         :return: Response object.
         :rtype: JsonResponse
         """
-        form: forms.UpdateUserEmailForm = self.form_class(data=request.POST, instance=self.get_object())
+        form: forms.UpdateUserEmailForm = self.form_class(
+            data=request.POST, instance=self.get_object()
+        )
         if form.is_valid():
             form.save()
             return JsonResponse(

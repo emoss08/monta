@@ -21,7 +21,4 @@ from django.urls import path
 
 from monta_billing import api_v1 as billing_api
 
-urlpatterns = [
-    path("billing/", billing_api.api.urls)
-
-]
+urlpatterns = [path("billing/", billing_api.api.urls)]

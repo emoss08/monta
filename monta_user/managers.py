@@ -46,7 +46,9 @@ class MontaUserManager(BaseUserManager):
         user.save()
         return user
 
-    def create_superuser(self, username: str, email: str, password: str, **extra_fields: Any):
+    def create_superuser(
+        self, username: str, email: str, password: str, **extra_fields: Any
+    ):
         """
         Create and save a SuperUser with the given email and password.
         """
