@@ -17,6 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+from typing import Any
 
 # Core Django Imports
 from django.db import models
@@ -224,7 +225,7 @@ class Profile(TimeStampedModel):
         """
         return self.user.username
 
-    def save(self, *args: any, **kwargs: any) -> None:
+    def save(self, *args: Any, **kwargs: Any) -> None:
         """
         Save the profile instance to the database
 
