@@ -19,7 +19,7 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Standard library imports
-from typing import List, Type
+from typing import List
 
 # Core Django imports
 from django.db.models import QuerySet
@@ -27,11 +27,13 @@ from django.shortcuts import get_object_or_404
 from django.core.handlers.asgi import ASGIRequest
 
 # Django Ninja Imports
-from ninja import ModelSchema, NinjaAPI
+from ninja import NinjaAPI
 from ninja.pagination import paginate
+from ninja.responses import Response
 
 # Monta Imports
-from monta_billing import models
+from monta_billing import models, schema
+from monta import decorators
 
 """
 NOTE: Do not add docstrings to this file. Docstrings are added to the generated
@@ -39,35 +41,30 @@ documentation for the API. If you add docstrings to this file, they will be
 included in the documentation.
 """
 
-api = NinjaAPI(csrf=True, version='1.0.0')
+api = NinjaAPI(csrf=True, version="1.0.0")
 
 
-class ChargeTypeSchema(ModelSchema):
-    """
-    ChargeTypeSchema
-    """
-
-    class Config:
-        """
-        Config class
-        """
-        model: Type[models.ChargeType] = models.ChargeType
-        model_fields: list[str] = ['id', 'name', 'description']
-
-
+@decorators.check_organization(models.ChargeType)
 @api.post("/charge_types", tags=["Charge Types"])
-def create_charge_type(request: ASGIRequest, payload: ChargeTypeSchema) -> ChargeTypeSchema:
+def create_charge_type(
+    request: ASGIRequest, payload: schema.ChargeTypeIn
+) -> schema.ChargeTypeIn:
     """
     Create a new charge type
 
     Note:
     - **Organization** is set to the organization of the user making the request
     """
-    charge_type = models.ChargeType.objects.create(organization=request.user.profile.organization, **payload.dict())
-    return ChargeTypeSchema.from_orm(charge_type)
+    charge_type = models.ChargeType.objects.create(
+        organization=request.user.profile.organization, **payload.dict()
+    )
+    return schema.ChargeTypeIn.from_orm(charge_type)
 
 
-@api.get("/charge_types/{charge_id}", response=ChargeTypeSchema, tags=["Charge Types"])
+@decorators.check_organization(models.ChargeType)
+@api.get(
+    "/charge_types/{charge_id}", response=schema.ChargeTypeSchema, tags=["Charge Types"]
+)
 def get_charge_type(request: ASGIRequest, charge_id: int) -> models.ChargeType:
     """
     Get a charge type by id
@@ -76,7 +73,8 @@ def get_charge_type(request: ASGIRequest, charge_id: int) -> models.ChargeType:
     return charge_type
 
 
-@api.get("/charge_types", response=List[ChargeTypeSchema], tags=["Charge Types"])
+@decorators.check_organization(models.ChargeType)
+@api.get("/charge_types", response=List[schema.ChargeTypeSchema], tags=["Charge Types"])
 @paginate
 def list_charge_types(request: ASGIRequest) -> QuerySet[models.ChargeType] | QuerySet:
     """
@@ -86,27 +84,37 @@ def list_charge_types(request: ASGIRequest) -> QuerySet[models.ChargeType] | Que
     - **Organization** is set to the organization of the user making the request
     - **Charge Types** are paginated
     """
-    qs: QuerySet[models.ChargeType] = models.ChargeType.objects.filter(organization=request.user.profile.organization)
+    qs: QuerySet[models.ChargeType] = models.ChargeType.objects.filter(
+        organization=request.user.profile.organization
+    )
     return qs
 
 
+@decorators.check_organization(models.ChargeType)
 @api.put("/charge_types/{charge_id}", tags=["Charge Types"])
-def update_charge_type(request: ASGIRequest, charge_id: int, payload: ChargeTypeSchema) -> ChargeTypeSchema:
+def update_charge_type(
+    request: ASGIRequest, charge_id: int, payload: schema.ChargeTypeSchema
+) -> Response | schema.ChargeTypeSchema:
     """
     Update a charge type
     """
-    charge_type: models.ChargeType = get_object_or_404(models.ChargeType, pk=charge_id)
+    charge_type: models.ChargeType = models.ChargeType.objects.get(
+        pk__exact=charge_id, organization=request.user.profile.organization
+    )
     for attr, value in payload.dict().items():
         setattr(charge_type, attr, value)
     charge_type.save()
-    return ChargeTypeSchema.from_orm(charge_type)
+    return schema.ChargeTypeSchema.from_orm(charge_type)
 
 
+@decorators.check_organization(models.ChargeType)
 @api.delete("/charge_types/{charge_id}", tags=["Charge Types"])
-def delete_charge_type(request: ASGIRequest, charge_id: int) -> dict[str, str]:
+def delete_charge_type(request: ASGIRequest, charge_id: int) -> Response:
     """
     Delete a charge type
     """
-    charge_type: models.ChargeType = get_object_or_404(models.ChargeType, pk=charge_id)
+    charge_type: models.ChargeType = models.ChargeType.objects.get(
+        pk__exact=charge_id, organization=request.user.profile.organization
+    )
     charge_type.delete()
-    return {"message": "Charge type deleted successfully"}
+    return Response({"detail": "Charge type deleted."}, status=204)

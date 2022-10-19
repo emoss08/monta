@@ -59,7 +59,7 @@
     - [ ] Partial Shipments
     - [ ] Manifest Management
     - [ ] Manifest Profiles
-- [ ] Monta Order
+- [x] Monta Order
     - [x] Order Management
         - [x] Movement Management
         - [x] Stop Management
@@ -86,4 +86,3 @@
 - [ ] Monta Safety
     - [ ] Safety Management
     - [ ] Incident Management
-- [ ] Monta Telematics (TBD)

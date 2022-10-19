@@ -33,4 +33,3 @@ def create_settings(sender, instance, created, **kwargs) -> None:
     """
     if created:
         models.OrganizationSettings.objects.create(organization=instance)
-

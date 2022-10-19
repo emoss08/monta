@@ -44,6 +44,7 @@ class EquipmentType(TimeStampedModel):
     name: Name of the equipment type
     description: Description of the equipment type
     """
+
     organization = models.ForeignKey(
         Organization,
         related_name="equipment_types",
@@ -63,6 +64,7 @@ class EquipmentType(TimeStampedModel):
         """
         Equipment Type Model Metaclass
         """
+
         verbose_name = _("Equipment Type")
         verbose_name_plural = _("Equipment Types")
         ordering = ["equip_type_id"]
@@ -122,6 +124,7 @@ class Equipment(TimeStampedModel):
     state: State the vehicle is registered in
 
     """
+
     organization = models.ForeignKey(
         Organization,
         on_delete=models.PROTECT,
@@ -295,6 +298,7 @@ class EquipmentPermit(TimeStampedModel):
     permit_file_size: Size of the permit file
     deletion_date: Date the permit will be deleted
     """
+
     organization = models.ForeignKey(
         Organization,
         on_delete=models.PROTECT,
@@ -377,7 +381,7 @@ class EquipmentPermit(TimeStampedModel):
         :return: None
         :rtype: None
         """
-        self.permit_file_size = self.permit_file.size / (1024 ** 2)
+        self.permit_file_size = self.permit_file.size / (1024**2)
         super(EquipmentPermit, self).save(**kwargs)
 
     def get_absolute_url(self) -> str:
