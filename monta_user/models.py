@@ -29,6 +29,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import InternalError
 
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
@@ -58,7 +59,6 @@ class MontaUser(AbstractBaseUser, PermissionsMixin):
         _("Username"),
         max_length=30,
         unique=True,
-        db_index=True,
         help_text=_(
             "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
         ),
@@ -78,21 +78,21 @@ class MontaUser(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         """
-        Meta class for the MontaUser model
+        Metaclass for the MontaUser model
         """
 
         verbose_name = _("User")
         verbose_name_plural = _("Users")
         ordering = ["-date_joined"]
-        triggers = [
-            pgtrigger.Protect(
-                name="stops_protect_redundant_updates",
-                operation=pgtrigger.Update,
-                condition=pgtrigger.Condition(
-                    "OLD.* IS DISTINCT FROM NEW.*",
-                )
-            )
-        ]
+        # triggers = [
+        #     pgtrigger.Protect(
+        #         name="stops_protect_redundant_updates",
+        #         operation=pgtrigger.Update,
+        #         condition=pgtrigger.Condition(
+        #             "OLD.* IS DISTINCT FROM NEW.*"
+        #         )
+        #     )
+        # ]
 
     def __str__(self) -> str:
         """
@@ -103,21 +103,14 @@ class MontaUser(AbstractBaseUser, PermissionsMixin):
         """
         return self.username
 
-    def clean(self) -> None:
+    def get_absolute_url(self) -> str:
         """
-        Override the clean method to clean the user object
+        Returns the url to access a particular user instance.
 
-        :return: None
-        :rtype: None
+        :return: The url to access a particular user instance
+        :rtype: str
         """
-        # Normalize the email address implemented in the MontaUserManager
-        setattr(self, self.USERNAME_FIELD, self.normalize_username(self.get_username()))
-
-        # If stop_protect_redundant_updates is triggered, raise a validation error
-        if self._meta.triggers[0]:
-            raise ValidationError(
-                "Cannot update user because it would be redundant"
-            )
+        return reverse("user_profile_overview", kwargs={"pk": self.pk})
 
 
 class Profile(TimeStampedModel):
@@ -499,9 +492,9 @@ class Organization(TimeStampedModel):
         Save the organization
 
         :param args: The arguments
-        :type args: any
+        :type args: Any
         :param kwargs: The keyword arguments
-        :type kwargs: any
+        :type kwargs: Any
         :return: None
         :rtype: None
         """

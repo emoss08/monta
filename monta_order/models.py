@@ -35,6 +35,7 @@ from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 import googlemaps
 import pgtrigger
+from googlemaps.exceptions import ApiError
 
 # Monta Imports
 from monta_customer.models import Customer, DocumentClassification
@@ -697,7 +698,7 @@ class Order(TimeStampedModel):
         )
         self.create_stops()
 
-    def get_or_create_route(self) -> decimal.Decimal:
+    def get_or_create_route(self) -> ApiError | Any:
         """
         Function to get or create route for the order.
 

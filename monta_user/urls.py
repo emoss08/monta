@@ -23,7 +23,7 @@ from monta_user import views
 
 urlpatterns = [
     path(
-        "profile/<int:user_id>/overview/",
+        "profile/<int:pk>/overview/",
         views.UserProfileView.as_view(),
         name="user_profile_overview",
     ),
