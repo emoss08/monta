@@ -25,7 +25,7 @@ from monta_order import models
 
 
 @admin.register(models.Order)
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(admin.ModelAdmin[models.Order]):
     """Order Admin"""
 
     list_display = (
@@ -39,7 +39,7 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Movement)
-class MovementAdmin(admin.ModelAdmin):
+class MovementAdmin(admin.ModelAdmin[models.Movement]):
     """Movement Admin"""
 
     list_display = (
@@ -52,7 +52,7 @@ class MovementAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.ServiceIncident)
-class ServiceIncidentAdmin(admin.ModelAdmin):
+class ServiceIncidentAdmin(admin.ModelAdmin[models.ServiceIncident]):
     """ServiceIncident Admin"""
 
     list_display = (
@@ -64,7 +64,7 @@ class ServiceIncidentAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.OrderDocumentation)
-class OrderDocumentationAdmin(admin.ModelAdmin):
+class OrderDocumentationAdmin(admin.ModelAdmin[models.OrderDocumentation]):
     """OrderDocumentation Admin"""
 
     list_display = (
@@ -76,7 +76,7 @@ class OrderDocumentationAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Stop)
-class StopAdmin(admin.ModelAdmin):
+class StopAdmin(admin.ModelAdmin[models.Stop]):
     """Stop Admin"""
 
     list_display = (
@@ -90,7 +90,7 @@ class StopAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.OrderType)
-class OrderTypeAdmin(admin.ModelAdmin):
+class OrderTypeAdmin(admin.ModelAdmin[models.OrderType]):
     """Order Type Admin"""
 
     list_display = (
@@ -102,7 +102,7 @@ class OrderTypeAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.DelayCode)
-class DelayCodeAdmin(admin.ModelAdmin):
+class DelayCodeAdmin(admin.ModelAdmin[models.DelayCode]):
     """Delay Code Admin"""
 
     list_display = (
@@ -114,7 +114,7 @@ class DelayCodeAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Commodity)
-class CommodityAdmin(admin.ModelAdmin):
+class CommodityAdmin(admin.ModelAdmin[models.Commodity]):
     """Commodity Admin"""
 
     list_display = (
@@ -126,7 +126,7 @@ class CommodityAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.RevenueCode)
-class RevenueCodeAdmin(admin.ModelAdmin):
+class RevenueCodeAdmin(admin.ModelAdmin[models.RevenueCode]):
     """
     Revenue Code Admin
     """

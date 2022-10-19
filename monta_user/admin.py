@@ -24,25 +24,25 @@ from typing import Literal, Type
 from django.contrib import admin
 
 # Monta Imports
-from monta_user.models import MontaUser, Organization, Profile, JobTitle
+from monta_user import models
 
 
-@admin.register(Organization)
-class OrganizationInline(admin.ModelAdmin):
+@admin.register(models.Organization)
+class OrganizationInline(admin.ModelAdmin[models.Organization]):
     """Organization Admin"""
 
     list_display = ("name", "description", "created", "modified")
 
 
-@admin.register(JobTitle)
-class JobTitleInline(admin.ModelAdmin):
+@admin.register(models.JobTitle)
+class JobTitleInline(admin.ModelAdmin[models.JobTitle]):
     """Job Title Admin"""
 
     list_display = ("name", "description", "created", "modified")
 
 
-@admin.register(Profile)
-class ProfileUserInline(admin.ModelAdmin):
+@admin.register(models.Profile)
+class ProfileUserInline(admin.ModelAdmin[models.Profile]):
     """Profile Admin"""
 
     list_display = (
@@ -58,16 +58,16 @@ class ProfileUserInline(admin.ModelAdmin):
     )
 
 
-class ProfileInline(admin.StackedInline):
+class ProfileInline(admin.StackedInline[models.Profile]):
     """User Info Inline"""
 
-    model: Type[Profile] = Profile
+    model: Type[models.Profile] = models.Profile
     can_delete: Literal[False] = False
     verbose_name_plural: Literal["User Info"] = "User Info"
 
 
-@admin.register(MontaUser)
-class UserInline(admin.ModelAdmin):
+@admin.register(models.MontaUser)
+class UserInline(admin.ModelAdmin[models.MontaUser]):
     """User Inline"""
 
     inlines: tuple[Type[ProfileInline]] = (ProfileInline,)

@@ -5,7 +5,7 @@ from monta_routes import models
 
 
 @admin.register(models.Route)
-class RouteAdmin(admin.ModelAdmin):
+class RouteAdmin(admin.ModelAdmin[models.Route]):
     list_display = (
         "organization",
         "origin",

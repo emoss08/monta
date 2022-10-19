@@ -25,7 +25,7 @@ from monta_hazardous_material import models
 
 
 @admin.register(models.HazardousMaterial)
-class HazardousClassAdmin(admin.ModelAdmin):
+class HazardousClassAdmin(admin.ModelAdmin[models.HazardousMaterial]):
     """Hazardous Class Admin"""
 
     list_display = (

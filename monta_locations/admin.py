@@ -25,7 +25,7 @@ from monta_locations import models
 
 
 @admin.register(models.Location)
-class LocationAdmin(admin.ModelAdmin):
+class LocationAdmin(admin.ModelAdmin[models.Location]):
     list_display = (
         "location_id",
         "name",
@@ -54,7 +54,7 @@ class LocationAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.LocationContact)
-class LocationContactAdmin(admin.ModelAdmin):
+class LocationContactAdmin(admin.ModelAdmin[models.LocationContact]):
     list_display = (
         "location",
         "name",
