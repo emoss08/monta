@@ -37,7 +37,7 @@ class CustomerContactInline(admin.StackedInline):
 
 
 @admin.register(models.Customer)
-class CustomerAdmin(admin.ModelAdmin):
+class CustomerAdmin(admin.ModelAdmin[models.Customer]):
     """
     CustomerAdmin class
     """
@@ -62,11 +62,11 @@ class CustomerAdmin(admin.ModelAdmin):
         "zip_code",
     )
     ordering = ("customer_id",)
-    inlines = (CustomerContactInline,)
+    inlines: tuple[type[CustomerContactInline]] = (CustomerContactInline,)
 
 
 @admin.register(models.DocumentClassification)
-class DocumentClassificationAdmin(admin.ModelAdmin):
+class DocumentClassificationAdmin(admin.ModelAdmin[models.DocumentClassification]):
     """
     DocumentClassificationAdmin class
     """
@@ -77,7 +77,7 @@ class DocumentClassificationAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.CustomerBillingProfile)
-class CustomerBillingProfileAdmin(admin.ModelAdmin):
+class CustomerBillingProfileAdmin(admin.ModelAdmin[models.CustomerBillingProfile]):
     """
     CustomerBillingProfileAdmin class
     """

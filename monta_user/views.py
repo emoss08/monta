@@ -23,7 +23,7 @@ from typing import Any, Type
 
 # Core Django Imports
 from django.views.generic import UpdateView, ListView
-from django.db.models import QuerySet, Model
+from django.db.models import QuerySet
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
@@ -47,9 +47,6 @@ from monta_user import models, forms
 class UserProfileView(LoginRequiredMixin, ModelUserFieldPermissionMixin, ListView):
     """
     Class to render overview page for the user profile app.
-
-    Typical Usage:
-        >>> UserProfileView.as_view()
     """
 
     model: Type[models.Profile] = models.Profile
@@ -73,9 +70,6 @@ class UserProfileView(LoginRequiredMixin, ModelUserFieldPermissionMixin, ListVie
 class UserProfileSettings(LoginRequiredMixin, ModelUserFieldPermissionMixin, ListView):
     """
     Class to render settings page for the user profile app.
-
-    Typical usage example:
-        >>> UserProfileSettings.as_view()
     """
 
     model: Type[models.Profile] = models.Profile
@@ -98,14 +92,6 @@ class UserProfileSettings(LoginRequiredMixin, ModelUserFieldPermissionMixin, Lis
 class UpdateUserProfile(LoginRequiredMixin, UpdateView):
     """
     Class to update user's general information.
-
-    Overwrite the default dispatch method to check if the user is authenticated, if the user is not
-    authenticated, raise a PermissionDenied exception. After the user is authenticated, call the
-    default dispatch method. After the default dispatch method is called, check if the request method
-    is POST, if the request method is not POST, raise a PermissionDenied exception.
-
-    Typical usage example:
-        >>> UpdateUserProfile.as_view()
     """
 
     model: Type[models.Profile] = models.Profile
@@ -144,20 +130,12 @@ class UpdateUserProfile(LoginRequiredMixin, UpdateView):
 class UpdateUserEmail(LoginRequiredMixin, UpdateView):
     """
     Class to Update the user email action.
-
-    Overwrites the dispatch method to check if the password is correct. If the password is correct,
-    the form_valid method is called. If the password is incorrect, a JsonResponse is returned with
-    the error message.
-
-    Typical usage example:
-        >>> UpdateUserEmail.as_view()
     """
 
     model: Type[models.MontaUser] = models.MontaUser
     form_class: Type[forms.UpdateUserEmailForm] = forms.UpdateUserEmailForm
 
     def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
-
         """
         Method to handle POST requests.
 
@@ -190,56 +168,35 @@ class UpdateUserEmail(LoginRequiredMixin, UpdateView):
 class UpdateUserPassword(LoginRequiredMixin, UpdateView):
     """
     Class to Update the user password action.
-
-    Overwrites the default dispatch method to check if the user current password is correct.
-    If the password is correct, the form is valid and the password is updated.
-    If the password is incorrect, return a JsonResponse with the error message.
-
-    Returns:
-        HttpResponse
-
-    Typical usage example:
-        UpdateUserPassword(request, user_id)
     """
 
     model: Type[models.MontaUser] = models.MontaUser
     form_class: Type[forms.UpdateUserPasswordForm] = forms.UpdateUserPasswordForm
     success_url = "/"
 
-    def dispatch(
-        self,
-        request: ASGIRequest,
-        *args,
-        **kwargs,
-    ) -> None | JsonResponse:
+    def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
-        Method to check if the user is authenticated, if the user is not authenticated, raise a
+        Method to handle POST requests.
 
-        Args:
-            request (ASGIRequest): The request object.
-            *args: Arguments.
-            **kwargs: Keyword arguments.
-
-        Returns:
-            None | JsonResponse: None if the user is authenticated, JsonResponse if the user is not authenticated.
-
+        :param request: Request object.
+        :type request: ASGIRequest
+        :param args: Arguments.
+        :type args: Any
+        :param kwargs: Keyword arguments.
+        :type kwargs: Any
+        :return: Response object.
+        :rtype: JsonResponse
         """
-        user = self.get_object()
-        if check_password(request.POST["current_password"], user.password):
-            super().dispatch(request, *args, **kwargs)
-        return JsonResponse(
-            {"status": "error", "message": "Please check your password."}, status=400
+        form: forms.UpdateUserPasswordForm = self.form_class(
+            data=request.POST, instance=self.get_object()
         )
-
-    def form_valid(self, form: forms.UpdateProfileGeneralInformationForm) -> None:
-        """
-        Method to update the user password.
-
-        Args:
-            form (forms.UpdateProfileGeneralInformationForm): Form to update the user password.
-
-        Returns:
-            None
-        """
-        form.instance.user = self.request.user
-        super().form_valid(form)
+        if form.is_valid():
+            form.save()
+            return JsonResponse(
+                {"result": "success", "message": "Password Updated Successfully"},
+                status=201,
+            )
+        return JsonResponse(
+            {"result": "error", "message": form.errors},
+            status=400,
+        )

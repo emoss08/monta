@@ -314,8 +314,12 @@ class ChargeTypeUpdateView(
         :return: JsonResponse
         :rtype: JsonResponse
         """
-        charge_type: models.ChargeType = get_object_or_404(models.ChargeType, pk=kwargs["pk"])
-        form: forms.AddChargeTypeForm = self.form_class(data=request.POST, instance=charge_type)
+        charge_type: models.ChargeType = get_object_or_404(
+            models.ChargeType, pk=kwargs["pk"]
+        )
+        form: forms.AddChargeTypeForm = self.form_class(
+            data=request.POST, instance=charge_type
+        )
         if form.is_valid():
             form.save()
             return JsonResponse(
@@ -512,7 +516,9 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
                 [customer_contact.contact_email],
             )
         else:
-            missing_requirements: set[Any] = set(billing_requirements) - set(order_document)
+            missing_requirements: set[Any] = set(billing_requirements) - set(
+                order_document
+            )
             for requirement in missing_requirements:
                 if not models.BillingException.objects.filter(
                         order=order.order,

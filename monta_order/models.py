@@ -34,15 +34,17 @@ from django.utils.translation import gettext_lazy as _
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 import googlemaps
+import pgtrigger
+from googlemaps.exceptions import ApiError
 
 # Monta Imports
 from monta_customer.models import Customer, DocumentClassification
 from monta_driver.models import Driver
 from monta_hazardous_material.models import HazardousMaterial
 from monta_locations.models import Location
-from monta_organization.models import Integration, OrganizationSettings
+from monta_organization.models import Integration, OrganizationSettings, Organization
 from monta_routes.models import Route
-from monta_user.models import MontaUser, Organization
+from monta_user.models import MontaUser
 from monta_equipment.models import EquipmentType, Equipment
 
 
@@ -696,7 +698,7 @@ class Order(TimeStampedModel):
         )
         self.create_stops()
 
-    def get_or_create_route(self) -> decimal.Decimal:
+    def get_or_create_route(self) -> ApiError | Any:
         """
         Function to get or create route for the order.
 
@@ -1303,6 +1305,15 @@ class Stop(TimeStampedModel):
         ordering = ["sequence"]
         indexes = [
             models.Index(fields=["sequence"]),
+        ]
+        triggers = [
+            pgtrigger.Protect(
+                name="stops_protect_redundant_updates",
+                operation=pgtrigger.Update,
+                condition=pgtrigger.Condition(
+                    "OLD.* IS DISTINCT FROM NEW.*",
+                )
+            )
         ]
 
     def __str__(self) -> str:
