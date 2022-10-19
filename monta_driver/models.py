@@ -88,7 +88,7 @@ class Driver(TimeStampedModel):
         permissions: The permissions of the model
         """
 
-        ordering: list[functions.Lower] = (functions.Lower("last_name"),)
+        ordering: tuple[functions.Lower] = (functions.Lower("last_name"),)
         verbose_name: str = _("Driver")
         verbose_name_plural: str = _("Drivers")
         indexes = [
