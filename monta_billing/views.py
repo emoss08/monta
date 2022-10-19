@@ -28,7 +28,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_safe
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.handlers.asgi import ASGIRequest
@@ -36,7 +35,6 @@ from django.core.mail import send_mail
 from django.views.decorators.vary import vary_on_cookie
 from django.views import generic, View
 from django.contrib.auth import mixins
-from django.db import transaction
 from django.db.models import QuerySet
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -179,7 +177,7 @@ class ChargeTypeOverviewListView(AjaxDatatableView, mixins.LoginRequiredMixin):
         """
         return qs.order_by("-name")
 
-    def customize_row(self, row: Any, obj: Any) -> dict:
+    def customize_row(self, row: dict[Any, Any], obj: models.ChargeType) -> dict:
         """
         Customize the row by adding the driver information, license number, license state, license expiration, and
         actions.
@@ -254,8 +252,8 @@ class ChargeTypeCreateView(
 
     permission_required: str = "monta_billing.add_chargetype"
     form_class: Type[forms.AddChargeTypeForm] = forms.AddChargeTypeForm
-    success_url = "/charge_type/"
-    template_name = "monta_billing/charge_types/index.html"
+    success_url: str = "/charge_type/"
+    template_name: str = "monta_billing/charge_types/index.html"
 
     def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
@@ -270,7 +268,7 @@ class ChargeTypeCreateView(
         :return: JsonResponse
         :rtype: JsonResponse
         """
-        form = self.form_class(data=request.POST)
+        form: forms.AddChargeTypeForm = self.form_class(data=request.POST)
         if form.is_valid():
             charge_type = form.save(commit=False)
             charge_type.organization = request.user.profile.organization
@@ -299,10 +297,10 @@ class ChargeTypeUpdateView(
     form_class: Type[forms.AddChargeTypeForm] = forms.AddChargeTypeForm
 
     def post(
-        self,
-        request: ASGIRequest,
-        *args: Any,
-        **kwargs: Any,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Method to update a Charge Type
@@ -316,8 +314,8 @@ class ChargeTypeUpdateView(
         :return: JsonResponse
         :rtype: JsonResponse
         """
-        charge_type = get_object_or_404(models.ChargeType, pk=kwargs["pk"])
-        form = self.form_class(data=request.POST, instance=charge_type)
+        charge_type: models.ChargeType = get_object_or_404(models.ChargeType, pk=kwargs["pk"])
+        form: forms.AddChargeTypeForm = self.form_class(data=request.POST, instance=charge_type)
         if form.is_valid():
             form.save()
             return JsonResponse(
@@ -338,7 +336,7 @@ class ChargeTypeDeleteView(
     """
 
     model: Type[models.ChargeType] = models.ChargeType
-    permission_required = "monta_billing.delete_chargetype"
+    permission_required: str = "monta_billing.delete_chargetype"
 
     def get(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
@@ -358,6 +356,59 @@ class ChargeTypeDeleteView(
         return JsonResponse(
             {"result": "success", "message": "Charge Type Deleted Successfully"},
             status=204,
+        )
+
+
+class ChargeTypeSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, View):
+    """
+
+    Class to delete a driver.
+
+    Typical Usage Example:
+        >>> ChargeTypeSearchView.as_view()
+    """
+
+    permission_required: str = "monta_billing.view_chargetypes"
+
+    def get(self, request: ASGIRequest) -> HttpResponse:
+        """
+        Get request for getting results from the search with params.
+
+        :param request
+        :type request: ASGIRequest
+        :return HttpResponse of the Charge Type search form
+        :rtype HttpResponse
+        """
+        form: SearchForm = SearchForm()
+        query = request.GET["query"] if "query" in request.GET else None
+        results: QuerySet[models.ChargeType] | list = []
+        if query:
+            form: SearchForm = SearchForm({"query": query})
+            search_vector: SearchVector = SearchVector(
+                "organization__name",
+                "name",
+                "description",
+            )
+            search_query: SearchQuery = SearchQuery(query)
+            results: QuerySet[models.ChargeType] = (
+                models.ChargeType.objects.annotate(
+                    search=search_vector, rank=SearchRank(search_vector, search_query)
+                )
+                .filter(
+                    search=search_query, organization=request.user.profile.organization
+                )
+                .select_related("profile")
+                .order_by("-rank")
+            )
+
+        return render(
+            request,
+            "monta_driver/search.html",
+            {
+                "form": form,
+                "query": query,
+                "results": results,
+            },
         )
 
 
@@ -437,7 +488,7 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
             primary_contact=True,
         ).first()
         for requirement in customer_billing_profile.values_list(
-            "document_class", flat=True
+                "document_class", flat=True
         ):
             billing_requirements.append(requirement)
         for document in order.order.order_documentation.all():
@@ -461,13 +512,12 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
                 [customer_contact.contact_email],
             )
         else:
-            missing_requirements = set(billing_requirements) - set(order_document)
+            missing_requirements: set[Any] = set(billing_requirements) - set(order_document)
             for requirement in missing_requirements:
-                # If the order already has a billing exception, do not create a new one
                 if not models.BillingException.objects.filter(
-                    order=order.order,
-                    organization=request.user.profile.organization,
-                    exception_type="PAPERWORK",
+                        order=order.order,
+                        organization=request.user.profile.organization,
+                        exception_type="PAPERWORK",
                 ):
                     billing_exception: models.BillingException = (
                         models.BillingException.objects.create(
@@ -525,56 +575,3 @@ def re_bill_order(request: ASGIRequest, order_id: str) -> JsonResponse:
         {"result": "success", "message": "Order set back to ready to bill"},
         status=201,
     )
-
-
-class ChargeTypeSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, View):
-    """
-
-    Class to delete a driver.
-
-    Typical Usage Example:
-        >>> ChargeTypeSearchView.as_view()
-    """
-
-    permission_required: str = "monta_billing.view_chargetypes"
-
-    def get(self, request: ASGIRequest) -> HttpResponse:
-        """
-        Get request for getting results from the search with params.
-
-        :param request
-        :type request: ASGIRequest
-        :return HttpResponse of the Charge Type search form
-        :rtype HttpResponse
-        """
-        form: SearchForm = SearchForm()
-        query = request.GET["query"] if "query" in request.GET else None
-        results: QuerySet[models.ChargeType] | list = []
-        if query:
-            form: SearchForm = SearchForm({"query": query})
-            search_vector: SearchVector = SearchVector(
-                "organization__name",
-                "name",
-                "description",
-            )
-            search_query: SearchQuery = SearchQuery(query)
-            results: QuerySet[models.ChargeType] = (
-                models.ChargeType.objects.annotate(
-                    search=search_vector, rank=SearchRank(search_vector, search_query)
-                )
-                .filter(
-                    search=search_query, organization=request.user.profile.organization
-                )
-                .select_related("profile")
-                .order_by("-rank")
-            )
-
-        return render(
-            request,
-            "monta_driver/search.html",
-            {
-                "form": form,
-                "query": query,
-                "results": results,
-            },
-        )

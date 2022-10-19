@@ -18,6 +18,9 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+# Standard Python Libraries
+from typing import final
+
 # Core Django Imports
 from django.db import models
 from django.urls import reverse
@@ -29,6 +32,7 @@ from monta_user.models import Organization
 from monta_routes.models import GoogleRouteDistanceUnitChoices, GoogleRouteModelChoices
 
 
+@final
 class IntegrationChoices(models.TextChoices):
     """
     Google API Choices

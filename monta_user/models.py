@@ -396,7 +396,7 @@ class JobTitle(TimeStampedModel):
         """
         return self.name
 
-    def save(self, *args: any, **kwargs: any) -> None:
+    def save(self, *args: Any, **kwargs: Any) -> None:
         """
         Save the job title instance to the database
 

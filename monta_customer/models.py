@@ -19,7 +19,7 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Standard library imports
-from typing import Any
+from typing import Any, Optional
 
 # Core Django Models
 from django.template.defaultfilters import slugify
@@ -153,7 +153,7 @@ class Customer(TimeStampedModel):
             models.Index(fields=["customer_id"]),
         ]
 
-    def __str__(self) -> str:
+    def __str__(self) -> Optional[str]:
         """
         Return the string representation of the customer
 

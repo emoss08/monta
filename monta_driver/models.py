@@ -28,7 +28,7 @@ from django.urls import reverse
 from django.templatetags.static import static
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-from django.db.models import functions
+from django.db.models import functions, QuerySet
 
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
@@ -99,7 +99,7 @@ class Driver(TimeStampedModel):
             ("search_drivers", "Can search drivers"),
         ]
 
-    def get_driver_fleets(self) -> list[Fleet]:
+    def get_driver_fleets(self) -> QuerySet[Fleet]:
         """
         Get the fleets for the driver
 
