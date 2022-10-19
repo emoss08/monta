@@ -28,7 +28,7 @@ from django.contrib import admin
 from monta_customer import models
 
 
-class CustomerContactInline(admin.StackedInline):
+class CustomerContactInline(admin.StackedInline[models.CustomerContact]):
     """
     CustomerContactInline class
     """

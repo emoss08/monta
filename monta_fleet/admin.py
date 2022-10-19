@@ -19,12 +19,12 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 from django.contrib import admin
 
-from monta_fleet.models import Fleet
+from monta_fleet import models
 
 
 # Register your models here.
-@admin.register(Fleet)
-class FleetAdmin(admin.ModelAdmin):
+@admin.register(models.Fleet)
+class FleetAdmin(admin.ModelAdmin[models.Fleet]):
     """Fleet Admin"""
 
     list_display = ("name", "description")

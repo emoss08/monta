@@ -26,7 +26,7 @@ from monta_billing import models
 
 
 @admin.register(models.ChargeType)
-class ChargeTypeAdmin(admin.ModelAdmin):
+class ChargeTypeAdmin(admin.ModelAdmin[models.ChargeType]):
     """
     ChargeType Admin
     """
@@ -42,7 +42,7 @@ class ChargeTypeAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.AdditionalCharge)
-class AdditionalChargeAdmin(admin.ModelAdmin):
+class AdditionalChargeAdmin(admin.ModelAdmin[models.AdditionalCharge]):
     """
     Admin for AdditionalCharge model
     """
@@ -62,7 +62,7 @@ class AdditionalChargeAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.BillingQueue)
-class BillingQueueAdmin(admin.ModelAdmin):
+class BillingQueueAdmin(admin.ModelAdmin[models.BillingQueue]):
     """
     Admin for BillingQueue
     """
@@ -72,7 +72,7 @@ class BillingQueueAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.BillingHistory)
-class BillingHistoryAdmin(admin.ModelAdmin):
+class BillingHistoryAdmin(admin.ModelAdmin[models.BillingHistory]):
     """
     Billing History Admin
     """
@@ -88,7 +88,7 @@ class BillingHistoryAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.BillingException)
-class BillingExceptionAdmin(admin.ModelAdmin):
+class BillingExceptionAdmin(admin.ModelAdmin[models.BillingException]):
     """
     Admin for BillingException
     """

@@ -24,18 +24,18 @@ from typing import Literal
 from django.contrib import admin
 
 # Monta Imports
-from monta_equipment.models import Equipment, EquipmentType
+from monta_equipment import models
 
 
-@admin.register(EquipmentType)
-class EquipmentTypeAdmin(admin.ModelAdmin):
+@admin.register(models.EquipmentType)
+class EquipmentTypeAdmin(admin.ModelAdmin[models.EquipmentType]):
     """Equipment Type Admin"""
 
     list_display = ("equip_type_id", "name", "description", "created", "modified")
 
 
-@admin.register(Equipment)
-class EquipmentAdmin(admin.ModelAdmin):
+@admin.register(models.Equipment)
+class EquipmentAdmin(admin.ModelAdmin[models.Equipment]):
     """Equipment Admin"""
 
     list_display = (
