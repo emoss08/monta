@@ -17,6 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+import uuid
 from typing import Any
 
 # Core Django Imports
@@ -32,6 +33,7 @@ from django.core.exceptions import ValidationError
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 from localflavor.us.models import USStateField, USZipCodeField
+import pgtrigger
 
 # Monta Imports
 from monta_user.managers import MontaUserManager
@@ -74,6 +76,24 @@ class MontaUser(AbstractBaseUser, PermissionsMixin):
 
     objects = MontaUserManager()
 
+    class Meta:
+        """
+        Meta class for the MontaUser model
+        """
+
+        verbose_name = _("User")
+        verbose_name_plural = _("Users")
+        ordering = ["-date_joined"]
+        triggers = [
+            pgtrigger.Protect(
+                name="stops_protect_redundant_updates",
+                operation=pgtrigger.Update,
+                condition=pgtrigger.Condition(
+                    "OLD.* IS DISTINCT FROM NEW.*",
+                )
+            )
+        ]
+
     def __str__(self) -> str:
         """
         String representation of the user
@@ -92,10 +112,12 @@ class MontaUser(AbstractBaseUser, PermissionsMixin):
         """
         # Normalize the email address implemented in the MontaUserManager
         setattr(self, self.USERNAME_FIELD, self.normalize_username(self.get_username()))
-        if self.email:
-            # Ensure the user is not updating their email to the same email as they already have.
-            if self.email == self.__class__.objects.get(id=self.id).email:
-                raise ValidationError(_("This email is already in use by you."))
+
+        # If stop_protect_redundant_updates is triggered, raise a validation error
+        if self._meta.triggers[0]:
+            raise ValidationError(
+                "Cannot update user because it would be redundant"
+            )
 
 
 class Profile(TimeStampedModel):
@@ -432,10 +454,15 @@ class Organization(TimeStampedModel):
     profile_picture: The profile picture of the organization
     """
 
-    org_id = models.SlugField(
-        _("Organization ID"), max_length=255, unique=True, null=True, blank=True
-    )
     name = models.CharField(_("Organization Name"), max_length=255, unique=True)
+    org_id = models.UUIDField(
+        _("Organization ID"),
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        blank=True,
+        null=True,
+    )
     description = models.TextField(_("Organization Description"), null=True, blank=True)
     profile_picture = models.ImageField(
         _("Profile Picture"), upload_to="organizations/", null=True, blank=True
@@ -454,7 +481,7 @@ class Organization(TimeStampedModel):
         ordering: list[str] = ["name"]
         verbose_name: str = _("Organization")
         verbose_name_plural: str = _("Organizations")
-        indexes = [
+        indexes: list[models.Index] = [
             models.Index(fields=["name"]),
         ]
 
@@ -478,9 +505,9 @@ class Organization(TimeStampedModel):
         :return: None
         :rtype: None
         """
-        if not self.org_id:
-            self.org_id = slugify(self.name)
         self.full_clean()
+        if not self.org_id:
+            self.org_id = uuid.uuid4()
         return super(Organization, self).save(**kwargs)
 
     def get_absolute_url(self) -> str:
@@ -491,12 +518,3 @@ class Organization(TimeStampedModel):
         :rtype: str
         """
         return reverse("", kwargs={"pk": self.pk})
-
-    def get_org_id_name_combo(self) -> str:
-        """
-        Get the organization id and name combo
-
-        :return: The organization id and name combo
-        :rtype: str
-        """
-        return f"{self.org_id} - {self.name}"

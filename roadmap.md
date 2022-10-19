@@ -44,7 +44,7 @@
     - [x] Fleet Management
 - [x] Monta Hazardous Material
     - [x] Hazardous Class Management
-- [x] Monta Learning
+- [ ] Monta Learning
     - [ ] Knowledge Base
     - [ ] Courses
     - [ ] Quizzes

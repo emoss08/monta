@@ -297,10 +297,10 @@ class ChargeTypeUpdateView(
     form_class: Type[forms.AddChargeTypeForm] = forms.AddChargeTypeForm
 
     def post(
-            self,
-            request: ASGIRequest,
-            *args: Any,
-            **kwargs: Any,
+        self,
+        request: ASGIRequest,
+        *args: Any,
+        **kwargs: Any,
     ) -> JsonResponse:
         """
         Method to update a Charge Type
@@ -314,8 +314,12 @@ class ChargeTypeUpdateView(
         :return: JsonResponse
         :rtype: JsonResponse
         """
-        charge_type: models.ChargeType = get_object_or_404(models.ChargeType, pk=kwargs["pk"])
-        form: forms.AddChargeTypeForm = self.form_class(data=request.POST, instance=charge_type)
+        charge_type: models.ChargeType = get_object_or_404(
+            models.ChargeType, pk=kwargs["pk"]
+        )
+        form: forms.AddChargeTypeForm = self.form_class(
+            data=request.POST, instance=charge_type
+        )
         if form.is_valid():
             form.save()
             return JsonResponse(
@@ -488,7 +492,7 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
             primary_contact=True,
         ).first()
         for requirement in customer_billing_profile.values_list(
-                "document_class", flat=True
+            "document_class", flat=True
         ):
             billing_requirements.append(requirement)
         for document in order.order.order_documentation.all():
@@ -512,12 +516,14 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
                 [customer_contact.contact_email],
             )
         else:
-            missing_requirements: set[Any] = set(billing_requirements) - set(order_document)
+            missing_requirements: set[Any] = set(billing_requirements) - set(
+                order_document
+            )
             for requirement in missing_requirements:
                 if not models.BillingException.objects.filter(
-                        order=order.order,
-                        organization=request.user.profile.organization,
-                        exception_type="PAPERWORK",
+                    order=order.order,
+                    organization=request.user.profile.organization,
+                    exception_type="PAPERWORK",
                 ):
                     billing_exception: models.BillingException = (
                         models.BillingException.objects.create(

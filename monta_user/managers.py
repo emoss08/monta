@@ -19,6 +19,7 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Standard Library Imports
+from __future__ import annotations
 from typing import Any
 import unicodedata
 
