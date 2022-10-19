@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from functools import wraps
 from typing import Type, Callable, Any
 from django.core.handlers.asgi import ASGIRequest
