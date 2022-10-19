@@ -46,7 +46,9 @@ api = NinjaAPI(csrf=True, version="1.0.0")
 
 @decorators.check_organization(models.ChargeType)
 @api.post("/charge_types", tags=["Charge Types"])
-def create_charge_type(request: ASGIRequest, payload: schema.ChargeTypeIn) -> schema.ChargeTypeIn:
+def create_charge_type(
+    request: ASGIRequest, payload: schema.ChargeTypeIn
+) -> schema.ChargeTypeIn:
     """
     Create a new charge type
 
@@ -60,7 +62,9 @@ def create_charge_type(request: ASGIRequest, payload: schema.ChargeTypeIn) -> sc
 
 
 @decorators.check_organization(models.ChargeType)
-@api.get("/charge_types/{charge_id}", response=schema.ChargeTypeSchema, tags=["Charge Types"])
+@api.get(
+    "/charge_types/{charge_id}", response=schema.ChargeTypeSchema, tags=["Charge Types"]
+)
 def get_charge_type(request: ASGIRequest, charge_id: int) -> models.ChargeType:
     """
     Get a charge type by id
@@ -89,7 +93,7 @@ def list_charge_types(request: ASGIRequest) -> QuerySet[models.ChargeType] | Que
 @decorators.check_organization(models.ChargeType)
 @api.put("/charge_types/{charge_id}", tags=["Charge Types"])
 def update_charge_type(
-        request: ASGIRequest, charge_id: int, payload: schema.ChargeTypeSchema
+    request: ASGIRequest, charge_id: int, payload: schema.ChargeTypeSchema
 ) -> Response | schema.ChargeTypeSchema:
     """
     Update a charge type
