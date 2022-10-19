@@ -17,6 +17,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+# Standard Python Libraries
+from typing import final
 
 # Core Django Imports
 from django.utils.translation import gettext_lazy as _
@@ -30,6 +32,7 @@ from django_extensions.db.models import TimeStampedModel
 from monta_user.models import Organization
 
 
+@final
 class GoogleRouteAvoidanceChoices(models.TextChoices):
     """Google Route Avoidance Choices"""
 
@@ -38,6 +41,7 @@ class GoogleRouteAvoidanceChoices(models.TextChoices):
     FERRIES = "ferries", "Ferries"
 
 
+@final
 class GoogleRouteModelChoices(models.TextChoices):
     """Google Route Model Choices"""
 
@@ -46,6 +50,7 @@ class GoogleRouteModelChoices(models.TextChoices):
     PESSIMISTIC = "pessimistic", "Pessimistic"
 
 
+@final
 class GoogleRouteDistanceUnitChoices(models.TextChoices):
     """Google Route Distance Unit Choices"""
 
@@ -147,7 +152,6 @@ class Route(TimeStampedModel):
             str: Absolute url for the Route model
         """
         return reverse("route_detail", kwargs={"pk": self.pk})
-
 
 # class RouteConfiguration(TimeStampedModel):
 #     organization = models.OneToOneField(

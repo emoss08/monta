@@ -19,7 +19,7 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Standard library imports
-from typing import Any
+from typing import Any, final
 
 # Core Django Imports
 from django.db import models
@@ -35,6 +35,7 @@ from monta_order.models import Order, Commodity, StatusChoices
 from monta_user.models import Organization
 
 
+@final
 class BillingExceptionChoices(models.TextChoices):
     """
     Status choices for Order model
@@ -46,6 +47,7 @@ class BillingExceptionChoices(models.TextChoices):
     OTHER = "OTHER", _("Other")
 
 
+@final
 class BillTypeChoices(models.TextChoices):
     """
     Status choices for Order model
