@@ -297,10 +297,10 @@ class ChargeTypeUpdateView(
     form_class: Type[forms.AddChargeTypeForm] = forms.AddChargeTypeForm
 
     def post(
-        self,
-        request: ASGIRequest,
-        *args: Any,
-        **kwargs: Any,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Method to update a Charge Type
@@ -492,7 +492,7 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
             primary_contact=True,
         ).first()
         for requirement in customer_billing_profile.values_list(
-            "document_class", flat=True
+                "document_class", flat=True
         ):
             billing_requirements.append(requirement)
         for document in order.order.order_documentation.all():
@@ -521,9 +521,9 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
             )
             for requirement in missing_requirements:
                 if not models.BillingException.objects.filter(
-                    order=order.order,
-                    organization=request.user.profile.organization,
-                    exception_type="PAPERWORK",
+                        order=order.order,
+                        organization=request.user.profile.organization,
+                        exception_type="PAPERWORK",
                 ):
                     billing_exception: models.BillingException = (
                         models.BillingException.objects.create(

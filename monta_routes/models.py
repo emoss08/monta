@@ -153,7 +153,6 @@ class Route(TimeStampedModel):
         """
         return reverse("route_detail", kwargs={"pk": self.pk})
 
-
 # class RouteConfiguration(TimeStampedModel):
 #     organization = models.OneToOneField(
 #         Organization,
