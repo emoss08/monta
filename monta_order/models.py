@@ -1238,6 +1238,7 @@ class Stop(TimeStampedModel):
         :rtype: None
         :raises ValidationError
         """
+        cleaned_data: None = super(Stop, self).clean()
         if self.pk:
             if self.status == StatusChoices.AVAILABLE:
                 old_status = Stop.objects.get(pk__exact=self.pk).status
@@ -1329,7 +1330,7 @@ class Stop(TimeStampedModel):
                     raise ValidationError(
                         _("Stop departure time cannot be before the stop arrival time")
                     )
-        super(Stop, self).clean()
+        return cleaned_data
 
     def save(self, **kwargs: Any) -> None:
         """
@@ -1340,8 +1341,6 @@ class Stop(TimeStampedModel):
         :return: None
         :rtype: None
         """
-        self.full_clean()
-
         # If the status changes to in progress, change the movement status associated to this stop to in progress.
         if self.status == StatusChoices.IN_PROGRESS:
             self.movement.status = StatusChoices.IN_PROGRESS

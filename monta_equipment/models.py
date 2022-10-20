@@ -323,8 +323,6 @@ class EquipmentPermit(TimeStampedModel):
         :return: None
         :rtype: None
         """
-        if self.deletion_date:
-            raise ValidationError(_("Permit File cannot be deleted."))
         if self.permit_file_size:
             if self.permit_file_size > 10000000:
                 raise ValidationError(_("Permit File cannot be larger than 10MB."))

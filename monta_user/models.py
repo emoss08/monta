@@ -28,13 +28,10 @@ from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.db import InternalError
 
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 from localflavor.us.models import USStateField, USZipCodeField
-import pgtrigger
 
 # Monta Imports
 from monta_user.managers import MontaUserManager
@@ -378,7 +375,11 @@ class JobTitle(TimeStampedModel):
     name: The name of the job title
     description: The description of the job title
     """
-
+    organization = models.ForeignKey(
+        "Organization",
+        on_delete=models.CASCADE,
+        related_name="job_titles",
+    )
     title_id = models.SlugField(
         _("Title ID"), max_length=255, unique=True, null=True, blank=True
     )

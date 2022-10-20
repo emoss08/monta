@@ -21,7 +21,6 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 # Standard Library Imports
 from typing import (
     List,
-    Literal,
     Type,
     Any,
 )
@@ -39,7 +38,6 @@ from django.views import View
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import (
     require_safe,
-    require_POST,
 )
 from django.views.decorators.vary import vary_on_cookie
 from django.views.generic import (
