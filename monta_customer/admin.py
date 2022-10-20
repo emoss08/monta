@@ -31,7 +31,7 @@ from monta_customer import models
 class CustomerBillingProfileInline(admin.StackedInline[models.CustomerBillingProfile]):
     """CustomerBillingProfile Inline"""
     model: Type[models.CustomerBillingProfile] = models.CustomerBillingProfile
-    extra = 0
+    extra: int = 0
 
 
 class CustomerContactInline(admin.TabularInline[models.CustomerContact]):

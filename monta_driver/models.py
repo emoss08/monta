@@ -43,14 +43,6 @@ from monta_fleet.models import Fleet
 class Driver(TimeStampedModel):
     """
     Driver Model Fields
-
-    driver_id: The unique identifier for the driver
-    first_name: The first name of the driver
-    last_name: The last name of the driver
-    email: The email address of the driver
-    phone_number: The phone number of the driver
-    organization: The organization the driver belongs to
-    fleet: The fleet the driver belongs to
     """
 
     organization = models.ForeignKey(
@@ -80,12 +72,6 @@ class Driver(TimeStampedModel):
     class Meta:
         """
         Meta Class for Driver Model
-
-        verbose_name: The verbose name for the model
-        verbose_name_plural: The plural verbose name for the model
-        ordering: The ordering of the model
-        indexes: The indexes of the model
-        permissions: The permissions of the model
         """
 
         ordering: tuple[functions.Lower] = (functions.Lower("last_name"),)
@@ -112,8 +98,8 @@ class Driver(TimeStampedModel):
         """
         String representation of the driver
 
-        Returns:
-            str: The string representation of the driver
+        :return: The string representation of the driver
+        :rtype: str
         """
         return f"{self.driver_id} - {self.last_name}"
 
@@ -129,9 +115,9 @@ class Driver(TimeStampedModel):
         self.full_clean()
         if not self.driver_id:
             self.driver_id = (
-                self.first_name[:1].upper()
-                + self.last_name[:4].upper()
-                + str(int(Driver.objects.count() + 1))
+                    self.first_name[:1].upper()
+                    + self.last_name[:4].upper()
+                    + str(int(Driver.objects.count() + 1))
             )
         self.driver_id = self.driver_id.upper()
         super(Driver, self).save(**kwargs)
@@ -184,22 +170,15 @@ class Driver(TimeStampedModel):
 class DriverProfile(TimeStampedModel):
     """
     Driver Profile Model Fields
-
-    driver: The driver the profile belongs to
-    address_line_1: The first line of the address
-    address_line_2: The second line of the address
-    city: The city of the address
-    state: The state of the address
-    zip_code: The zip code of the address
-    license_number: The license number of the driver
-    license_state: The state the license is issued in
-    license_expiration: The expiration date of the license
-    is_hazmat: Whether the driver is hazmat certified
-    is_tanker: Whether the driver is tanker certified
-    is_double_triple: Whether the driver is double/triple certified
-    is_passenger: Whether the driver is passenger certified
     """
 
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.PROTECT,
+        related_name="driver_profiles",
+        related_query_name="driver_profile",
+        verbose_name=_("Organization"),
+    )
     driver = models.OneToOneField(
         Driver,
         on_delete=models.CASCADE,
@@ -260,9 +239,6 @@ class DriverProfile(TimeStampedModel):
     class Meta:
         """
         Meta Class for Driver Profile Model
-
-        verbose_name: The verbose name for the model
-        verbose_name_plural: The plural verbose name for the model
         """
 
         verbose_name: str = _("Driver Profile")
@@ -316,13 +292,6 @@ class DriverProfile(TimeStampedModel):
 class DriverContact(TimeStampedModel):
     """
     Driver Contact Model Fields
-
-    driver: The driver the contact belongs to
-    contact_name: The name of the contact
-    contact_email: The email of the contact
-    contact_phone: The phone number of the contact
-    is_primary: Whether the contact is the primary contact
-    is_emergency: Whether the contact is an emergency contact
     """
 
     driver = models.ForeignKey(
@@ -354,11 +323,6 @@ class DriverContact(TimeStampedModel):
     class Meta:
         """
         Meta Class for Driver Contact Model
-
-        ordering: The ordering of the driver contacts
-        verbose_name: The verbose name for the model
-        verbose_name_plural: The plural verbose name for the model
-        indexes: The indexes for the model
         """
 
         ordering: list[str] = ["driver", "contact_name"]
@@ -514,7 +478,13 @@ class CommentType(TimeStampedModel):
     name: The name of the comment type
     description: The description of the comment type
     """
-
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.CASCADE,
+        related_name="comment_types",
+        related_query_name="comment_type",
+        verbose_name=_("Organization"),
+    )
     name = models.CharField(_("Name"), max_length=255, null=True, blank=True)
     description = models.TextField(_("Description"), null=True, blank=True)
 

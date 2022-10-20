@@ -24,88 +24,63 @@ from typing import Type
 from django.contrib import admin
 
 # Monta Imports
-from monta_driver.models import (
-    CommentType,
-    DriverProfile,
-    DriverContact,
-    DriverQualification,
-    DriverComment,
-    Driver,
-)
+from monta_driver import models
 
 
 # Register your models here.
-@admin.register(CommentType)
-class CommentTypeInline(admin.ModelAdmin):
+@admin.register(models.CommentType)
+class CommentTypeInline(admin.ModelAdmin[models.CommentType]):
     """Comment Type Admin"""
 
     list_display = ("name", "description", "created", "modified")
 
 
-class DriverProfileInline(admin.StackedInline):
+class DriverProfileInline(admin.StackedInline[models.DriverProfile]):
     """Driver Profile Inline"""
 
-    model: Type[DriverProfile] = DriverProfile
+    model: Type[models.DriverProfile] = models.DriverProfile
     can_delete = False
     verbose_name_plural = "Driver Profile"
 
 
-class DriverContactInline(admin.StackedInline):
+class DriverContactInline(admin.TabularInline[models.DriverContact]):
     """Driver Contact Inline"""
 
-    model: Type[DriverContact] = DriverContact
-    can_delete = False
+    model: Type[models.DriverContact] = models.DriverContact
     verbose_name_plural = "Driver Contact"
     list_select_related = True
+    extra: int = 0
 
 
-class DriverQualificationInline(admin.StackedInline):
+class DriverQualificationInline(admin.TabularInline[models.DriverQualification]):
     """Driver Qualification Inline"""
 
-    model: Type[DriverQualification] = DriverQualification
-    can_delete = False
+    model: Type[models.DriverQualification] = models.DriverQualification
     verbose_name_plural = "Driver Qualifications"
+    extra: int = 0
 
 
-class DriverCommentInline(admin.StackedInline):
+class DriverCommentInline(admin.TabularInline[models.DriverComment]):
     """Driver Comment Inline"""
 
-    model: Type[DriverComment] = DriverComment
-    can_delete = False
+    model: Type[models.DriverComment] = models.DriverComment
     verbose_name_plural = "Driver Comments"
+    extra: int = 0
 
 
-@admin.register(Driver)
+@admin.register(models.Driver)
 class DriverInline(admin.ModelAdmin):
     """Driver Admin"""
 
     list_display = ("driver_id", "first_name", "last_name")
-    inlines = (
+    inlines: tuple[
+        Type[DriverProfileInline],
+        Type[DriverContactInline],
+        Type[DriverQualificationInline],
+        Type[DriverCommentInline]
+    ] = (
         DriverProfileInline,
         DriverContactInline,
         DriverQualificationInline,
         DriverCommentInline,
     )
-
-
-@admin.register(DriverProfile)
-class DriverProfileAdmin(admin.ModelAdmin):
-    """Driver Profile Admin"""
-
-    list_display = (
-        "driver",
-        "address_line_1",
-        "address_line_2",
-        "city",
-        "state",
-        "zip_code",
-    )
-    list_select_related = True
-
-
-@admin.register(DriverContact)
-class DriverContactAdmin(admin.ModelAdmin):
-    """Driver Contact Admin"""
-
-    list_display = ("driver", "contact_name", "contact_phone")
-    list_select_related = True
