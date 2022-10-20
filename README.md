@@ -37,7 +37,7 @@ If you want to use Monta in production, you will need to purchase a license for 
 - Python 3.10+ (Recommended)
   - Currently, being developed on Python 3.11.0
 - Django 4.1.2 (Recommended)
-  - Does support Django 4.0.0+ 
+  - Does support Django 4.0.0+
 - PostgreSQL 12+ (no plans to support other databases)
 - Redis 6.0+
 
