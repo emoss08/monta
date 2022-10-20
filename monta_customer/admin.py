@@ -28,12 +28,19 @@ from django.contrib import admin
 from monta_customer import models
 
 
-class CustomerContactInline(admin.StackedInline[models.CustomerContact]):
+class CustomerBillingProfileInline(admin.StackedInline[models.CustomerBillingProfile]):
+    """CustomerBillingProfile Inline"""
+    model: Type[models.CustomerBillingProfile] = models.CustomerBillingProfile
+    extra = 0
+
+
+class CustomerContactInline(admin.TabularInline[models.CustomerContact]):
     """
     CustomerContactInline class
     """
 
     model: Type[models.CustomerContact] = models.CustomerContact
+    extra: int = 0
 
 
 @admin.register(models.Customer)
@@ -62,7 +69,9 @@ class CustomerAdmin(admin.ModelAdmin[models.Customer]):
         "zip_code",
     )
     ordering = ("customer_id",)
-    inlines: tuple[type[CustomerContactInline]] = (CustomerContactInline,)
+    inlines: tuple[Type[CustomerBillingProfileInline], Type[CustomerContactInline]] = (
+        CustomerBillingProfileInline, CustomerContactInline
+    )
 
 
 @admin.register(models.DocumentClassification)
@@ -74,14 +83,3 @@ class DocumentClassificationAdmin(admin.ModelAdmin[models.DocumentClassification
     list_display = ("name", "description")
     search_fields = ("name", "description")
     ordering = ("name",)
-
-
-@admin.register(models.CustomerBillingProfile)
-class CustomerBillingProfileAdmin(admin.ModelAdmin[models.CustomerBillingProfile]):
-    """
-    CustomerBillingProfileAdmin class
-    """
-
-    list_display = ("customer", "name")
-    search_fields = ("customer", "name")
-    ordering = ("customer",)

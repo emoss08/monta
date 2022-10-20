@@ -49,10 +49,6 @@ class CustomerContactChoices(models.TextChoices):
 class DocumentClassification(TimeStampedModel):
     """
     Document Classification Model Fields
-
-    organization: The organization that the classification belongs to
-    name: The name of the classification
-    description: The description of the classification
     """
 
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
@@ -62,10 +58,6 @@ class DocumentClassification(TimeStampedModel):
     class Meta:
         """
         Document Classification Model Meta
-
-        ordering: The default ordering of the model
-        verbose_name: The verbose name of the model
-        verbose_name_plural: The plural verbose name of the model
         """
 
         ordering = ["name"]
@@ -106,16 +98,6 @@ class DocumentClassification(TimeStampedModel):
 class Customer(TimeStampedModel):
     """
     Customer Model Fields
-
-    organization: The organization that the customer belongs to
-    customer_id: The customer id of the customer
-    name: The name of the customer
-    customer_id: The customer id of the customer
-    address_line_1: The first line of the address of the customer
-    address_line_2: The second line of the address of the customer
-    city: The city of the customer
-    state: The state of the customer
-    zip_code: The zip code of the customer
     """
 
     organization = models.ForeignKey(
@@ -146,6 +128,9 @@ class Customer(TimeStampedModel):
     zip_code = USZipCodeField(_("Zip Code"), max_length=5)
 
     class Meta:
+        """
+        Customer Model Metaclass
+        """
         ordering = ["customer_id"]
         verbose_name = _("Customer")
         verbose_name_plural = _("Customers")
@@ -186,15 +171,6 @@ class Customer(TimeStampedModel):
 class CustomerBillingProfile(TimeStampedModel):
     """
     Customer Billing Profile Model Fields
-
-    organization: The organization that the customer belongs to
-    customer: The customer that the billing profile belongs to
-    name: The name of the billing profile
-    document_class: The document classification that the billing profile belongs to
-
-    ------------------------------------------------------------
-    Note: Model responsible for defining the Billing requirements for a specific customer
-    ------------------------------------------------------------
     """
 
     organization = models.ForeignKey(
@@ -205,13 +181,17 @@ class CustomerBillingProfile(TimeStampedModel):
         verbose_name=_("Organization"),
         help_text=_("Organization"),
     )
+    is_active = models.BooleanField(
+        default=True,
+        help_text=_("Is this billing profile active?"),
+    )
     name = models.CharField(
         _("Name"),
         max_length=100,
         unique=True,
         help_text=_("Name"),
     )
-    customer = models.ForeignKey(
+    customer = models.OneToOneField(
         Customer,
         on_delete=models.PROTECT,
         related_name="billing_profiles",
@@ -230,11 +210,6 @@ class CustomerBillingProfile(TimeStampedModel):
     class Meta:
         """
         Metaclass for the CustomerBillingProfile model
-
-        ordering: Order by name
-        verbose_name: Singular name for the model
-        verbose_name_plural: Plural name for the model
-        indexes: Indexes for the model
         """
 
         ordering = ["name"]
@@ -278,12 +253,6 @@ class CustomerBillingProfile(TimeStampedModel):
 class CustomerContact(TimeStampedModel):
     """
     Customer Contact Model Fields
-
-    organization: The organization that the customer belongs to
-    customer: The customer that the contact belongs to
-    name: The name of the contact
-    email: The email address of the contact
-    phone: The phone number of the contact
     """
 
     organization = models.ForeignKey(
@@ -325,25 +294,26 @@ class CustomerContact(TimeStampedModel):
         null=True,
         blank=True,
     )
-    primary_contact = models.BooleanField(
+    is_primary = models.BooleanField(
         _("Is Primary"),
         default=False,
+        help_text=_("Is this the primary contact?"),
+    )
+    is_billing = models.BooleanField(
+        _("Is Billing"),
+        default=False,
+        help_text=_("Is this the billing contact?"),
     )
 
     class Meta:
         """
         Metaclass for the CustomerContact model
-
-        ordering: Order by contact name
-        verbose_name: Singular name for the model
-        verbose_name_plural: Plural name for the model
-        indexes: Indexes for the model
         """
 
-        ordering = ["contact_name"]
-        verbose_name = _("Customer Contact")
-        verbose_name_plural = _("Customer Contacts")
-        indexes = [
+        ordering: list[str] = ["contact_name"]
+        verbose_name: str = _("Customer Contact")
+        verbose_name_plural: str = _("Customer Contacts")
+        indexes: list[models.Index] = [
             models.Index(fields=["contact_name"]),
         ]
 
@@ -353,10 +323,15 @@ class CustomerContact(TimeStampedModel):
 
         :return: None
         """
-        if self.primary_contact:
-            if self.customer.contacts.filter(primary_contact=True).exists():
+        if self.is_primary:
+            if self.customer.contacts.filter(is_primary=True).exists():
                 raise ValidationError(
                     _("You can only have one primary contact per customer")
+                )
+        if self.is_billing:
+            if self.customer.contacts.filter(is_billing=True).exists():
+                raise ValidationError(
+                    _("You can only have one billing contact per customer")
                 )
 
     def __str__(self) -> str:
@@ -367,17 +342,6 @@ class CustomerContact(TimeStampedModel):
         :rtype: str
         """
         return self.contact_name
-
-    def save(self, **kwargs: Any) -> None:
-        """
-        Save the CustomerContact model
-
-        :param kwargs: Arbitrary keyword arguments
-        :type kwargs: Any
-        :return: None
-        :rtype: None
-        """
-        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """

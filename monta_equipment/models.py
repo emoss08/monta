@@ -39,10 +39,6 @@ from monta_user.models import Organization, MontaUser
 class EquipmentType(TimeStampedModel):
     """
     Equipment Type Model Fields
-
-    equip_type_id: Unique identifier for the equipment type
-    name: Name of the equipment type
-    description: Description of the equipment type
     """
 
     organization = models.ForeignKey(
@@ -108,21 +104,6 @@ class EquipmentType(TimeStampedModel):
 class Equipment(TimeStampedModel):
     """
     Equipment Model Fields
-
-    organization: The organization the equipment belongs to
-    is_active: Whether the equipment is active or not
-    equip_id: Unique identifier for the equipment
-    equipment_type: The type of equipment
-    description: Description of the equipment
-    vin_number: Vehicle Identification Number
-    primary_driver: Primary driver of the equipment
-    secondary_driver: Secondary driver of the equipment
-    vehicle_model: Model of the vehicle
-    vehicle_make: Make of the vehicle
-    vehicle_year: Year of the vehicle
-    vehicle_license_expiration: Expiration date of the vehicle license plate
-    state: State the vehicle is registered in
-
     """
 
     organization = models.ForeignKey(
@@ -217,12 +198,6 @@ class Equipment(TimeStampedModel):
     class Meta:
         """
         Meta class for Equipment
-
-        Attributes:
-            verbose_name (str): verbose name for Equipment
-            verbose_name_plural (str): verbose name plural for Equipment
-            ordering (list): ordering for Equipment
-            indexes (list): indexes for Equipment
         """
 
         verbose_name: str = _("Equipment")
@@ -288,15 +263,6 @@ class Equipment(TimeStampedModel):
 class EquipmentPermit(TimeStampedModel):
     """
     Equipment Permit Model Fields
-
-    organization: The organization the equipment permit belongs to
-    equipment: The equipment the permit belongs to
-    name: Name of the permit
-    description: Description of the permit
-    user: User who created the permit
-    permit_file: File of the permit
-    permit_file_size: Size of the permit file
-    deletion_date: Date the permit will be deleted
     """
 
     organization = models.ForeignKey(
@@ -327,18 +293,10 @@ class EquipmentPermit(TimeStampedModel):
     permit_file_size = models.PositiveIntegerField(
         _("Permit File Size"), blank=True, null=True
     )
-    # Going to be used to "soft delete" the permit file.
-    deletion_date = models.DateTimeField(_("Deletion Date"), blank=True, null=True)
 
     class Meta:
         """
         Metaclass for the EquipmentPermit model.
-
-        Attributes:
-            verbose_name: The verbose name for the EquipmentPermit model.
-            verbose_name_plural: The verbose name plural for the EquipmentPermit model.
-            ordering: The ordering for the EquipmentPermit model.
-            indexes: The indexes for the EquipmentPermit model.
         """
 
         verbose_name: str = _("Equipment Permit")
@@ -352,8 +310,8 @@ class EquipmentPermit(TimeStampedModel):
         """
         String representation of the EquipmentPermit object.
 
-        Returns:
-            str: String representation of the EquipmentPermit object.
+        :return: String representation of the EquipmentPermit object
+        :rtype: str
         """
         return f"{self.equipment} - {self.permit_file}"
 
@@ -381,7 +339,7 @@ class EquipmentPermit(TimeStampedModel):
         :return: None
         :rtype: None
         """
-        self.permit_file_size = self.permit_file.size / (1024**2)
+        self.permit_file_size = self.permit_file.size / (1024 ** 2)
         super(EquipmentPermit, self).save(**kwargs)
 
     def get_absolute_url(self) -> str:
