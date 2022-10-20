@@ -18,10 +18,17 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Core Django Imports
-from django.urls import path
+# Celery Import
+from celery import shared_task
 
-# Third Party Imports
-from monta_billing import api_v1 as billing_api
 
-urlpatterns = [path("billing/", billing_api.api.urls)]
+@shared_task
+def run_order_transfer():
+    # Create pipeline for orders transfer to billing
+    pass
+
+
+@shared_task
+def run_billing_queue():
+    # Create pipeline for billing
+    pass

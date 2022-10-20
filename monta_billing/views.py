@@ -37,7 +37,6 @@ from django.views import generic, View
 from django.contrib.auth import mixins
 from django.db.models import QuerySet
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Third Party Imports
 from braces import views
@@ -363,7 +362,7 @@ class ChargeTypeDeleteView(
         )
 
 
-class ChargeTypeSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, View):
+class ChargeTypeSearchView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, View):
     """
 
     Class to delete a driver.
@@ -387,7 +386,7 @@ class ChargeTypeSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, Vi
         query = request.GET["query"] if "query" in request.GET else None
         results: QuerySet[models.ChargeType] | list = []
         if query:
-            form: SearchForm = SearchForm({"query": query})
+            form: SearchForm = SearchForm({'query': query})
             search_vector: SearchVector = SearchVector(
                 "organization__name",
                 "name",
@@ -489,7 +488,7 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
         customer_contact: CustomerContact = CustomerContact.objects.filter(
             customer=order.order.customer,
             organization=request.user.profile.organization,
-            primary_contact=True,
+            is_billing=True,
         ).first()
         for requirement in customer_billing_profile.values_list(
                 "document_class", flat=True
@@ -535,20 +534,20 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
                     )
                     billing_exception.save()
         return JsonResponse(
-            {"result": "success", "message": "Orders billed out to customers."},
+            {'result': 'success', 'message': 'Orders billed out to customers.'},
             status=201,
         )
     return JsonResponse(
-        {"result": "success", "message": "No orders to bill."},
+        {'result': 'success', 'message': 'No orders to bill.'},
         status=201,
     )
 
 
 @login_required
-@permission_required("monta_billing.re_bill_orders", raise_exception=True)
+@permission_required('monta_billing.re_bill_orders', raise_exception=True)
 def re_bill_order(request: ASGIRequest, order_id: str) -> JsonResponse:
     """
-    Rebill Order
+    Rebill Order.
 
     :param request
     :type request: ASGIRequest
@@ -569,7 +568,7 @@ def re_bill_order(request: ASGIRequest, order_id: str) -> JsonResponse:
     if order:
         models.BillingQueue.objects.create(
             order=order,
-            bill_type="CREDIT",
+            bill_type='CREDIT',
             organization=request.user.profile.organization,
         )
         order.transferred_to_billing = False
@@ -578,6 +577,6 @@ def re_bill_order(request: ASGIRequest, order_id: str) -> JsonResponse:
         order.bill_date = None
         order.save()
     return JsonResponse(
-        {"result": "success", "message": "Order set back to ready to bill"},
+        {'result': 'success', 'message': 'Order set back to ready to bill'},
         status=201,
     )

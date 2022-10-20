@@ -74,4 +74,4 @@ class CustomerContactFactory(factory.django.DjangoModelFactory):
     contact_email = factory.Faker("email")
     contact_phone = factory.Faker("phone_number")
     fax_number = factory.Faker("phone_number")
-    primary_contact = factory.Faker("boolean")
+    is_primary = factory.Faker("boolean")

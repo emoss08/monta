@@ -102,10 +102,6 @@ class RateMethodChoices(models.TextChoices):
 class DelayCode(TimeStampedModel):
     """
     Delay Code Model Fields
-
-    delay_code_id: The delay code id.
-    name: The name of the delay code.
-    description: The description of the delay code.
     """
 
     organization = models.ForeignKey(
@@ -137,11 +133,6 @@ class DelayCode(TimeStampedModel):
     class Meta:
         """
         Metaclass for DelayCode model
-
-        verbose_name: The verbose name for the model.
-        verbose_name_plural: The plural verbose name for the model.
-        ordering: The default ordering for the model.
-        indexes: The indexes for the model.
         """
 
         verbose_name = _("Delay Code")
@@ -188,11 +179,6 @@ class DelayCode(TimeStampedModel):
 class Commodity(TimeStampedModel):
     """
     Commodity Model Fields
-
-    commodity_id: The commodity id.
-    name: The name of the commodity.
-    description: The description of the commodity.
-    is_hazardous: Is the commodity hazardous.
     """
 
     organization = models.ForeignKey(
@@ -235,11 +221,6 @@ class Commodity(TimeStampedModel):
     class Meta:
         """
         Metaclass for the commodity model.
-
-        verbose_name: The verbose name for the commodity model.
-        verbose_name_plural: The verbose plural name for the commodity model.
-        ordering: The default ordering for the commodity model.
-        indexes: The indexes for the commodity model.
         """
 
         verbose_name = _("Commodity")
@@ -286,10 +267,6 @@ class Commodity(TimeStampedModel):
 class OrderType(TimeStampedModel):
     """
     Order Type Model Fields
-
-    order_type_id: Order Type ID
-    name: Name of the Order Type
-    description: Description of the Order Type
     """
 
     organization = models.ForeignKey(
@@ -302,6 +279,8 @@ class OrderType(TimeStampedModel):
         _("Order Type ID"),
         max_length=150,
         unique=True,
+        blank=True,
+        null=True,
         help_text=_("Order Type ID"),
     )
     name = models.CharField(_("Name"), max_length=100, unique=True)
@@ -310,11 +289,6 @@ class OrderType(TimeStampedModel):
     class Meta:
         """
         Metaclass for the Order Type model.
-
-        verbose_name: The verbose name for the Order Type model.
-        verbose_name_plural: The verbose plural name for the Order Type model.
-        ordering: The default ordering for the Order Type model.
-        indexes: The indexes for the Order Type model.
         """
 
         verbose_name = _("Order Type")
@@ -360,28 +334,6 @@ class OrderType(TimeStampedModel):
 class Order(TimeStampedModel):
     """
     Order Model Fields
-
-    organization: The organization the order belongs to.
-    order_id: The order id.
-    order_type: The order type.
-    status: The status of the order.
-    customer: The customer the order belongs to.
-    mileage: The mileage of the order.
-    additional_charge: The additional charge of the order.
-    freight_charge: The freight charge of the order.
-    rate_method: The rate method of the order.
-    comments: The comments of the order.
-    sub_total: The subtotal of the order.
-    bill_date: The bill date of the order.
-    user: The user the order belongs to.
-    equipment_type: The equipment type of the order.
-    order_type: The order type of the order.
-    commodity: The commodity of the order.
-    hazmat_id: The hazmat id of the order.
-    temperature_min: The minimum temperature of the order.
-    temperature_max: The maximum temperature of the order.
-    bol_number: The bill of lading number of the order.
-    consignee_ref_num: The consignee reference number of the order.
     """
 
     organization = models.ForeignKey(
@@ -618,11 +570,6 @@ class Order(TimeStampedModel):
     class Meta:
         """
         Metaclass for the Order model.
-
-        verbose_name: Verbose name for the Order model.
-        verbose_name_plural: Verbose name plural for the Order model.
-        ordering: Default ordering for the Order model.
-        indexes: Indexes for the Order model.
         """
 
         verbose_name = _("Order")
@@ -648,15 +595,15 @@ class Order(TimeStampedModel):
         :return: Order ID
         :rtype: str
         """
-        last_order = Order.objects.filter(organization=self.organization).last()
+        last_order = self.objects.filter(organization=self.organization).last()
         if last_order:
             order_id = last_order.order_id
             order_id = order_id[1:]
-            order_id = int(order_id) + 1
-            order_id = "S" + str(order_id)
+            order_id: int = int(order_id) + 1
+            new_order_id: str = "S" + str(order_id)
         else:
-            order_id = "S1"
-        return order_id
+            new_order_id = "S1"
+        return new_order_id
 
     def create_stops(self) -> tuple:
         """
@@ -898,13 +845,6 @@ class Order(TimeStampedModel):
 class Movement(TimeStampedModel):
     """
     Movement Model Fields
-
-    organization: The organization the movement belongs to.
-    assigned_driver: The driver assigned to the movement.
-    assigned_driver_2: The second driver assigned to the movement.
-    equipment: The equipment assigned to the movement.
-    order: The order the movement belongs to.
-    status: The status of the movement.
     """
 
     organization = models.ForeignKey(
@@ -958,11 +898,6 @@ class Movement(TimeStampedModel):
     class Meta:
         """
         Metaclass for Movement Model
-
-        verbose_name: The verbose name of the model.
-        verbose_name_plural: The plural verbose name of the model.
-        ordering: The default ordering of the model.
-        indexes: The indexes of the model.
         """
 
         verbose_name = _("Movement")
@@ -1081,17 +1016,14 @@ class Movement(TimeStampedModel):
         :rtype: None
         """
         self.full_clean()
-        # If a movement is put in progress, make sure the order is in progress.
         if self.status == StatusChoices.IN_PROGRESS:
             self.order.status = StatusChoices.IN_PROGRESS
             self.order.save()
 
-        # if a driver is assigned to the movement, autopopulate the equipment.
         if self.assigned_driver:
             self.equipment = self.assigned_driver.equipments.first()
         super(Movement, self).save(**kwargs)
 
-        # Set the order status to complete if all the movements are completed.
         if self.status == StatusChoices.COMPLETED:
             if not self.order.movements.filter(
                     status=StatusChoices.IN_PROGRESS
@@ -1099,20 +1031,12 @@ class Movement(TimeStampedModel):
                 self.order.status = StatusChoices.COMPLETED
                 self.order.save()
 
-        # Call the sequence_stops method to set the stop sequence number.
         self.sequence_stops()
 
 
 class ServiceIncident(TimeStampedModel):
     """
     Service Incident Model Fields
-
-    organization: The organization the service incident belongs to.
-    movement: The movement the service incident belongs to.
-    stop: The stop the service incident belongs to.
-    delay_code: The delay code the service incident belongs to.
-    delay_reason: The delay reason the service incident belongs to.
-    delay_duration: The delay duration the service incident belongs to.
     """
 
     organization = models.ForeignKey(
@@ -1196,20 +1120,6 @@ class ServiceIncident(TimeStampedModel):
 class Stop(TimeStampedModel):
     """
     Stop model fields
-
-    organization: The organization that the stop belongs to.
-    sequence: The sequence of the stop in the movement.
-    movement: The movement that the stop belongs to.
-    origin_location: The origin location of the stop.
-    origin_address: The origin address of the stop.
-    origin_appointment_time: The origin appointment time of the stop.
-    origin_arrival_time: The origin arrival time of the stop.
-    destination_location: The destination location of the stop.
-    destination_address: The destination address of the stop.
-    destination_appointment_time: The destination appointment time of the stop.
-    destination_arrival_time: The destination arrival time of the stop.
-    stop_type: The type of the stop.
-    status: The status of the stop.
     """
 
     organization = models.ForeignKey(
@@ -1293,11 +1203,6 @@ class Stop(TimeStampedModel):
     class Meta:
         """
         Metaclass for the Stop model
-
-        verbose_name: The verbose name of the model.
-        verbose_name_plural: The verbose name of the model in plural.
-        ordering: The default ordering of the model.
-        indexes: The indexes of the model.
         """
 
         verbose_name = _("Stop")
@@ -1455,7 +1360,7 @@ class Stop(TimeStampedModel):
         if self.arrival_time:
             self.status = StatusChoices.IN_PROGRESS
 
-        # If the stop arrival and departure time are set, change the status to completed.
+        # If the stop arrival and departure time are set, change the status to complete.
         if self.arrival_time and self.departure_time:
             self.status = StatusChoices.COMPLETED
 
@@ -1484,11 +1389,6 @@ class Stop(TimeStampedModel):
 class OrderDocumentation(TimeStampedModel):
     """
     Order Documentation Model Fields
-
-    organization: The organization that the order belongs to.
-    order: The order that the documentation belongs to.
-    document: The document that is attached to the order.
-    document_class: The class of the document.
     """
 
     organization = models.ForeignKey(
@@ -1520,11 +1420,6 @@ class OrderDocumentation(TimeStampedModel):
     class Meta:
         """
         Metaclass for OrderDocumentation
-
-        verbose_name: Order Documentation
-        verbose_name_plural: Order Documentation
-        ordering: Order by order
-        indexes: Indexes for the OrderDocumentation model
         """
 
         verbose_name = _("Order Documentation")
@@ -1567,9 +1462,6 @@ class OrderDocumentation(TimeStampedModel):
 class RevenueCode(TimeStampedModel):
     """
     Revenue Code Model Fields
-
-    code: Code of the Revenue Code
-    description: Description of the Revenue Code
     """
 
     organization = models.ForeignKey(
@@ -1580,6 +1472,8 @@ class RevenueCode(TimeStampedModel):
         verbose_name=_("Organization"),
         help_text=_("Organization that the revenue code belongs to."),
     )
+
+    # TODO: Rename this field
     code = models.CharField(
         _("Code"),
         max_length=5,
@@ -1596,11 +1490,6 @@ class RevenueCode(TimeStampedModel):
     class Meta:
         """
         Metaclass for Revenue Code Model
-
-        ordering: Order by name
-        verbose_name: Revenue Code
-        verbose_name_plural: Revenue Codes
-        indexes: Indexes for name
         """
 
         verbose_name = _("Revenue Code")
