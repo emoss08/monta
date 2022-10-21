@@ -7,12 +7,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('monta_equipment', '0008_alter_equipment_secondary_driver'),
+        ("monta_equipment", "0008_alter_equipment_secondary_driver"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='equipmentpermit',
-            name='deletion_date',
+            model_name="equipmentpermit",
+            name="deletion_date",
         ),
     ]

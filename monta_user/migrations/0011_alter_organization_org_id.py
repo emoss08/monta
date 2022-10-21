@@ -8,13 +8,20 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('monta_user', '0010_alter_montauser_email_alter_montauser_username'),
+        ("monta_user", "0010_alter_montauser_email_alter_montauser_username"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='organization',
-            name='org_id',
-            field=models.UUIDField(blank=True, default=uuid.uuid4, editable=False, null=True, unique=True, verbose_name='Organization ID'),
+            model_name="organization",
+            name="org_id",
+            field=models.UUIDField(
+                blank=True,
+                default=uuid.uuid4,
+                editable=False,
+                null=True,
+                unique=True,
+                verbose_name="Organization ID",
+            ),
         ),
     ]

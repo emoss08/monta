@@ -19,8 +19,9 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import json
+from typing import TextIO
 
-file = open("monta_config.json", "r")
+file: TextIO = open("monta_config.json", "r")
 
 data = json.load(file)
 
@@ -29,37 +30,28 @@ def get_config() -> dict:
     """
     Returns the config file
 
-    Args:
-        None
-
-    Returns:
-        dict: The config file
+    :return: The config file
+    :rtype: dict
     """
     return data
 
 
 def get_google_client_id() -> str:
     """
-    Returns the google client id from the config file
+    Returns the Google client id from the config file
 
-    Args:
-        None
-
-    Returns:
-        str: The google client id
+    :return: The Google client id
+    :rtype: str
     """
     return data["google_client_id"]
 
 
-def update_google_client_id(new_id):
+def update_google_client_id(new_id: str) -> None:
     """
-    Updates the google client id in the config file
+    Updates the Google client id in the config file
 
-    Args:
-        new_id (str): The new google client id
-
-    Returns:
-        None
+    :param new_id: The new Google client id
+    :type new_id: str
     """
     data["google_client_id"] = new_id
     with open("monta_config.json", "w") as client_id_file:
@@ -68,26 +60,22 @@ def update_google_client_id(new_id):
 
 def get_google_client_secret() -> str:
     """
-    Returns the google client secret from the config file
+    Returns the Google client secret from the config file
 
-    Args:
-        None
-
-    Returns:
-        str: The google client secret
+    :return: The Google client secret
+    :rtype: str
     """
     return data["google_client_secret"]
 
 
-def update_google_client_secret(new_secret):
+def update_google_client_secret(new_secret: str) -> None:
     """
-    Updates the google client secret in the config file
+    Updates the Google client secret in the config file
 
-    Args:
-        new_secret (str): The new google client secret
-
-    Returns:
-        None
+    :param new_secret: The new Google client secret
+    :type new_secret: str
+    :return: None
+    :rtype: None
     """
     data["google_client_secret"] = new_secret
     with open("monta_config.json", "w") as new_secret_file:
@@ -98,24 +86,20 @@ def get_google_api_key() -> str:
     """
     Returns the google api key from the config file
 
-    Args:
-        None
-
-    Returns:
-        str: The google api key
+    :return: The google api key
+    :rtype: str
     """
     return data["google_api_key"]
 
 
-def update_google_api_key(new_key):
+def update_google_api_key(new_key: str) -> None:
     """
     Updates the google api key in the config file
 
-    Args:
-        new_key (str): The new google api key
-
-    Returns:
-        None
+    :param new_key: The new google api key
+    :type new_key: str
+    :return: None
+    :rtype: None
     """
     data["google_api_key"] = new_key
     with open("monta_config.json", "w") as api_key_file:

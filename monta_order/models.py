@@ -34,7 +34,6 @@ from django.utils.translation import gettext_lazy as _
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 import googlemaps
-import pgtrigger
 from googlemaps.exceptions import ApiError
 
 # Monta Imports
@@ -223,10 +222,10 @@ class Commodity(TimeStampedModel):
         Metaclass for the commodity model.
         """
 
-        verbose_name = _("Commodity")
-        verbose_name_plural = _("Commodities")
-        ordering = ("commodity_id", "name")
-        indexes = [
+        verbose_name: str = _("Commodity")
+        verbose_name_plural: str = _("Commodities")
+        ordering: tuple[str] = ("commodity_id", "name")
+        indexes: list[models.Index] = [
             models.Index(fields=["commodity_id", "name"]),
         ]
 
@@ -291,10 +290,10 @@ class OrderType(TimeStampedModel):
         Metaclass for the Order Type model.
         """
 
-        verbose_name = _("Order Type")
-        verbose_name_plural = _("Order Types")
-        ordering = ["name"]
-        indexes = [
+        verbose_name: str = _("Order Type")
+        verbose_name_plural: str = _("Order Types")
+        ordering: list[str] = ["name"]
+        indexes: list[models.Index] = [
             models.Index(fields=["name"]),
         ]
 
@@ -572,10 +571,10 @@ class Order(TimeStampedModel):
         Metaclass for the Order model.
         """
 
-        verbose_name = _("Order")
-        verbose_name_plural = _("Orders")
-        ordering = ["order_id"]
-        indexes = [
+        verbose_name: str = _("Order")
+        verbose_name_plural: str = _("Orders")
+        ordering: list[str] = ["order_id"]
+        indexes: list[models.Index] = [
             models.Index(fields=["order_id"]),
         ]
 
@@ -588,17 +587,18 @@ class Order(TimeStampedModel):
         """
         return f"{self.order_id} - {self.customer.name}"
 
-    def generate_order_id(self) -> str:
+    @staticmethod
+    def generate_order_id() -> str:
         """
         Generate Order ID
 
         :return: Order ID
         :rtype: str
         """
-        last_order = self.objects.filter(organization=self.organization).last()
+        last_order = Order.objects.all().order_by("-order_id").last()
         if last_order:
-            order_id = last_order.order_id
-            order_id = order_id[1:]
+            order_id: int = last_order.order_id
+            order_id: int = order_id[1:]
             order_id: int = int(order_id) + 1
             new_order_id: str = "S" + str(order_id)
         else:
@@ -900,10 +900,10 @@ class Movement(TimeStampedModel):
         Metaclass for Movement Model
         """
 
-        verbose_name = _("Movement")
-        verbose_name_plural = _("Movements")
-        ordering = ["order"]
-        indexes = [
+        verbose_name: str = _("Movement")
+        verbose_name_plural: str = _("Movements")
+        ordering: list[str] = ["order"]
+        indexes: list[models.Index] = [
             models.Index(fields=["order"]),
         ]
 
@@ -1080,10 +1080,10 @@ class ServiceIncident(TimeStampedModel):
     )
 
     class Meta:
-        verbose_name = _("Service Incident")
-        verbose_name_plural = _("Service Incidents")
-        ordering = ["movement"]
-        indexes = [
+        verbose_name: str = _("Service Incident")
+        verbose_name_plural: str = _("Service Incidents")
+        ordering: list[str] = ["movement"]
+        indexes: list[models.Index] = [
             models.Index(fields=["movement"]),
         ]
 
@@ -1205,20 +1205,11 @@ class Stop(TimeStampedModel):
         Metaclass for the Stop model
         """
 
-        verbose_name = _("Stop")
-        verbose_name_plural = _("Stops")
-        ordering = ["sequence"]
-        indexes = [
+        verbose_name: str = _("Stop")
+        verbose_name_plural: str = _("Stops")
+        ordering: list[str] = ["sequence"]
+        indexes: list[models.Index] = [
             models.Index(fields=["sequence"]),
-        ]
-        triggers = [
-            pgtrigger.Protect(
-                name="stops_protect_redundant_updates",
-                operation=pgtrigger.Update,
-                condition=pgtrigger.Condition(
-                    "OLD.* IS DISTINCT FROM NEW.*",
-                )
-            )
         ]
 
     def __str__(self) -> str:
@@ -1238,8 +1229,8 @@ class Stop(TimeStampedModel):
         :rtype: None
         :raises ValidationError
         """
-        cleaned_data: None = super(Stop, self).clean()
         if self.pk:
+            # If the stop is in progress or completed, the appointment time cannot be changed back to available.
             if self.status == StatusChoices.AVAILABLE:
                 old_status = Stop.objects.get(pk__exact=self.pk).status
                 if (
@@ -1250,24 +1241,19 @@ class Stop(TimeStampedModel):
                         _("Stop status cannot be changed back to available")
                     )
 
-            if self.movement.assigned_driver and self.movement.equipment is None:
-                raise ValidationError(
-                    _(
-                        "Movement must have a driver and equipment to be in progress or completed"
-                    )
-                )
-
             if self.sequence > 1:
                 previous_stop = self.movement.stops.filter(
                     sequence__exact=self.sequence - 1
                 ).first()
                 if previous_stop:
+                    # If the current stop appointment time is before the previous stop appointment time, raise an error
                     if self.appointment_time < previous_stop.appointment_time:
                         raise ValidationError(
                             _(
                                 "Stop appointment time cannot be before the previous stop appointment time"
                             )
                         )
+                    # If previous stop is in available or in progress, current stop cannot be completed or in progress
                     if previous_stop.status != StatusChoices.COMPLETED:
                         if (
                                 self.status == StatusChoices.IN_PROGRESS
@@ -1279,18 +1265,21 @@ class Stop(TimeStampedModel):
                                     "or completed "
                                 )
                             )
-
+            # Sequence the stops
             if self.sequence < self.movement.stops.count():
                 next_stop = self.movement.stops.filter(
                     sequence__exact=self.sequence + 1
                 ).first()
                 if next_stop:
+                    # If the appointment time of current stop is greater than the next stop, then raise an error
                     if self.appointment_time > next_stop.appointment_time:
                         raise ValidationError(
                             _(
                                 "Stop appointment time cannot be after the next stop appointment time"
                             )
                         )
+
+                    # If the next stop is in progress or completed, the current stop cannot be available
                     if self.status != StatusChoices.COMPLETED:
                         if (
                                 next_stop.status == StatusChoices.IN_PROGRESS
@@ -1302,6 +1291,8 @@ class Stop(TimeStampedModel):
                                     "or completed "
                                 )
                             )
+
+            # If the movement has no driver or equipment ,but the status is in progress or completed, raise an error
             if self.movement.assigned_driver is None or self.movement.equipment is None:
                 if (
                         self.status == StatusChoices.IN_PROGRESS
@@ -1312,6 +1303,8 @@ class Stop(TimeStampedModel):
                             "Movement must have a driver and equipment to be in progress or completed"
                         )
                     )
+
+                # if arrival_time or departure_time is set, without a driver or equipment, raise error
                 if self.arrival_time or self.departure_time:
                     raise ValidationError(
                         _(
@@ -1319,6 +1312,7 @@ class Stop(TimeStampedModel):
                         )
                     )
 
+            # If the stop has a departure time ,but not arrival time, throw an error
             if self.departure_time:
                 if not self.arrival_time:
                     raise ValidationError(
@@ -1326,11 +1320,12 @@ class Stop(TimeStampedModel):
                             "Stop arrival time must be set before the stop departure time"
                         )
                     )
+                # If the departure time is before the arrival time, throw an error
                 if self.departure_time < self.arrival_time:
                     raise ValidationError(
                         _("Stop departure time cannot be before the stop arrival time")
                     )
-        return cleaned_data
+        super(Stop, self).clean()
 
     def save(self, **kwargs: Any) -> None:
         """
@@ -1491,9 +1486,9 @@ class RevenueCode(TimeStampedModel):
         Metaclass for Revenue Code Model
         """
 
-        verbose_name = _("Revenue Code")
-        verbose_name_plural = _("Revenue Codes")
-        ordering = ["code"]
+        verbose_name: str = _("Revenue Code")
+        verbose_name_plural: str = _("Revenue Codes")
+        ordering: list[str] = ["code"]
 
     def __str__(self) -> str:
         """

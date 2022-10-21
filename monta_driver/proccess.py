@@ -32,14 +32,10 @@ def download_image_from_url(url: str) -> None | str:
     """
     Download an image from a url and save it in the media folder.
 
-    Args:
-        url (str): Url of the image to download.
-
-    Returns:
-        str | None: Path of the image in the media folder or None if the image could not be downloaded.
-
-    Typical usage example:
-        download_image_from_url("https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png")
+    :param url: The url of the image to download.
+    :type url: str
+    :return: The path of the image in the media folder.
+    :rtype: str
     """
     extension = url.rsplit(".", 1)[1].lower()
     image_name = f"{uuid.uuid4()}.{extension}"

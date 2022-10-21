@@ -37,15 +37,10 @@ async def geocode_locations(request: ASGIRequest) -> JsonResponse:
     """
     Process to geocode locations
 
-    Args:
-        request (ASGIRequest): The request object.
-
-    Returns:
-        JsonResponse: The response object.
-
-    Typical Usage Example:
-        >>> from monta_locations.google_api import geocode_locations
-        >>> geocode_locations(request)
+    :param request: ASGIRequest
+    :type request: ASGIRequest
+    :return: JsonResponse
+    :rtype: JsonResponse
     """
     # Get the organization's Google API key
     google_api: Integration = await Integration.objects.filter(

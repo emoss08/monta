@@ -17,6 +17,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+
+# Standard Python Libraries
 import uuid
 from typing import Any
 
@@ -45,11 +47,6 @@ Go Follow her on Twitch!
 class MontaUser(AbstractBaseUser, PermissionsMixin):
     """
     User Model Fields
-
-    username: The username of the user
-    email: The email of the user
-    is_staff: If the user is a staff member
-    date_joined: The date the user joined
     """
 
     username = models.CharField(
@@ -78,18 +75,9 @@ class MontaUser(AbstractBaseUser, PermissionsMixin):
         Metaclass for the MontaUser model
         """
 
-        verbose_name = _("User")
-        verbose_name_plural = _("Users")
-        ordering = ["-date_joined"]
-        # triggers = [
-        #     pgtrigger.Protect(
-        #         name="stops_protect_redundant_updates",
-        #         operation=pgtrigger.Update,
-        #         condition=pgtrigger.Condition(
-        #             "OLD.* IS DISTINCT FROM NEW.*"
-        #         )
-        #     )
-        # ]
+        verbose_name: str = _("User")
+        verbose_name_plural: str = _("Users")
+        ordering: list[str] = ["-date_joined"]
 
     def __str__(self) -> str:
         """
@@ -113,20 +101,6 @@ class MontaUser(AbstractBaseUser, PermissionsMixin):
 class Profile(TimeStampedModel):
     """
     Profile Model Fields
-
-    user: The user the profile belongs to
-    organization: The organization the user belongs to
-    title: The title of the user
-    first_name: The first name of the user
-    last_name: The last name of the user
-    profile_picture: The profile picture of the user
-    bio: The bio of the user
-    address: The address of the user
-    city: The city of the user
-    state: The state of the user
-    zip_code: The zip code of the user
-    phone: The phone number of the user
-    email_verified: If the user has verified their email
     """
 
     user = models.OneToOneField(
@@ -214,17 +188,12 @@ class Profile(TimeStampedModel):
     class Meta:
         """
         Metaclass for the Profile model
-
-        verbose_name: The verbose name of the model
-        verbose_name_plural: The plural verbose name of the model
-        ordering: The default ordering of the model
-        indexes: The indexes of the model
         """
 
-        ordering = ["-created"]
-        verbose_name = _("Profile")
-        verbose_name_plural = _("Profiles")
-        indexes = [
+        ordering: list[str] = ["-created"]
+        verbose_name: str = _("Profile")
+        verbose_name_plural: str = _("Profiles")
+        indexes: list[models.Index] = [
             models.Index(fields=["-created"]),
         ]
 
@@ -375,6 +344,7 @@ class JobTitle(TimeStampedModel):
     name: The name of the job title
     description: The description of the job title
     """
+
     organization = models.ForeignKey(
         "Organization",
         on_delete=models.CASCADE,

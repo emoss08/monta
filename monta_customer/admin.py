@@ -30,6 +30,7 @@ from monta_customer import models
 
 class CustomerBillingProfileInline(admin.StackedInline[models.CustomerBillingProfile]):
     """CustomerBillingProfile Inline"""
+
     model: Type[models.CustomerBillingProfile] = models.CustomerBillingProfile
     extra: int = 0
 
@@ -70,7 +71,8 @@ class CustomerAdmin(admin.ModelAdmin[models.Customer]):
     )
     ordering = ("customer_id",)
     inlines: tuple[Type[CustomerBillingProfileInline], Type[CustomerContactInline]] = (
-        CustomerBillingProfileInline, CustomerContactInline
+        CustomerBillingProfileInline,
+        CustomerContactInline,
     )
 
 

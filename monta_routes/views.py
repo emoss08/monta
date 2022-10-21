@@ -37,8 +37,15 @@ from monta_routes.models import Route
 
 @login_required
 def geocode_locations(request: ASGIRequest) -> JsonResponse:
-    return google_api.geocode_locations(request)
+    """
+    Geocode Locations
 
+    :param request: ASGIRequest
+    :type request: ASGIRequest
+    :return: JsonResponse
+    :rtype: JsonResponse
+    """
+    return google_api.geocode_locations(request)
 
 # NOTE: May add back if requested ability to generate one off routes.
 # @login_required

@@ -17,6 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+
 # Standard Library Imports
 from typing import Type
 
@@ -24,10 +25,17 @@ from typing import Type
 from django import forms
 
 # Third Party Imports
-from localflavor.us.forms import USStateSelect, USZipCodeField
+from localflavor.us.forms import (
+    USStateSelect,
+    USZipCodeField
+)
 
 # Core Monta Imports
-from monta_driver.models import Driver, DriverProfile, DriverContact
+from monta_driver.models import (
+    Driver,
+    DriverProfile,
+    DriverContact
+)
 
 
 class AddDriverForm(forms.ModelForm):
@@ -102,7 +110,7 @@ class AddDriverProfileForm(forms.ModelForm):
         """
 
         model: Type[DriverProfile] = DriverProfile
-        fields = (
+        fields: tuple[str] = (
             "driver",
             "profile_picture",
             "address_line_1",
@@ -194,11 +202,10 @@ class UpdateDriverForm(forms.Form):
         """
         Save the Driver Information
 
-        Args:
-            driver (Driver): Driver to update
-
-        Returns:
-            None
+        :param driver: Driver to update
+        :type driver: Driver
+        :return: None
+        :rtype: None
         """
         driver.first_name = self.cleaned_data["first_name"]
         driver.middle_name = self.cleaned_data["middle_name"]

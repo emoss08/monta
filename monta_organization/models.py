@@ -19,13 +19,15 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Standard Python Libraries
-from typing import final
+from typing import final, Any
 
 # Core Django Imports
 from django.db import models
 from django.urls import reverse
-from django_extensions.db.models import TimeStampedModel
 from django.utils.translation import gettext_lazy as _
+
+# Third Party Imports
+from django_extensions.db.models import TimeStampedModel
 
 # Monta Imports
 from monta_user.models import Organization
@@ -45,16 +47,6 @@ class IntegrationChoices(models.TextChoices):
 class OrganizationSettings(TimeStampedModel):
     """
     Organization Settings Model
-
-    organization: The organization that the settings belong to
-    timezone: The timezone of the organization
-    language: The language of the organization
-    currency: The currency of the organization
-    date_format: The date format of the organization
-    time_format: The time format of the organization
-    mileage_unit: The mileage unit of the organization
-    traffic_model: The traffic model of the organization
-    generate_routes: Whether to generate a routes for the organization
     """
 
     organization = models.OneToOneField(
@@ -114,32 +106,28 @@ class OrganizationSettings(TimeStampedModel):
     class Meta:
         """
         Metaclass for OrganizationSettings
-
-        verbose_name: The verbose name of the model
-        verbose_name_plural: The plural verbose name of the model
         """
 
-        verbose_name = "Organization Settings"
-        verbose_name_plural = "Organization Settings"
+        verbose_name: str = _('Organization Settings')
+        verbose_name_plural: str = _('Organization Settings')
 
     def __str__(self) -> str:
         """
         Return the string representation of the settings
 
-        Returns:
-            str: The string representation of the settings
+        :return: The string representation of the settings
+        :rtype: str
         """
         return f"{self.organization.name} Settings"
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: Any) -> None:
         """
         Save the settings
 
-        Args:
-            **kwargs: Keyword arguments
-
-        Returns:
-            None
+        :param kwargs: Keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         return super(OrganizationSettings, self).save(**kwargs)
@@ -148,8 +136,8 @@ class OrganizationSettings(TimeStampedModel):
         """
         Get the absolute url for the OrganizationSettings
 
-        Returns:
-            str: The absolute url for the OrganizationSettings
+        :return: The absolute url for the OrganizationSettings
+        :rtype: str
         """
         return reverse("organization_settings", kwargs={"pk": self.pk})
 
@@ -157,13 +145,6 @@ class OrganizationSettings(TimeStampedModel):
 class Integration(TimeStampedModel):
     """
     Integration Model Fields
-
-    organization: The organization that the integration belongs to
-    is_active: Whether the integration is active
-    name: The name of the integration
-    api_key: The API key of the integration
-    client_id: The client id of the integration
-    client_secret: The client secret of the integration
     """
 
     organization = models.ForeignKey(
@@ -202,17 +183,12 @@ class Integration(TimeStampedModel):
     class Meta:
         """
         Metaclass for Integration
-
-        verbose_name: The verbose name of the model
-        verbose_name_plural: The plural verbose name of the model
-        ordering: The ordering of the model
-        indexes: The indexes of the model
         """
 
-        verbose_name = _("Integration")
-        verbose_name_plural = _("Integrations")
-        ordering = ["name"]
-        indexes = [
+        verbose_name: str = _("Integration")
+        verbose_name_plural: str = _("Integrations")
+        ordering: list[str] = ["name"]
+        indexes: list[models.Index] = [
             models.Index(fields=["name"]),
         ]
 
@@ -220,20 +196,19 @@ class Integration(TimeStampedModel):
         """
         String representation of the Integration
 
-        Returns:
-            str: The string representation of the Integration
+        :return: The string representation of the Integration
+        :rtype: str
         """
         return f"{self.name}"
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: Any) -> None:
         """
         Save the Integration
 
-        Args:
-            **kwargs: Keyword arguments
-
-        Returns:
-            None
+        :param kwargs: Keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         self.full_clean()
         return super().save(**kwargs)
@@ -242,7 +217,7 @@ class Integration(TimeStampedModel):
         """
         Get the absolute url of the Integration
 
-        Returns:
-            str: The absolute url of the Integration
+        :return: The absolute url of the Integration
+        :rtype: str
         """
         return reverse("integration_detail", kwargs={"pk": self.pk})

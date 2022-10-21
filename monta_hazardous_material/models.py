@@ -80,15 +80,6 @@ class HazardousMaterial(TimeStampedModel):
     """
     Hazardous Class Model Fields
 
-    organization: Organization Model Foreign Key
-    is_active: Is Hazardous Class Active or not
-    name: Name of the Hazardous Class
-    description: Description of the Hazardous Class
-    hazard_class: Hazard Class of the Hazardous Class
-    packing_group: Packing Group of the Hazardous Class
-    erg_number: ERG Number of the Hazardous Class
-    proper_packing_name: Proper Packing Name of the Hazardous Class
-
     ----------------------------------------
     Reference:(https://www.fmcsa.dot.gov/regulations/enforcement/nine-classes-hazardous-materials-yellow-visor-card)
     ----------------------------------------
@@ -148,15 +139,11 @@ class HazardousMaterial(TimeStampedModel):
     class Meta:
         """
         Meta Class for HazardousClass Model
-
-        verbose_name: Hazardous Material
-        verbose_name_plural: Hazardous Materials
-        ordering: the ordering of the Hazardous Material Model
         """
 
-        verbose_name = "Hazardous Material"
-        verbose_name_plural = "Hazardous Materials"
-        ordering = ["name"]
+        verbose_name: str = _('Hazardous Material')
+        verbose_name_plural: str = _('Hazardous Materials')
+        ordering: list[str] = ["name"]
 
     def __str__(self) -> str:
         """

@@ -74,6 +74,5 @@ def monta_logout_user(request: ASGIRequest) -> HttpResponseRedirect | JsonRespon
     try:
         auth_logout(request)
         return HttpResponseRedirect("/")
-    except Exception as e:
-        error = {"message": e}
-        return JsonResponse(error, status=400)
+    except AuthenticationError as logout_error:
+        return JsonResponse(logout_error, status=400)

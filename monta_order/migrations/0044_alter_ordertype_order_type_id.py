@@ -7,13 +7,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('monta_order', '0043_stop_stops_protect_redundant_updates'),
+        ("monta_order", "0043_stop_stops_protect_redundant_updates"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='ordertype',
-            name='order_type_id',
-            field=models.SlugField(blank=True, help_text='Order Type ID', max_length=150, null=True, unique=True, verbose_name='Order Type ID'),
+            model_name="ordertype",
+            name="order_type_id",
+            field=models.SlugField(
+                blank=True,
+                help_text="Order Type ID",
+                max_length=150,
+                null=True,
+                unique=True,
+                verbose_name="Order Type ID",
+            ),
         ),
     ]

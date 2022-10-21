@@ -17,6 +17,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+
+# Standard library imports
+from typing import Literal
+
 # Core Django Imports
 from django.contrib import admin
 
@@ -27,10 +31,10 @@ admin.site.register(models.OrganizationSettings)
 
 
 @admin.register(models.Integration)
-class Integration(admin.ModelAdmin):
-    list_display = ("organization", "name", "api_key")
-    list_filter = ("organization", "name")
-    search_fields = ("organization", "name", "api_key")
-    ordering = ("organization", "name")
-    filter_horizontal = ()
-    list_per_page = 25
+class Integration(admin.ModelAdmin[models.Integration]):
+    list_display: tuple[str] = ("organization", "name", "api_key")
+    list_filter: tuple[str] = ("organization", "name")
+    search_fields: tuple[str] = ("organization", "name", "api_key")
+    ordering: tuple[str] = ("organization", "name")
+    filter_horizontal: tuple[None] = ()
+    list_per_page: Literal[25] = 25

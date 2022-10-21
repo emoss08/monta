@@ -34,8 +34,9 @@ from monta_order.models import Order, StatusChoices
 @final
 class Manifest(TimeStampedModel):
     """
-     Manifest Model
-     """
+    Manifest Model
+    """
+
     organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE,
@@ -77,7 +78,9 @@ class Manifest(TimeStampedModel):
         :return: new_manifest_number
         :rtype: str
         """
-        last_manifest = self.objects.filter(organization=self.organization, ).last()
+        last_manifest = self.objects.filter(
+            organization=self.organization,
+        ).last()
         if last_manifest:
             last_manifest_number = last_manifest.manifest_number
             last_manifest_number = int(last_manifest_number[1:])

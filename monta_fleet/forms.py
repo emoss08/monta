@@ -38,4 +38,4 @@ class AddFleetForm(forms.ModelForm):
 
     class Meta:
         model: Type[models.Fleet] = models.Fleet
-        fields = ("organization", "name", "description", "fleet_manager", "is_active")
+        fields: list[str] = ("organization", "name", "description", "fleet_manager", "is_active")

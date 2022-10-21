@@ -17,6 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+from typing import Any
 
 # Create tests data for the application
 
@@ -31,7 +32,7 @@ from monta_customer.models import (
     Customer,
     CustomerBillingProfile,
     CustomerContact,
-    DocumentClassification
+    DocumentClassification,
 )
 from monta_billing.models import ChargeType
 from monta_driver.models import Driver, DriverProfile, CommentType
@@ -41,36 +42,36 @@ from monta_order.models import DelayCode, OrderType, RevenueCode, Commodity
 
 
 class Command(BaseCommand):
-    help = 'Seeds the database with test data'
+    help = "Seeds the database with test data"
 
-    def handle(self, *args, **options) -> None:
+    def handle(self, *args: Any, **options: Any) -> None:
         """Seeds the database with test data"""
         with transaction.atomic():
             self._create_test_data()
-        self.stdout.write(self.style.SUCCESS('Successfully seeded test data'))
+        self.stdout.write(self.style.SUCCESS("Successfully seeded test data"))
 
     @staticmethod
     def _create_test_data() -> None:
         organization = Organization.objects.create(
-            name='monta',
-            description='test monta organization - do not use in production',
+            name="monta",
+            description="test monta organization - do not use in production",
         )
         JobTitle.objects.create(
-            name='test',
-            description='test job title - do not use in production',
+            name="test",
+            description="test job title - do not use in production",
             organization=organization,
         )
         document_classification = DocumentClassification.objects.create(
-            name='test',
-            description='test document classification - do not use in production',
+            name="test",
+            description="test document classification - do not use in production",
             organization=organization,
         )
         customer = Customer.objects.create(
-            name='test',
+            name="test",
             organization=organization,
         )
         billing_profile = CustomerBillingProfile.objects.create(
-            name='test',
+            name="test",
             is_active=True,
             customer=customer,
             organization=organization,
@@ -80,87 +81,80 @@ class Command(BaseCommand):
         CustomerContact.objects.create(
             customer=customer,
             organization=organization,
-            contact_name='test',
-            contact_email='test@test.com',
+            contact_name="test",
+            contact_email="test@test.com",
             is_primary=True,
             is_billing=True,
         )
         ChargeType.objects.create(
-            name='test',
-            description='test charge type - do not use in production',
+            name="test",
+            description="test charge type - do not use in production",
             organization=organization,
         )
         driver = Driver.objects.create(
-            first_name='test',
-            last_name='driver',
+            first_name="test",
+            last_name="driver",
             is_active=True,
             organization=organization,
         )
         DriverProfile.objects.create(
             driver=driver,
             organization=organization,
-            address_line_1='test',
-            address_line_2='test',
-            city='test',
-            state='NC',
-            zip_code='12345',
-            license_number='12345',
-            license_state='NC',
-            license_expiration='2022-01-01',
+            address_line_1="test",
+            address_line_2="test",
+            city="test",
+            state="NC",
+            zip_code="12345",
+            license_number="12345",
+            license_state="NC",
+            license_expiration="2022-01-01",
         )
         CommentType.objects.create(
-            name='test',
-            description='test comment type - do not use in production',
+            name="test",
+            description="test comment type - do not use in production",
             organization=organization,
         )
         equipment_type = EquipmentType.objects.create(
-            name='test',
-            description='test equipment type - do not use in production',
+            name="test",
+            equip_type_id="test",
+            description="test equipment type - do not use in production",
             organization=organization,
         )
         Equipment.objects.create(
-            equip_id='test',
+            equip_id="test",
             equipment_type=equipment_type,
             organization=organization,
             primary_driver=driver,
-            state='NC',
-            vin_number='12345',
+            state="NC",
+            vin_number="12345",
         )
         Location.objects.create(
-            name='test',
-            description='test location - do not use in production',
+            name="test",
+            description="test location - do not use in production",
             organization=organization,
-            address_line_1='test',
-            city='test',
-            state='NC',
-            zip_code='12345',
+            address_line_1="test",
+            city="test",
+            state="NC",
+            zip_code="12345",
         )
         DelayCode.objects.create(
-            name='test',
-            description='test delay code - do not use in production',
+            name="test",
+            description="test delay code - do not use in production",
             organization=organization,
         )
         OrderType.objects.create(
-            name='test',
-            description='test order type - do not use in production',
+            name="test",
+            description="test order type - do not use in production",
             organization=organization,
         )
         RevenueCode.objects.create(
-            code='test',
-            description='test revenue code - do not use in production',
+            code="test",
+            description="test revenue code - do not use in production",
             organization=organization,
         )
         Commodity.objects.create(
-            name='test',
-            commodity_id='test',
-            description='test commodity - do not use in production',
+            name="test",
+            commodity_id="test",
+            description="test commodity - do not use in production",
             organization=organization,
         )
-
-    # def _create_output(self) -> None:
-    #     # for each create in _create_test_data stdout.write(self.style.SUCCESS('Successfully created {object}'))
-    #
-    #     if self._create_test_data():
-    #         for record in self._create_test_data():
-    #             print(record)
-    #             self.stdout.write(self.style.SUCCESS(f'Successfully created {record}'))

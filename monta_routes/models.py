@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Standard Python Libraries
-from typing import final
+from typing import final, Any
 
 # Core Django Imports
 from django.utils.translation import gettext_lazy as _
@@ -61,12 +61,6 @@ class GoogleRouteDistanceUnitChoices(models.TextChoices):
 class Route(TimeStampedModel):
     """
     Route Model Fields
-
-    organization: The organization that the route belongs to
-    origin: The origin location of the route
-    destination: The destination location of the route
-    distance: The distance of the route
-    duration: The duration of the route
     """
 
     organization = models.ForeignKey(
@@ -106,17 +100,12 @@ class Route(TimeStampedModel):
     class Meta:
         """
         Metaclass for Route model
-
-        verbose_name: Singular name for the model
-        verbose_name_plural: Plural name for the model
-        ordering: Default ordering for the model
-        indexes: Indexes for the model
         """
 
         verbose_name = "Route"
         verbose_name_plural = "Routes"
-        ordering = ["-created"]
-        indexes = [
+        ordering: list[str] = ["-created"]
+        indexes: list[models.Index] = [
             models.Index(fields=["-created"]),
         ]
 
@@ -124,20 +113,19 @@ class Route(TimeStampedModel):
         """
         String representation of the Route model
 
-        Returns:
-            str: String representation of the Route model
+        :return: String representation of the Route model
+        :rtype: str
         """
         return f"{self.origin} - {self.destination}"
 
-    def save(self, **kwargs) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the Route model
 
-        Args:
-            **kwargs: Arbitrary keyword arguments
-
-        Returns:
-            None
+        :param kwargs: Keyword arguments
+        :type kwargs: Any
+        :return: None
+        :rtype: None
         """
         if self.origin == self.destination:
             self.distance = 0
@@ -148,8 +136,8 @@ class Route(TimeStampedModel):
         """
         Get the absolute url for the Route model
 
-        Returns:
-            str: Absolute url for the Route model
+        :return: Absolute url for the Route model
+        :rtype: str
         """
         return reverse("route_detail", kwargs={"pk": self.pk})
 

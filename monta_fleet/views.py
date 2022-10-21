@@ -17,10 +17,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-# Core Django Imports
-from __future__ import annotations
-from typing import Literal, Type, Any
 
+# Standard library imports
+from __future__ import annotations
+from typing import Type, Any
+
+# Core Django Imports
 from ajax_datatable import AjaxDatatableView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -43,8 +45,7 @@ from monta_driver.models import Driver
 class FleetListView(LoginRequiredMixin, TemplateView):
     """ """
 
-    template_name: Literal["fleet/index.html"] = "fleet/index.html"
-    http_method_names: list[str] = ["get", "head", "options", "trace"]
+    template_name: str = "fleet/index.html"
 
 
 class CreateFleet(LoginRequiredMixin, CreateView):
@@ -54,18 +55,17 @@ class CreateFleet(LoginRequiredMixin, CreateView):
     form_class: Type[forms.AddFleetForm] = forms.AddFleetForm
 
     def post(
-        self, request: ASGIRequest, *args: Any, **kwargs: Any
+            self, request: ASGIRequest, *args: Any, **kwargs: Any
     ) -> JsonResponse | None:
         """
-        Override the post method to create a new fleet.
-
-        Args:
-            request (ASGIRequest): Request object.
-            *args (Any): Variable length argument list.
-            **kwargs (Any): Arbitrary keyword arguments.
-
-        Returns:
-            JsonResponse: Response object.
+        :param request
+        :type request: ASGIRequest
+        :param args
+        :type args: Any
+        :param kwargs
+        :type kwargs: Any
+        :return: JsonResponse
+        :rtype: JsonResponse | None
         """
         form: forms.AddFleetForm = forms.AddFleetForm(request.POST)
         if form.is_valid():
@@ -79,26 +79,9 @@ class CreateFleet(LoginRequiredMixin, CreateView):
 class FleetEditView(LoginRequiredMixin, DetailView):
     """
     Class to render the driver edit page.
-
-    Args:
-        LoginRequiredMixin (class): Django class to check if user is logged in.
-        DetailView (class): Django class to render a detail view.
-
-    Returns:
-        Template: Returns the driver edit page.
     """
 
     model: Type[models.Fleet] = models.Fleet
-    template_name = ""
-    http_method_names = ["get", "head", "options", "trace"]
-
-    def __init__(self):
-        super().__init__()
-        self.allowed_methods: list[str] = self._allowed_methods()
-
-    def _allowed_methods(self) -> list[str]:
-        """Return a list of allowed HTTP methods."""
-        return [m.upper() for m in self.http_method_names if hasattr(self, m)]
 
     def get_queryset(self) -> QuerySet[models.Fleet]:
         return (
@@ -113,7 +96,7 @@ class FleetEditView(LoginRequiredMixin, DetailView):
 
 
 def fleet_by_manager(
-    request: ASGIRequest, manager_id: int, fleet_id: int
+        request: ASGIRequest, manager_id: int, fleet_id: int
 ) -> HttpResponse | JsonResponse:
     if request.user.id == manager_id:
         fleet: models.Fleet = models.Fleet.objects.get(
@@ -138,6 +121,14 @@ def fleet_by_manager(
 
 @login_required
 def delete_fleet(request: ASGIRequest, fleet_id: int) -> JsonResponse:
+    """
+    :param request
+    :type request: ASGIRequest
+    :param fleet_id
+    :type fleet_id: int
+    :return: JsonResponse
+    :rtype: JsonResponse
+    """
     fleet: models.Fleet = models.Fleet.objects.get(pk__exact=fleet_id)
     fleet.delete()
     return JsonResponse(
@@ -149,15 +140,6 @@ def delete_fleet(request: ASGIRequest, fleet_id: int) -> JsonResponse:
 class FleetOverviewList(AjaxDatatableView, LoginRequiredMixin):
     """
     Class to render the driver overview page.
-
-    Driver Overview list is a subclass of AjaxDatatableView. This class is used to render the driver overview page.
-
-    Args:
-        AjaxDatatableView (class): Django class to render a datatable.
-        LoginRequiredMixin (class): Django class to check if user is logged in.
-
-    Returns:
-        Template: Returns the driver overview page.
     """
 
     model: Type[Driver] = models.Fleet

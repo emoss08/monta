@@ -49,11 +49,22 @@ class EquipmentType(TimeStampedModel):
         verbose_name=_("Organization"),
     )
     equip_type_id = models.CharField(
-        _("Equipment Type ID"), max_length=50, primary_key=True
+        _("Equipment Type ID"),
+        max_length=50,
+        primary_key=True,
+        help_text=_("Equipment Type ID")
     )
-    name = models.CharField(_("Equipment Type Name"), max_length=50)
+    name = models.CharField(
+        _("Equipment Type Name"),
+        max_length=50,
+        help_text=_("Equipment Type Name")
+    )
     description = models.CharField(
-        _("Equipment Type Description"), max_length=200, blank=True, null=True
+        _("Equipment Type Description"),
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text=_("Equipment Type Description")
     )
 
     class Meta:
@@ -61,10 +72,10 @@ class EquipmentType(TimeStampedModel):
         Equipment Type Model Metaclass
         """
 
-        verbose_name = _("Equipment Type")
-        verbose_name_plural = _("Equipment Types")
-        ordering = ["equip_type_id"]
-        indexes = [
+        verbose_name: str = _("Equipment Type")
+        verbose_name_plural: str = _("Equipment Types")
+        ordering: list[str] = ["equip_type_id"]
+        indexes: list[models.Index] = [
             models.Index(fields=["equip_type_id"]),
         ]
 
@@ -203,7 +214,7 @@ class Equipment(TimeStampedModel):
         verbose_name: str = _("Equipment")
         verbose_name_plural: str = _("Equipment")
         ordering: list[str] = ["equip_id"]
-        indexes = [
+        indexes: list[models.Index] = [
             models.Index(fields=["equip_id"]),
         ]
 
@@ -302,7 +313,7 @@ class EquipmentPermit(TimeStampedModel):
         verbose_name: str = _("Equipment Permit")
         verbose_name_plural: str = _("Equipment Permits")
         ordering: list[str] = ["name"]
-        indexes = [
+        indexes: list[models.Index] = [
             models.Index(fields=["name"]),
         ]
 

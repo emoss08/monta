@@ -17,25 +17,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+from typing import Type
+
 # Core Django Imports
 from django.contrib import admin
 
 # Monta Imports
 from monta_order import models
-
-
-@admin.register(models.Order)
-class OrderAdmin(admin.ModelAdmin[models.Order]):
-    """Order Admin"""
-
-    list_display = (
-        "order_id",
-        "status",
-        "order_type",
-        "commodity",
-        "created",
-        "modified",
-    )
 
 
 @admin.register(models.Movement)
@@ -63,16 +51,12 @@ class ServiceIncidentAdmin(admin.ModelAdmin[models.ServiceIncident]):
     )
 
 
-@admin.register(models.OrderDocumentation)
-class OrderDocumentationAdmin(admin.ModelAdmin[models.OrderDocumentation]):
+class OrderDocumentationAdmin(admin.TabularInline[models.OrderDocumentation]):
     """OrderDocumentation Admin"""
 
-    list_display = (
-        "id",
-        "order",
-        "created",
-        "modified",
-    )
+    model: Type[models.OrderDocumentation] = models.OrderDocumentation
+    verbose_name_plural = "Order Documentation"
+    extra: int = 0
 
 
 @admin.register(models.Stop)
@@ -138,4 +122,22 @@ class RevenueCodeAdmin(admin.ModelAdmin[models.RevenueCode]):
     search_fields = (
         "code",
         "description",
+    )
+
+
+@admin.register(models.Order)
+class OrderAdmin(admin.ModelAdmin[models.Order]):
+    """Order Admin"""
+
+    list_display = (
+        "order_id",
+        "status",
+        "order_type",
+        "commodity",
+        "created",
+        "modified",
+    )
+
+    inlines: tuple[Type[OrderDocumentationAdmin]] = (
+        OrderDocumentationAdmin,
     )

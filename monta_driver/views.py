@@ -27,7 +27,7 @@ from typing import (
 
 # Core Django Imports
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import mixins
 from django.db.models import QuerySet
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
@@ -40,13 +40,7 @@ from django.views.decorators.http import (
     require_safe,
 )
 from django.views.decorators.vary import vary_on_cookie
-from django.views.generic import (
-    CreateView,
-    TemplateView,
-    DetailView,
-    UpdateView,
-    DeleteView,
-)
+from django.views import generic
 from django.contrib.postgres.search import (
     SearchVector,
     SearchQuery,
@@ -64,12 +58,9 @@ from monta_driver import models, forms
 @method_decorator(require_safe, name="dispatch")
 @method_decorator(cache_control(max_age=60 * 60 * 24), name="dispatch")
 @method_decorator(vary_on_cookie, name="dispatch")
-class DriverListView(LoginRequiredMixin, views.PermissionRequiredMixin, TemplateView):
+class DriverListView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.TemplateView):
     """
     Class to render the driver Index page.
-
-    Typical Usage Example:
-        >>> DriverListView.as_view()
     """
 
     template_name = "monta_driver/index.html"
@@ -79,11 +70,10 @@ class DriverListView(LoginRequiredMixin, views.PermissionRequiredMixin, Template
         """
         Method to get the context data for the driver index page.
 
-        Args:
-            **kwargs (Any): Any keyword arguments.
-
-        Returns:
-            dict: Context data for the driver Index page
+        :param kwargs: Any keyword arguments.
+        :type kwargs: Any
+        :return: The context data for the driver index page.
+        :rtype: dict[str, Any]
         """
         context: dict[str, Any] = super().get_context_data(**kwargs)
         context["fleets"] = models.Fleet.objects.filter(
@@ -93,15 +83,9 @@ class DriverListView(LoginRequiredMixin, views.PermissionRequiredMixin, Template
         return context
 
 
-class DriverCreateView(LoginRequiredMixin, views.PermissionRequiredMixin, CreateView):
+class DriverCreateView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.CreateView):
     """
     Class to render create driver page.
-
-    Overwrites the post method to check if the form is valid. If the form is valid, request the user's organization
-    and save the form. If the form is not valid, return a JSON response with a success value of False.
-
-    Typical Usage Example:
-        >>> DriverCreateView.as_view()
     """
 
     model: Type[models.Driver] = models.Driver
@@ -111,10 +95,10 @@ class DriverCreateView(LoginRequiredMixin, views.PermissionRequiredMixin, Create
     template_name = "monta_driver/index.html"
 
     def post(
-        self,
-        request: ASGIRequest,
-        *args: Any,
-        **kwargs: Any,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Method to handle the POST request.
@@ -161,12 +145,9 @@ class DriverCreateView(LoginRequiredMixin, views.PermissionRequiredMixin, Create
 
 
 @method_decorator(require_safe, name="dispatch")
-class DriverEditView(LoginRequiredMixin, views.PermissionRequiredMixin, DetailView):
+class DriverEditView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.DetailView):
     """
     Class to render the driver edit page.
-
-    Typical Usage Example:
-        >>> DriverEditView.as_view()
     """
 
     model: Type[models.Driver] = models.Driver
@@ -191,24 +172,19 @@ class DriverEditView(LoginRequiredMixin, views.PermissionRequiredMixin, DetailVi
         )
 
 
-class DriverUpdateView(UpdateView, views.PermissionRequiredMixin, LoginRequiredMixin):
+class DriverUpdateView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.UpdateView):
     """
     Class to update the driver profile.
-
-    Typical Usage Example:
-        >>> DriverUpdateView.as_view()
     """
 
     model: Type[models.Driver] = models.Driver
     form_class: Type[forms.UpdateDriverForm] = forms.UpdateDriverForm
-    template_name = "monta_driver/edit.html"
-    success_url = "/driver/"
 
     def post(
-        self,
-        request: ASGIRequest,
-        *args: Any,
-        **kwargs: Any,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Overwrites the post method to check if the form is valid. If the form is valid, request the user's organization
@@ -236,7 +212,7 @@ class DriverUpdateView(UpdateView, views.PermissionRequiredMixin, LoginRequiredM
         )
 
 
-class DriverDeleteView(LoginRequiredMixin, views.PermissionRequiredMixin, DeleteView):
+class DriverDeleteView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.DeleteView):
     """
     Class to delete a driver.
     """
@@ -265,14 +241,9 @@ class DriverDeleteView(LoginRequiredMixin, views.PermissionRequiredMixin, Delete
         )
 
 
-class DriverOverviewList(AjaxDatatableView, LoginRequiredMixin):
+class DriverOverviewList(mixins.LoginRequiredMixin, AjaxDatatableView):
     """
     Class to render the driver overview page.
-
-    Driver Overview list is a subclass of AjaxDatatableView. This class is used to render the driver overview page.
-
-    Typical Usage Example:
-        >>> DriverOverviewList.as_view()
     """
 
     model: Type[models.Driver] = models.Driver
@@ -338,12 +309,12 @@ class DriverOverviewList(AjaxDatatableView, LoginRequiredMixin):
         """
         Customize the row by adding the driver information, license number, license state, license expiration, and actions.
 
-        Args:
-            row (dict): Row dictionary.
-            obj (Driver): Driver object.
-
-        Returns:
-            dict: Returns the customized row.
+        :param row: The row to customize.
+        :type row: dict
+        :param obj: The driver object.
+        :type obj: models.Driver
+        :return: The customized row.
+        :rtype: dict
         """
         row[
             "information"
@@ -409,12 +380,9 @@ class DriverOverviewList(AjaxDatatableView, LoginRequiredMixin):
         return row
 
 
-class DriverSearchView(LoginRequiredMixin, views.PermissionRequiredMixin, View):
+class DriverSearchView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, View):
     """
     Class to delete a driver.
-
-    Typical Usage Example:
-        >>> DriverSearchView.as_view()
     """
 
     permission_required: str = "monta_driver.search_drivers"
@@ -480,9 +448,6 @@ def validate_license_number(request: ASGIRequest) -> HttpResponse:
     :type request: ASGIRequest
     :return HttpResponse
     :rtype HttpResponse
-
-    Typical usage example:
-        >>> validate_license_number(request)
     """
     license_number: str | List[object] | None = (
         request.GET["license_number"] if "license_number" in request.GET else None
@@ -496,8 +461,8 @@ def validate_license_number(request: ASGIRequest) -> HttpResponse:
                 "license_number"
             ]
             if models.Driver.objects.filter(
-                profile__license_number=license_number,
-                organization=request.user.profile.organization,
+                    profile__license_number=license_number,
+                    organization=request.user.profile.organization,
             ).exists():
                 return HttpResponse(
                     "<div class='text-danger ease_in_5' id='license_error'>License is already "

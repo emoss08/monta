@@ -35,17 +35,6 @@ from monta_locations import models
 class AddLocationForm(forms.ModelForm):
     """
     Form for adding a location to the database.
-
-    name(CharField): The name of the location.
-    description(CharField): The description of the location.
-    address_line_1(CharField): The address line 1 of the location.
-    address_line_2(CharField): The address line 2 of the location.
-    city(CharField): The city of the location.
-    state(USStateSelect): The state of the location.
-    zip_code(USZipCodeField): The zip code of the location.
-
-    Args:
-        forms.ModelForm (ModelForm): Django ModelForm class.
     """
 
     name = forms.CharField(
@@ -94,7 +83,7 @@ class AddLocationForm(forms.ModelForm):
         """
 
         model: Type[models.Location] = models.Location
-        fields = (
+        fields: tuple[str] = (
             "name",
             "description",
             "address_line_1",
@@ -108,17 +97,6 @@ class AddLocationForm(forms.ModelForm):
 class UpdateLocationForm(forms.Form):
     """
     Form for adding a location to the database.
-
-    name(CharField): The name of the location.
-    description(CharField): The description of the location.
-    address_line_1(CharField): The address line 1 of the location.
-    address_line_2(CharField): The address line 2 of the location.
-    city(CharField): The city of the location.
-    state(USStateSelect): The state of the location.
-    zip_code(USZipCodeField): The zip code of the location.
-
-    Args:
-        forms.ModelForm (ModelForm): Django ModelForm class.
     """
 
     name = forms.CharField(
@@ -161,15 +139,14 @@ class UpdateLocationForm(forms.Form):
         help_text=_("Zip Code"),
     )
 
-    def save(self, location: models.Location):
+    def save(self, location: models.Location) -> None:
         """
         Save the form to the database.
 
-        Args:
-            location (models.Location): The location to update.
-
-        Returns:
-            None
+        :param location: The location to update.
+        :type location: models.Location
+        :return: None
+        :rtype: None
         """
         location.name = self.cleaned_data["name"]
         location.description = self.cleaned_data["description"]

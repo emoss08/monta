@@ -131,6 +131,7 @@ class Customer(TimeStampedModel):
         """
         Customer Model Metaclass
         """
+
         ordering = ["customer_id"]
         verbose_name = _("Customer")
         verbose_name_plural = _("Customers")

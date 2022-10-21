@@ -31,21 +31,21 @@ from monta_user import models
 class OrganizationInline(admin.ModelAdmin[models.Organization]):
     """Organization Admin"""
 
-    list_display = ("name", "description", "created", "modified")
+    list_display: tuple[str] = ("name", "description", "created", "modified")
 
 
 @admin.register(models.JobTitle)
 class JobTitleInline(admin.ModelAdmin[models.JobTitle]):
     """Job Title Admin"""
 
-    list_display = ("name", "description", "created", "modified")
+    list_display: tuple[str] = ("name", "description", "created", "modified")
 
 
 @admin.register(models.Profile)
 class ProfileUserInline(admin.ModelAdmin[models.Profile]):
     """Profile Admin"""
 
-    list_display = (
+    list_display: tuple[str] = (
         "user",
         "organization",
         "address_line_1",
@@ -63,7 +63,7 @@ class ProfileInline(admin.StackedInline[models.Profile]):
 
     model: Type[models.Profile] = models.Profile
     can_delete: Literal[False] = False
-    verbose_name_plural: Literal["User Info"] = "User Info"
+    verbose_name_plural: str = "User Info"
 
 
 @admin.register(models.MontaUser)

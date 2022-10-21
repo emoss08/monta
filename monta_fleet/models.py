@@ -34,11 +34,6 @@ from monta_user.models import Organization, MontaUser
 class Fleet(TimeStampedModel):
     """
     Fleet Model Fields
-
-    fleet_id: The fleet id.
-    name: The name of the fleet.
-    fleet_manager: The fleet manager of the fleet.
-    description: The description of the fleet.
     """
 
     organization = models.ForeignKey(
@@ -86,19 +81,13 @@ class Fleet(TimeStampedModel):
 
     class Meta:
         """
-        Meta class for Fleet.
-
-        Attributes:
-            verbose_name (str): Verbose name for Fleet.
-            verbose_name_plural (str): Verbose name for Fleet.
-            ordering (list): Ordering for Fleet.
-            indexes (list): Indexes for Fleet.
+        Metaclass for Fleet.
         """
 
-        ordering = ["name"]
-        verbose_name = _("Fleet")
-        verbose_name_plural = _("Fleets")
-        indexes = [
+        ordering: list[str] = ['name']
+        verbose_name: str = _('Fleet')
+        verbose_name_plural: str = _('Fleets')
+        indexes: list[models.Index] = [
             models.Index(fields=["name", "fleet_id"]),
         ]
 

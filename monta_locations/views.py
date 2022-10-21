@@ -17,8 +17,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+
 # Standard Library Imports
-from typing import Any, Literal, Type
+from typing import Any, Type
 
 # Core Django Imports
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -37,31 +38,19 @@ from monta_locations import models, forms
 class LocationListView(LoginRequiredMixin, views.PermissionRequiredMixin, TemplateView):
     """
     Class to render the driver Index page.
-
-    Args:
-        LoginRequiredMixin (class): Django class to check if user is logged in.
-        views.PermissionRequiredMixin (class): Django class to check if user has permission.
-        TemplateView (class): Django class to render a template.
-
-    Returns:
-        Template: Returns the driver index page.
-
-    Typical Usage Example:
-        >>> LocationListView.as_view()
     """
 
-    template_name: Literal["monta_location/index.html"] = "monta_location/index.html"
+    template_name: str = "monta_location/index.html"
     permission_required: str = "monta_driver.view_driver"
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         """
         Method to get the context data for the driver index page.
 
-        Args:
-            **kwargs (Any): Any keyword arguments.
-
-        Returns:
-            dict: Context data for the driver Index page
+        :param kwargs: Keyword arguments.
+        :type kwargs: Any
+        :return: Returns the context data for the driver index page.
+        :rtype: dict[str, Any]
         """
         context: dict[str, Any] = super().get_context_data(**kwargs)
         context["fleets"] = models.Location.objects.filter(
@@ -74,48 +63,30 @@ class LocationListView(LoginRequiredMixin, views.PermissionRequiredMixin, Templa
 class LocationCreateView(LoginRequiredMixin, views.PermissionRequiredMixin, CreateView):
     """
     Class to create a new location.
-
-    Overwrites the post method to check if the form is valid. If the form is valid, request the user's organization
-    and save the form. If the form is not valid, return a JSON response with a success value of False.
-
-    Args:
-        LoginRequiredMixin (class): Django class to check if user is logged in.
-        views.PermissionRequiredMixin (class): Django class to check if user has permission.
-        CreateView (class): Django class to create a new object.
-
-    Returns:
-        JSONResponse: Returns a JSON response with a success value of True or False.
-
-    Typical Usage Example:
-        >>> LocationCreateView.as_view()
     """
 
     model: Type[models.Location] = models.Location
     form_class: Type[forms.AddLocationForm] = forms.AddLocationForm
     permission_required: str = "monta_location.add_location"
-    success_url: Literal["/"] = "/"
-    template_name: Literal["monta_location/index.html"] = "monta_location/index.html"
 
     @transaction.atomic
     def post(
-        self,
-        request: ASGIRequest,
-        *args,
-        **kwargs,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Method to handle the POST request.
 
-        Args:
-            request (ASGIRequest): The request object.
-            *args: Any arguments.
-            **kwargs: Any keyword arguments.
-
-        Returns:
-            JsonResponse: Returns a JSON response with a success value of True or False.
-
-        Typical Usage Example:
-            >>> LocationCreateView.post(request)
+        :param request: The request object.
+        :type request: ASGIRequest
+        :param args: Any arguments.
+        :type args: Any
+        :param kwargs: Any keyword arguments.
+        :type kwargs: Any
+        :return: Returns a JSON response with a success value of True or False.
+        :rtype: JsonResponse
         """
         add_location: forms.AddLocationForm = self.form_class(data=request.POST)
         if add_location.is_valid():
@@ -133,46 +104,35 @@ class LocationCreateView(LoginRequiredMixin, views.PermissionRequiredMixin, Crea
 class LocationUpdateView(LoginRequiredMixin, views.PermissionRequiredMixin, UpdateView):
     """
     Class to update a location.
-
-    Overwrites the post method to check if the form is valid. If the form is valid, request the user's organization
-    and save the form. If the form is not valid, return a JSON response with a success value of False.
-
-    Args:
-        LoginRequiredMixin (class): Django class to check if user is logged in.
-        views.PermissionRequiredMixin (class): Django class to check if user has permission.
-        UpdateView (class): Django class to update an object.
     """
 
     model: Type[models.Location] = models.Location
     form_class: Type[forms.UpdateLocationForm] = forms.UpdateLocationForm
-    template_name: Literal["monta_driver/edit.html"] = "monta_driver/edit.html"
-    success_url: Literal["/driver/"] = "/driver/"
+    permission_required: str = "monta_location.change_location"
 
     @transaction.atomic
     def post(
-        self,
-        request: ASGIRequest,
-        *args,
-        **kwargs,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Overwrites the post method to check if the form is valid. If the form is valid, request the user's organization
         and save the form. If the form is not valid, return a JSON response with a success value of False.
 
-        Args:
-            request (ASGIRequest): Django request object.
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-
-        Returns:
-            JsonResponse: Returns a JSON response with a success value of True or False.
-
-        Typical Usage Example:
-            >>> LocationUpdateView.post(request)
+        :param request: The request object.
+        :type request: ASGIRequest
+        :param args: Any arguments.
+        :type args: Any
+        :param kwargs: Any keyword arguments.
+        :type kwargs: Any
+        :return: Returns a JSON response with a success value of True or False.
+        :rtype: JsonResponse
         """
         form: forms.UpdateLocationForm = self.form_class(data=request.POST)
         if form.is_valid():
-            form.save(data=self.get_object())
+            form.save(location=self.get_object())
             return JsonResponse(
                 {"result": "success", "message": "Driver Posted Successfully"},
                 status=201,

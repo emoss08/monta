@@ -8,14 +8,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('monta_user', '0016_remove_montauser_stops_protect_redundant_updates'),
+        ("monta_user", "0016_remove_montauser_stops_protect_redundant_updates"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='jobtitle',
-            name='organization',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='job_titles', to='monta_user.organization'),
+            model_name="jobtitle",
+            name="organization",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="job_titles",
+                to="monta_user.organization",
+            ),
             preserve_default=False,
         ),
     ]

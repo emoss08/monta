@@ -17,6 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+
 # Core Django Imports
 from django.contrib.syndication.views import Feed
 from django.template.defaultfilters import truncatewords_html

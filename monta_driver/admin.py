@@ -77,7 +77,7 @@ class DriverInline(admin.ModelAdmin):
         Type[DriverProfileInline],
         Type[DriverContactInline],
         Type[DriverQualificationInline],
-        Type[DriverCommentInline]
+        Type[DriverCommentInline],
     ] = (
         DriverProfileInline,
         DriverContactInline,

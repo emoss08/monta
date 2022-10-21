@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('monta_customer', '0013_alter_customerbillingprofile_organization_and_more'),
+        ("monta_customer", "0013_alter_customerbillingprofile_organization_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customerbillingprofile',
-            name='is_active',
-            field=models.BooleanField(default=True, help_text='Is this billing profile active?'),
+            model_name="customerbillingprofile",
+            name="is_active",
+            field=models.BooleanField(
+                default=True, help_text="Is this billing profile active?"
+            ),
         ),
     ]

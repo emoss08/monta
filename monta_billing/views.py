@@ -296,10 +296,10 @@ class ChargeTypeUpdateView(
     form_class: Type[forms.AddChargeTypeForm] = forms.AddChargeTypeForm
 
     def post(
-            self,
-            request: ASGIRequest,
-            *args: Any,
-            **kwargs: Any,
+        self,
+        request: ASGIRequest,
+        *args: Any,
+        **kwargs: Any,
     ) -> JsonResponse:
         """
         Method to update a Charge Type
@@ -362,7 +362,9 @@ class ChargeTypeDeleteView(
         )
 
 
-class ChargeTypeSearchView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, View):
+class ChargeTypeSearchView(
+    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, View
+):
     """
 
     Class to delete a driver.
@@ -386,7 +388,7 @@ class ChargeTypeSearchView(mixins.LoginRequiredMixin, views.PermissionRequiredMi
         query = request.GET["query"] if "query" in request.GET else None
         results: QuerySet[models.ChargeType] | list = []
         if query:
-            form: SearchForm = SearchForm({'query': query})
+            form: SearchForm = SearchForm({"query": query})
             search_vector: SearchVector = SearchVector(
                 "organization__name",
                 "name",
@@ -491,7 +493,7 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
             is_billing=True,
         ).first()
         for requirement in customer_billing_profile.values_list(
-                "document_class", flat=True
+            "document_class", flat=True
         ):
             billing_requirements.append(requirement)
         for document in order.order.order_documentation.all():
@@ -520,9 +522,9 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
             )
             for requirement in missing_requirements:
                 if not models.BillingException.objects.filter(
-                        order=order.order,
-                        organization=request.user.profile.organization,
-                        exception_type="PAPERWORK",
+                    order=order.order,
+                    organization=request.user.profile.organization,
+                    exception_type="PAPERWORK",
                 ):
                     billing_exception: models.BillingException = (
                         models.BillingException.objects.create(
@@ -534,17 +536,17 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
                     )
                     billing_exception.save()
         return JsonResponse(
-            {'result': 'success', 'message': 'Orders billed out to customers.'},
+            {"result": "success", "message": "Orders billed out to customers."},
             status=201,
         )
     return JsonResponse(
-        {'result': 'success', 'message': 'No orders to bill.'},
+        {"result": "success", "message": "No orders to bill."},
         status=201,
     )
 
 
 @login_required
-@permission_required('monta_billing.re_bill_orders', raise_exception=True)
+@permission_required("monta_billing.re_bill_orders", raise_exception=True)
 def re_bill_order(request: ASGIRequest, order_id: str) -> JsonResponse:
     """
     Rebill Order.
@@ -568,7 +570,7 @@ def re_bill_order(request: ASGIRequest, order_id: str) -> JsonResponse:
     if order:
         models.BillingQueue.objects.create(
             order=order,
-            bill_type='CREDIT',
+            bill_type="CREDIT",
             organization=request.user.profile.organization,
         )
         order.transferred_to_billing = False
@@ -577,6 +579,6 @@ def re_bill_order(request: ASGIRequest, order_id: str) -> JsonResponse:
         order.bill_date = None
         order.save()
     return JsonResponse(
-        {'result': 'success', 'message': 'Order set back to ready to bill'},
+        {"result": "success", "message": "Order set back to ready to bill"},
         status=201,
     )

@@ -18,6 +18,9 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+# Standard Python library imports
+from typing import Any
+
 # Core Django Imports
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -38,13 +41,6 @@ from monta_user.models import Organization
 class Location(TimeStampedModel):
     """
     Location Model Fields
-
-    location_id: The location id.
-    name: The name of the location.
-    address: The address of the location.
-    city: The city of the location.
-    state: The state of the location.
-    zip_code: The zip code of the location.
     """
 
     organization = models.ForeignKey(
@@ -127,35 +123,30 @@ class Location(TimeStampedModel):
     class Meta:
         """
         Meta Class for Location Model
-
-        verbose_name: The verbose name of the model.
-        verbose_name_plural: The verbose plural name of the model.
-        ordering: The ordering of the model.
-        indexes: The indexes of the model.
         """
 
-        verbose_name = _("Location")
-        verbose_name_plural = _("Locations")
-        ordering = ("location_id", "name")
-        indexes = [
+        verbose_name: str = _("Location")
+        verbose_name_plural: str = _("Locations")
+        ordering: tuple[str] = ("location_id", "name")
+        indexes: list[models.Index] = [
             models.Index(fields=["location_id", "name"]),
         ]
 
     def __str__(self) -> str:
         """
-        String representation of the location.
-
-        Returns:
-            str: String representation of the location.
+        :return: String representation of the location.
+        :rtype: str
         """
         return f"{self.location_id} - {self.name}"
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: Any) -> None:
         """
         Save the location.
 
-        Returns:
-            None
+        :param kwargs: Keyword arguments.
+        :type kwargs: Any
+        :return None
+        :rtype None
         """
         if not self.location_id:
             self.location_id = slugify(self.name)
@@ -163,20 +154,16 @@ class Location(TimeStampedModel):
 
     def get_absolute_url(self) -> str:
         """
-        Get the absolute url for the location.
-
-        Returns:
-            str: Absolute url for the location.
+        :return: Absolute URL for the location.
+        :rtype: str
         """
         return reverse("location_detail", kwargs={"pk": self.pk})
 
     @property
     def get_address_combination(self) -> str:
         """
-        Return address combination of location.
-
-        Returns:
-            str: Address combination of location.
+        :return: Address combination for the location.
+        :rtype: str
         """
         return f"{self.address_line_1} {self.address_line_2}, {self.city} {self.state}, {self.zip_code}"
 
@@ -184,12 +171,6 @@ class Location(TimeStampedModel):
 class LocationContact(TimeStampedModel):
     """
     Location Contact Model Fields
-
-    location: The location of the contact.
-    name: The name of the contact.
-    email: The email of the contact.
-    phone: The phone number of the contact.
-    fax: The fax number of the contact.
     """
 
     organization = models.ForeignKey(
@@ -233,17 +214,12 @@ class LocationContact(TimeStampedModel):
     class Meta:
         """
         Meta Class for LocationContact Model
-
-        verbose_name: The verbose name of the model.
-        verbose_name_plural: The verbose plural name of the model.
-        ordering: The ordering of the model.
-        indexes: The indexes of the model.
         """
 
-        verbose_name = _("Location Contact")
-        verbose_name_plural = _("Location Contacts")
-        ordering = ("name",)
-        indexes = [
+        verbose_name: str = _("Location Contact")
+        verbose_name_plural: str = _("Location Contacts")
+        ordering: tuple[str] = ("name",)
+        indexes: list[models.Index] = [
             models.Index(fields=["name"]),
         ]
 
@@ -251,27 +227,23 @@ class LocationContact(TimeStampedModel):
         """
         Clean the location contact.
 
-        Returns:
-            None
+        :return None
+        :rtype None
         """
         if not self.email or self.phone:
             raise ValidationError(_("Must have either an email or phone number."))
 
     def __str__(self) -> str:
         """
-        String representation of the location contact.
-
-        Returns:
-            str: String representation of the location contact.
+        :return: String representation of the location contact.
+        :rtype: str
         """
         return self.name
 
     def get_absolute_url(self) -> str:
         """
-        Get the absolute url for the location contact.
-
-        Returns:
-            str: Absolute url for the location contact.
+        :return: Absolute URL for the location contact.
+        :rtype: str
         """
         return reverse("location_contact_detail", kwargs={"pk": self.pk})
 
@@ -279,10 +251,6 @@ class LocationContact(TimeStampedModel):
 class LocationComment(TimeStampedModel):
     """
     Location Comment Model Fields
-
-    location: The location of the comment.
-    comment_type: The Type of comment.
-    comment: The comment.
     """
 
     organization = models.ForeignKey(
@@ -314,34 +282,25 @@ class LocationComment(TimeStampedModel):
     class Meta:
         """
         Meta Class for LocationComment Model
-
-        verbose_name: The verbose name of the model.
-        verbose_name_plural: The verbose plural name of the model.
-        ordering: The ordering of the model.
-        indexes: The indexes of the model.
         """
 
-        verbose_name = _("Location Comment")
-        verbose_name_plural = _("Location Comments")
-        ordering = ("comment_type",)
-        indexes = [
+        verbose_name: str = _("Location Comment")
+        verbose_name_plural: str = _("Location Comments")
+        ordering: tuple[str] = ("comment_type",)
+        indexes: list[models.Index] = [
             models.Index(fields=["comment_type"]),
         ]
 
     def __str__(self) -> str:
         """
-        String representation of the location comment.
-
-        Returns:
-            str: String representation of the location comment.
+        :return: String representation of the location comment.
+        :rtype: str
         """
         return f"{self.comment_type} - {self.comment}"
 
     def get_absolute_url(self) -> str:
         """
-        Get the absolute url for the location comment.
-
-        Returns:
-            str: Absolute url for the location comment.
+        :return: Absolute URL for the location comment.
+        :rtype: str
         """
         return reverse("location_comment_detail", kwargs={"pk": self.pk})
