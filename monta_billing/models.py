@@ -31,7 +31,7 @@ from django.core.exceptions import ValidationError
 from django_extensions.db.models import TimeStampedModel
 
 # Monta Imports
-from monta_order.models import Order, Commodity, StatusChoices
+from monta_order.models import Order, StatusChoices
 from monta_user.models import Organization
 
 
@@ -44,6 +44,7 @@ class BillingExceptionChoices(models.TextChoices):
     PAPERWORK = "PAPERWORK", _("Paperwork")
     CHARGE = "CHARGE", _("Charge")
     CREDIT = "CREDIT", _("Credit")
+    DEBIT = "DEBIT", _("Debit")
     OTHER = "OTHER", _("Other")
 
 
@@ -56,6 +57,7 @@ class BillTypeChoices(models.TextChoices):
     INVOICE = "INVOICE", _("Invoice")
     CREDIT = "CREDIT", _("Credit")
     DEBIT = "DEBIT", _("Debit")
+    PREPAID = "PREPAID", _("Prepaid")
     OTHER = "OTHER", _("Other")
 
 
@@ -102,7 +104,7 @@ class ChargeType(TimeStampedModel):
         """
         return self.name
 
-    def save(self, **kwargs: Any):
+    def save(self, **kwargs: Any) -> None:
         """
         Save the Charge Type Model
 
@@ -115,7 +117,7 @@ class ChargeType(TimeStampedModel):
         self.name = self.name.upper()
         if self.description:
             self.description = self.description.capitalize()
-        super(ChargeType, self).save(**kwargs)
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """
@@ -217,7 +219,7 @@ class AdditionalCharge(TimeStampedModel):
         self.total_amount = self.unit * self.amount
         self.order.other_charge_amount = self.total_amount
         self.order.save()
-        super(AdditionalCharge, self).save(**kwargs)
+        super().save(**kwargs)
 
 
 class BillingQueue(TimeStampedModel):
@@ -298,7 +300,7 @@ class BillingQueue(TimeStampedModel):
             raise ValidationError(_("Order is already cancelled."))
         if self.order.ready_to_bill is False:
             raise ValidationError(_("Order is not marked ready to bill."))
-        super(BillingQueue, self).clean()
+        super().clean()
 
     def save(self, **kwargs: Any) -> None:
         """
@@ -314,7 +316,7 @@ class BillingQueue(TimeStampedModel):
             self.bill_type = BillTypeChoices.INVOICE
         self.total_amount = self.order.sub_total
         self.other_charge_total = self.order.other_charge_amount
-        super(BillingQueue, self).save(**kwargs)
+        super().save(**kwargs)
 
     def __str__(self) -> str:
         """
@@ -441,7 +443,7 @@ class BillingHistory(TimeStampedModel):
             raise ValidationError(
                 "Order must be marked billed before putting into the billing history."
             )
-        super(BillingHistory, self).clean()
+        super().clean()
 
     def __str__(self) -> str:
         """
@@ -460,7 +462,7 @@ class BillingHistory(TimeStampedModel):
         :return: Batch Name
         :rtype: str
         """
-        last_batch_name = (
+        last_batch_name: BillingHistory | None = (
             BillingHistory.objects.filter(
                 organization=self.organization,
             )
@@ -473,7 +475,7 @@ class BillingHistory(TimeStampedModel):
             batch_name = int(batch_name) + 1
             batch_name = f"B{batch_name}"
         else:
-            batch_name = f"B1"
+            batch_name = "B1"
 
         return batch_name
 

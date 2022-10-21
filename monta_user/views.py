@@ -24,7 +24,6 @@ from typing import Any, Type
 # Core Django Imports
 from django.views.generic import UpdateView, ListView
 from django.db.models import QuerySet
-from django.contrib.auth.hashers import check_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
 from django.http import (
@@ -50,8 +49,8 @@ class UserProfileView(LoginRequiredMixin, ModelUserFieldPermissionMixin, ListVie
     """
 
     model: Type[models.Profile] = models.Profile
-    template_name = "user_profile/overview.html"
-    model_permission_user_field = "user"
+    template_name: str = "user_profile/overview.html"
+    model_permission_user_field: str = "user"
 
     def get_queryset(self) -> QuerySet[models.Profile]:
         """
@@ -73,7 +72,7 @@ class UserProfileSettings(LoginRequiredMixin, ModelUserFieldPermissionMixin, Lis
     """
 
     model: Type[models.Profile] = models.Profile
-    template_name = "user_profile/settings.html"
+    template_name: str = "user_profile/settings.html"
     model_permission_user_field = "user"
 
     def get_queryset(self) -> QuerySet[models.Profile]:
@@ -172,7 +171,7 @@ class UpdateUserPassword(LoginRequiredMixin, UpdateView):
 
     model: Type[models.MontaUser] = models.MontaUser
     form_class: Type[forms.UpdateUserPasswordForm] = forms.UpdateUserPasswordForm
-    success_url = "/"
+    success_url: str = "/"
 
     def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
