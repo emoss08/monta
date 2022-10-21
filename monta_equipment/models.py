@@ -52,19 +52,17 @@ class EquipmentType(TimeStampedModel):
         _("Equipment Type ID"),
         max_length=50,
         primary_key=True,
-        help_text=_("Equipment Type ID")
+        help_text=_("Equipment Type ID"),
     )
     name = models.CharField(
-        _("Equipment Type Name"),
-        max_length=50,
-        help_text=_("Equipment Type Name")
+        _("Equipment Type Name"), max_length=50, help_text=_("Equipment Type Name")
     )
     description = models.CharField(
         _("Equipment Type Description"),
         max_length=200,
         blank=True,
         null=True,
-        help_text=_("Equipment Type Description")
+        help_text=_("Equipment Type Description"),
     )
 
     class Meta:
@@ -348,7 +346,7 @@ class EquipmentPermit(TimeStampedModel):
         :return: None
         :rtype: None
         """
-        self.permit_file_size = self.permit_file.size / (1024 ** 2)
+        self.permit_file_size = self.permit_file.size / (1024**2)
         super(EquipmentPermit, self).save(**kwargs)
 
     def get_absolute_url(self) -> str:

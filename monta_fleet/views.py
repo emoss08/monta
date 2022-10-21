@@ -55,7 +55,7 @@ class CreateFleet(LoginRequiredMixin, CreateView):
     form_class: Type[forms.AddFleetForm] = forms.AddFleetForm
 
     def post(
-            self, request: ASGIRequest, *args: Any, **kwargs: Any
+        self, request: ASGIRequest, *args: Any, **kwargs: Any
     ) -> JsonResponse | None:
         """
         :param request
@@ -96,7 +96,7 @@ class FleetEditView(LoginRequiredMixin, DetailView):
 
 
 def fleet_by_manager(
-        request: ASGIRequest, manager_id: int, fleet_id: int
+    request: ASGIRequest, manager_id: int, fleet_id: int
 ) -> HttpResponse | JsonResponse:
     if request.user.id == manager_id:
         fleet: models.Fleet = models.Fleet.objects.get(

@@ -138,6 +138,4 @@ class OrderAdmin(admin.ModelAdmin[models.Order]):
         "modified",
     )
 
-    inlines: tuple[Type[OrderDocumentationAdmin]] = (
-        OrderDocumentationAdmin,
-    )
+    inlines: tuple[Type[OrderDocumentationAdmin]] = (OrderDocumentationAdmin,)

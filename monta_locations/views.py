@@ -71,10 +71,10 @@ class LocationCreateView(LoginRequiredMixin, views.PermissionRequiredMixin, Crea
 
     @transaction.atomic
     def post(
-            self,
-            request: ASGIRequest,
-            *args: Any,
-            **kwargs: Any,
+        self,
+        request: ASGIRequest,
+        *args: Any,
+        **kwargs: Any,
     ) -> JsonResponse:
         """
         Method to handle the POST request.
@@ -112,10 +112,10 @@ class LocationUpdateView(LoginRequiredMixin, views.PermissionRequiredMixin, Upda
 
     @transaction.atomic
     def post(
-            self,
-            request: ASGIRequest,
-            *args: Any,
-            **kwargs: Any,
+        self,
+        request: ASGIRequest,
+        *args: Any,
+        **kwargs: Any,
     ) -> JsonResponse:
         """
         Overwrites the post method to check if the form is valid. If the form is valid, request the user's organization

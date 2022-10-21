@@ -25,17 +25,10 @@ from typing import Type
 from django import forms
 
 # Third Party Imports
-from localflavor.us.forms import (
-    USStateSelect,
-    USZipCodeField
-)
+from localflavor.us.forms import USStateSelect, USZipCodeField
 
 # Core Monta Imports
-from monta_driver.models import (
-    Driver,
-    DriverProfile,
-    DriverContact
-)
+from monta_driver.models import Driver, DriverProfile, DriverContact
 
 
 class AddDriverForm(forms.ModelForm):
@@ -110,7 +103,7 @@ class AddDriverProfileForm(forms.ModelForm):
         """
 
         model: Type[DriverProfile] = DriverProfile
-        fields: tuple[str] = (
+        fields = (
             "driver",
             "profile_picture",
             "address_line_1",
@@ -150,7 +143,7 @@ class AddDriverContactForm(forms.ModelForm):
         """
 
         model: Type[DriverContact] = DriverContact
-        fields: list[str] = [
+        fields = [
             "driver",
             "contact_name",
             "contact_email",

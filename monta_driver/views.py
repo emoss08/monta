@@ -58,7 +58,9 @@ from monta_driver import models, forms
 @method_decorator(require_safe, name="dispatch")
 @method_decorator(cache_control(max_age=60 * 60 * 24), name="dispatch")
 @method_decorator(vary_on_cookie, name="dispatch")
-class DriverListView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.TemplateView):
+class DriverListView(
+    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.TemplateView
+):
     """
     Class to render the driver Index page.
     """
@@ -83,7 +85,9 @@ class DriverListView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, g
         return context
 
 
-class DriverCreateView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.CreateView):
+class DriverCreateView(
+    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.CreateView
+):
     """
     Class to render create driver page.
     """
@@ -95,10 +99,10 @@ class DriverCreateView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin,
     template_name = "monta_driver/index.html"
 
     def post(
-            self,
-            request: ASGIRequest,
-            *args: Any,
-            **kwargs: Any,
+        self,
+        request: ASGIRequest,
+        *args: Any,
+        **kwargs: Any,
     ) -> JsonResponse:
         """
         Method to handle the POST request.
@@ -145,7 +149,9 @@ class DriverCreateView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin,
 
 
 @method_decorator(require_safe, name="dispatch")
-class DriverEditView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.DetailView):
+class DriverEditView(
+    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.DetailView
+):
     """
     Class to render the driver edit page.
     """
@@ -172,7 +178,9 @@ class DriverEditView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, g
         )
 
 
-class DriverUpdateView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.UpdateView):
+class DriverUpdateView(
+    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.UpdateView
+):
     """
     Class to update the driver profile.
     """
@@ -181,10 +189,10 @@ class DriverUpdateView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin,
     form_class: Type[forms.UpdateDriverForm] = forms.UpdateDriverForm
 
     def post(
-            self,
-            request: ASGIRequest,
-            *args: Any,
-            **kwargs: Any,
+        self,
+        request: ASGIRequest,
+        *args: Any,
+        **kwargs: Any,
     ) -> JsonResponse:
         """
         Overwrites the post method to check if the form is valid. If the form is valid, request the user's organization
@@ -212,7 +220,9 @@ class DriverUpdateView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin,
         )
 
 
-class DriverDeleteView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.DeleteView):
+class DriverDeleteView(
+    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.DeleteView
+):
     """
     Class to delete a driver.
     """
@@ -461,8 +471,8 @@ def validate_license_number(request: ASGIRequest) -> HttpResponse:
                 "license_number"
             ]
             if models.Driver.objects.filter(
-                    profile__license_number=license_number,
-                    organization=request.user.profile.organization,
+                profile__license_number=license_number,
+                organization=request.user.profile.organization,
             ).exists():
                 return HttpResponse(
                     "<div class='text-danger ease_in_5' id='license_error'>License is already "

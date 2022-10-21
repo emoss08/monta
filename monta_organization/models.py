@@ -108,8 +108,8 @@ class OrganizationSettings(TimeStampedModel):
         Metaclass for OrganizationSettings
         """
 
-        verbose_name: str = _('Organization Settings')
-        verbose_name_plural: str = _('Organization Settings')
+        verbose_name: str = _("Organization Settings")
+        verbose_name_plural: str = _("Organization Settings")
 
     def __str__(self) -> str:
         """

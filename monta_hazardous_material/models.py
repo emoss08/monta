@@ -141,8 +141,8 @@ class HazardousMaterial(TimeStampedModel):
         Meta Class for HazardousClass Model
         """
 
-        verbose_name: str = _('Hazardous Material')
-        verbose_name_plural: str = _('Hazardous Materials')
+        verbose_name: str = _("Hazardous Material")
+        verbose_name_plural: str = _("Hazardous Materials")
         ordering: list[str] = ["name"]
 
     def __str__(self) -> str:

@@ -20,24 +20,27 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 
 # Standard Python Libraries
 from __future__ import annotations
+
 from typing import Any
+
+from django.core.exceptions import ValidationError
 
 # Core Django Imports
 from django.db import models
-from django.urls import reverse
-from django.templatetags.static import static
-from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
 from django.db.models import functions, QuerySet
+from django.templatetags.static import static
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 from localflavor.us.models import USStateField, USZipCodeField
 
-# Monta Imports
-from monta_user.models import Organization
 from monta_customer.models import DocumentClassification
 from monta_fleet.models import Fleet
+
+# Monta Imports
+from monta_user.models import Organization
 
 
 class Driver(TimeStampedModel):
@@ -386,13 +389,6 @@ class DriverContact(TimeStampedModel):
 class DriverQualification(TimeStampedModel):
     """
     Driver Qualification Model Fields
-
-    driver: The driver the qualification belongs to
-    doc_class: The document class of the qualification
-    name: The name of the qualification
-    description: The description of the qualification
-    dq_file: The file for the qualification
-    dq_file_size: The size of the file for the qualification
     """
 
     driver = models.ForeignKey(
@@ -429,11 +425,6 @@ class DriverQualification(TimeStampedModel):
     class Meta:
         """
         Meta Class for Driver Qualification Model
-
-        ordering: The ordering of the driver qualifications
-        verbose_name: The verbose name for the model
-        verbose_name_plural: The plural verbose name for the model
-        indexes: The indexes for the model
         """
 
         ordering: list[str] = ["driver", "doc_class"]
@@ -474,9 +465,6 @@ class DriverQualification(TimeStampedModel):
 class CommentType(TimeStampedModel):
     """
     Comment Type Model Fields
-
-    name: The name of the comment type
-    description: The description of the comment type
     """
 
     organization = models.ForeignKey(
@@ -492,11 +480,6 @@ class CommentType(TimeStampedModel):
     class Meta:
         """
         Meta Class for Comment Type Model
-
-        ordering: The ordering of the comment types
-        verbose_name: The verbose name for the model
-        verbose_name_plural: The plural verbose name for the model
-        indexes: The indexes for the model
         """
 
         ordering: list[str] = ["name"]
@@ -528,10 +511,6 @@ class CommentType(TimeStampedModel):
 class DriverComment(TimeStampedModel):
     """
     Driver Comment Model Fields
-
-    driver: The driver the comment belongs to
-    comment_type: The type of the comment
-    comment: The comment
     """
 
     organization = models.ForeignKey(
@@ -560,11 +539,6 @@ class DriverComment(TimeStampedModel):
     class Meta:
         """
         Meta Class for Driver Comment Model
-
-        ordering: The ordering of the driver comments
-        verbose_name: The verbose name for the model
-        verbose_name_plural: The plural verbose name for the model
-        indexes: The indexes for the model
         """
 
         ordering: list[str] = ["driver", "comment_type"]
@@ -594,15 +568,6 @@ class DriverComment(TimeStampedModel):
 class DriverHour(TimeStampedModel):
     """
     Driver Hour Model Fields
-
-    driver: The driver the hours belong to
-    eight_hour_clock: The eight-hour clock
-    eleven_hour_clock: The eleven-hour clock
-    fourteen_hour_clock: The fourteen-hour clock
-    seventy_hour_clock: The seventy-hour clock
-    violation_time: The violation time
-    consecutive_time_off: The consecutive time off
-    last_known_duty_status: The last known duty status
     """
 
     organization = models.ForeignKey(
@@ -670,17 +635,12 @@ class DriverHour(TimeStampedModel):
     class Meta:
         """
         Meta Class for Driver Hour Model
-
-        ordering: The ordering of the driver hours
-        verbose_name: The verbose name for the model
-        verbose_name_plural: The plural verbose name for the model
-        indexes: The indexes for the model
         """
 
         ordering: list[str] = ["driver"]
         verbose_name: str = _("Driver Hour")
         verbose_name_plural: str = _("Driver Hours")
-        indexes = [
+        indexes: list[models.Index] = [
             models.Index(fields=["driver"]),
         ]
 

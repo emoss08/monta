@@ -84,9 +84,9 @@ class Fleet(TimeStampedModel):
         Metaclass for Fleet.
         """
 
-        ordering: list[str] = ['name']
-        verbose_name: str = _('Fleet')
-        verbose_name_plural: str = _('Fleets')
+        ordering: list[str] = ["name"]
+        verbose_name: str = _("Fleet")
+        verbose_name_plural: str = _("Fleets")
         indexes: list[models.Index] = [
             models.Index(fields=["name", "fleet_id"]),
         ]

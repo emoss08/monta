@@ -52,7 +52,7 @@ class UpdateProfileGeneralInformationForm(forms.ModelForm):
         """Update User General Information META"""
 
         model: Type[Profile] = Profile
-        fields: list[str] = [
+        fields = [
             "profile_picture",
             "first_name",
             "last_name",
@@ -74,7 +74,7 @@ class UpdateUserEmailForm(forms.ModelForm):
         """Update User Email META"""
 
         model: Type[MontaUser] = MontaUser
-        fields: list[str] = ["email"]
+        fields = ["email"]
 
 
 class UpdateUserPasswordForm(forms.ModelForm):
@@ -89,4 +89,4 @@ class UpdateUserPasswordForm(forms.ModelForm):
         """Update User Password META"""
 
         model: Type[MontaUser] = MontaUser
-        fields: list[str] = ["current_password", "password"]
+        fields = ["current_password", "password"]

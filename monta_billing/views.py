@@ -57,9 +57,6 @@ class InteractiveBillingView(
 ):
     """
     View for Interactive Billing
-
-    Typical Usage Example:
-        >>> InteractiveBillingView.as_view()
     """
 
     template_name = "monta_billing/interactive/index.html"
@@ -287,9 +284,6 @@ class ChargeTypeUpdateView(
 ):
     """
     Class to update the Charge Type
-
-    Typical Usage Example:
-        >>> ChargeTypeUpdateView.as_view()
     """
 
     permission_required: str = "monta_billing.change_chargetype"
@@ -366,11 +360,7 @@ class ChargeTypeSearchView(
     mixins.LoginRequiredMixin, views.PermissionRequiredMixin, View
 ):
     """
-
     Class to delete a driver.
-
-    Typical Usage Example:
-        >>> ChargeTypeSearchView.as_view()
     """
 
     permission_required: str = "monta_billing.view_chargetypes"
@@ -471,9 +461,6 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
     :type request: ASGIRequest
     :return: JsonResponse
     :rtype: JsonResponse
-
-    Typical Usage Example:
-        >>> bill_orders(request)
     """
     order_document = []
     billing_requirements = []
@@ -549,7 +536,7 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
 @permission_required("monta_billing.re_bill_orders", raise_exception=True)
 def re_bill_order(request: ASGIRequest, order_id: str) -> JsonResponse:
     """
-    Rebill Order.
+    Re bill Order.
 
     :param request
     :type request: ASGIRequest
@@ -557,10 +544,6 @@ def re_bill_order(request: ASGIRequest, order_id: str) -> JsonResponse:
     :type order_id: str
     :return: JsonResponse
     :rtype: JsonResponse
-
-    Typical Usage Example:
-        >>> re_bill_order(request, order_id)
-
     """
     order: Order = Order.objects.filter(
         organization=request.user.profile.organization,

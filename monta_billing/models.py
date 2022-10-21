@@ -89,23 +89,16 @@ class ChargeType(TimeStampedModel):
     class Meta:
         """
         Meta Class for Charge Type Model
-
-        ordering: Order by name
-        verbose_name: Charge Type
-        verbose_name_plural: Charge Types
-        indexes: Indexes for name
         """
 
-        ordering = ["name"]
-        verbose_name = _("Charge Type")
-        verbose_name_plural = _("Charge Types")
+        ordering: list[str] = ["name"]
+        verbose_name: str = _("Charge Type")
+        verbose_name_plural: str = _("Charge Types")
 
     def __str__(self) -> str:
         """
-        String representation of the Charge Type Model
-
-        Returns:
-            str: Name of the Charge Type
+        :return: String representation of the Charge Type Model
+        :rtype: str
         """
         return self.name
 
@@ -137,13 +130,6 @@ class ChargeType(TimeStampedModel):
 class AdditionalCharge(TimeStampedModel):
     """
     Additional Charge Model Fields
-
-    order: Order that the additional charge belongs to.
-    name: Name of the Additional Charge
-    description: Description of the Additional Charge
-    unit: Number of units of the Additional Charge
-    amount: Amount of the Additional Charge
-    total_amount: Total amount of the Additional Charge
     """
 
     organization = models.ForeignKey(
@@ -200,17 +186,12 @@ class AdditionalCharge(TimeStampedModel):
     class Meta:
         """
         Meta Class for Additional Charge Model
-
-        ordering: Order by name
-        verbose_name: Additional Charge
-        verbose_name_plural: Additional Charges
-        indexes: Indexes for name
         """
 
-        verbose_name = _("Additional Charge")
-        verbose_name_plural = _("Additional Charges")
-        ordering = ["name"]
-        indexes = [
+        verbose_name: str = _("Additional Charge")
+        verbose_name_plural: str = _("Additional Charges")
+        ordering: list[str] = ["name"]
+        indexes: list[models.Index] = [
             models.Index(fields=["name"]),
         ]
 
@@ -242,10 +223,6 @@ class AdditionalCharge(TimeStampedModel):
 class BillingQueue(TimeStampedModel):
     """
     Billing Queue Model Fields
-
-    organization: Organization that the order belongs to
-    order: Order that is being billed.
-    bill_type: Type of bill that is being created.
 
     ----------------------------------------
     NOTE: Intermediate model for storing order information before it is billed.
@@ -292,20 +269,15 @@ class BillingQueue(TimeStampedModel):
     class Meta:
         """
         Meta Class for Billing Queue Model
-
-        ordering: Order by name
-        verbose_name: Billing Queue
-        verbose_name_plural: Billing Queues
-        indexes: Indexes for name
         """
 
-        verbose_name = _("Billing Queue")
-        verbose_name_plural = _("Billing Queues")
-        ordering = ["order"]
-        indexes = [
+        verbose_name: str = _("Billing Queue")
+        verbose_name_plural: str = _("Billing Queues")
+        ordering: list[str] = ["order"]
+        indexes: list[models.Index] = [
             models.Index(fields=["order"]),
         ]
-        permissions = [
+        permissions: list[tuple[str, str]] = [
             ("transfer_to_billing", "Can Transfer to Billing"),
             ("bill_orders", "Can Bill Orders"),
             ("re_bill_orders", "Can Re Bill Orders"),
@@ -358,11 +330,6 @@ class BillingException(TimeStampedModel):
     """
     Billing Exception Model Fields
 
-    description: Description of the Billing Exception
-    exception_type: Type of the Billing Exception
-    order: Order that the Billing Exception is for
-    organization: Organization that the Billing Exception is for
-
     ----------------------------------------
     NOTE: Model responsible for storing billing exceptions.
     ----------------------------------------
@@ -396,15 +363,10 @@ class BillingException(TimeStampedModel):
     class Meta:
         """
         Metaclass for Billing Exception Model
-
-        ordering: Order by name
-        verbose_name: Billing Exception
-        verbose_name_plural: Billing Exceptions
-        indexes: Indexes for name
         """
 
-        verbose_name = _("Billing Exception")
-        verbose_name_plural = _("Billing Exceptions")
+        verbose_name: str = _("Billing Exception")
+        verbose_name_plural: str = _("Billing Exceptions")
 
     def __str__(self) -> str:
         """
@@ -419,10 +381,6 @@ class BillingException(TimeStampedModel):
 class BillingHistory(TimeStampedModel):
     """
     Billing History Model Fields
-
-    organization: Organization that the order belongs to
-    batch_name: Name of the batch that the order belongs to
-    order: Order that is being billed.
     """
 
     batch_name = models.CharField(
@@ -463,18 +421,12 @@ class BillingHistory(TimeStampedModel):
     class Meta:
         """
         Metaclass for Billing History Model
-
-        ordering: Order by name
-        verbose_name: Billing History
-        verbose_name_plural: Billing Histories
-        indexes: Indexes for name
-
         """
 
-        verbose_name = _("Billing History")
-        verbose_name_plural = _("Billing Histories")
-        ordering = ["batch_name"]
-        indexes = [
+        verbose_name: str = _("Billing History")
+        verbose_name_plural: str = _("Billing Histories")
+        ordering: list[str] = ["batch_name"]
+        indexes: list[models.Index] = [
             models.Index(fields=["batch_name"]),
         ]
 

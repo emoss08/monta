@@ -48,4 +48,4 @@ class AddDocumentClassificationsForm(forms.ModelForm):
         """
 
         model: Type[models.DocumentClassification] = models.DocumentClassification
-        fields: list[str] = ["name", "description"]
+        fields = ["name", "description"]

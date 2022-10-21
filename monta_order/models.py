@@ -733,7 +733,7 @@ class Order(TimeStampedModel):
         if self.rate_method == RateMethodChoices.PER_MILE:
             if self.other_charge_amount:
                 self.sub_total = (
-                        self.freight_charge_amount * self.mileage + self.other_charge_amount
+                    self.freight_charge_amount * self.mileage + self.other_charge_amount
                 )
             else:
                 self.sub_total = self.freight_charge_amount * self.mileage
@@ -926,11 +926,11 @@ class Movement(TimeStampedModel):
         # If the sequence is not ordered currently order it.
         # add to fix maximum recursion depth exceeded in comparison
         if (
-                not self.stops.order_by("sequence")
-                            .values_list("sequence", flat=True)
-                            .distinct()
-                            .count()
-                    == self.stops.count()
+            not self.stops.order_by("sequence")
+            .values_list("sequence", flat=True)
+            .distinct()
+            .count()
+            == self.stops.count()
         ):
             stops = self.stops.order_by("created")
             for index, stop in enumerate(stops, start=1):
@@ -950,8 +950,8 @@ class Movement(TimeStampedModel):
                 old_status = Movement.objects.get(pk=self.pk).status
                 # If the movement status is changed from available to something else, raise an error.
                 if (
-                        old_status == StatusChoices.IN_PROGRESS
-                        or old_status == StatusChoices.COMPLETED
+                    old_status == StatusChoices.IN_PROGRESS
+                    or old_status == StatusChoices.COMPLETED
                 ):
                     raise ValidationError(
                         _("Movement status cannot be changed back to available")
@@ -1026,7 +1026,7 @@ class Movement(TimeStampedModel):
 
         if self.status == StatusChoices.COMPLETED:
             if not self.order.movements.filter(
-                    status=StatusChoices.IN_PROGRESS
+                status=StatusChoices.IN_PROGRESS
             ).exists():
                 self.order.status = StatusChoices.COMPLETED
                 self.order.save()
@@ -1234,8 +1234,8 @@ class Stop(TimeStampedModel):
             if self.status == StatusChoices.AVAILABLE:
                 old_status = Stop.objects.get(pk__exact=self.pk).status
                 if (
-                        old_status == StatusChoices.IN_PROGRESS
-                        or old_status == StatusChoices.COMPLETED
+                    old_status == StatusChoices.IN_PROGRESS
+                    or old_status == StatusChoices.COMPLETED
                 ):
                     raise ValidationError(
                         _("Stop status cannot be changed back to available")
@@ -1256,8 +1256,8 @@ class Stop(TimeStampedModel):
                     # If previous stop is in available or in progress, current stop cannot be completed or in progress
                     if previous_stop.status != StatusChoices.COMPLETED:
                         if (
-                                self.status == StatusChoices.IN_PROGRESS
-                                or self.status == StatusChoices.COMPLETED
+                            self.status == StatusChoices.IN_PROGRESS
+                            or self.status == StatusChoices.COMPLETED
                         ):
                             raise ValidationError(
                                 _(
@@ -1282,8 +1282,8 @@ class Stop(TimeStampedModel):
                     # If the next stop is in progress or completed, the current stop cannot be available
                     if self.status != StatusChoices.COMPLETED:
                         if (
-                                next_stop.status == StatusChoices.IN_PROGRESS
-                                or next_stop.status == StatusChoices.COMPLETED
+                            next_stop.status == StatusChoices.IN_PROGRESS
+                            or next_stop.status == StatusChoices.COMPLETED
                         ):
                             raise ValidationError(
                                 _(
@@ -1295,8 +1295,8 @@ class Stop(TimeStampedModel):
             # If the movement has no driver or equipment ,but the status is in progress or completed, raise an error
             if self.movement.assigned_driver is None or self.movement.equipment is None:
                 if (
-                        self.status == StatusChoices.IN_PROGRESS
-                        or self.status == StatusChoices.COMPLETED
+                    self.status == StatusChoices.IN_PROGRESS
+                    or self.status == StatusChoices.COMPLETED
                 ):
                     raise ValidationError(
                         _(
@@ -1344,8 +1344,8 @@ class Stop(TimeStampedModel):
         # if the last stop is completed, change the movement status to complete.
         if self.status == StatusChoices.COMPLETED:
             if (
-                    self.movement.stops.filter(status=StatusChoices.COMPLETED).count()
-                    == self.movement.stops.count()
+                self.movement.stops.filter(status=StatusChoices.COMPLETED).count()
+                == self.movement.stops.count()
             ):
                 self.movement.status = StatusChoices.COMPLETED
                 self.movement.save()
