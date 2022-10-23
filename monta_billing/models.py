@@ -21,12 +21,11 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 # Standard library imports
 from typing import Any, final
 
+from django.core.exceptions import ValidationError
 # Core Django Imports
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
-
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 
@@ -377,7 +376,7 @@ class BillingException(TimeStampedModel):
         :return: Name of the Billing Exception
         :rtype: str
         """
-        return self.exception_type
+        return str(self.exception_type)
 
 
 class BillingHistory(TimeStampedModel):
@@ -459,6 +458,9 @@ class BillingHistory(TimeStampedModel):
         """
         Generate the batch name for the billing history.
 
+        # TODO: Add a check to make sure the batch name is unique. And if not, increment the batch name.
+        # TODO: Simplify this method.
+
         :return: Batch Name
         :rtype: str
         """
@@ -491,4 +493,4 @@ class BillingHistory(TimeStampedModel):
         self.full_clean()
         self.batch_name = self.generate_batch_name
         self.sub_total = round(self.order.sub_total, 2)
-        super(BillingHistory, self).save(**kwargs)
+        super().save(**kwargs)

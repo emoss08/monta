@@ -27,13 +27,11 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
+from django_extensions.db.models import TimeStampedModel
 # Third Party Imports
 from localflavor.us.models import USStateField, USZipCodeField
-from django_extensions.db.models import TimeStampedModel
 
 from monta_driver.models import CommentType
-
 # Monta Imports
 from monta_user.models import Organization
 
@@ -127,7 +125,7 @@ class Location(TimeStampedModel):
 
         verbose_name: str = _("Location")
         verbose_name_plural: str = _("Locations")
-        ordering: tuple[str] = ("location_id", "name")
+        ordering: tuple[str, str] = ("location_id", "name")
         indexes: list[models.Index] = [
             models.Index(fields=["location_id", "name"]),
         ]
@@ -150,7 +148,7 @@ class Location(TimeStampedModel):
         """
         if not self.location_id:
             self.location_id = slugify(self.name)
-        super(Location, self).save(**kwargs)
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """
@@ -238,7 +236,7 @@ class LocationContact(TimeStampedModel):
         :return: String representation of the location contact.
         :rtype: str
         """
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self) -> str:
         """

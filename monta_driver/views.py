@@ -19,40 +19,30 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Standard Library Imports
-from typing import (
-    List,
-    Type,
-    Any,
-)
+from typing import (Any, List, Type)
 
+# Third Party Imports
+from ajax_datatable import AjaxDatatableView
+from braces import views
+from django.contrib.auth import mixins
 # Core Django Imports
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import mixins
-from django.db.models import QuerySet
-from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render
+from django.contrib.postgres.search import (SearchQuery, SearchRank, SearchVector)
 from django.core.handlers.asgi import ASGIRequest
+from django.db.models import QuerySet
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.views import View
+from django.views import View, generic
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import (
     require_safe,
 )
 from django.views.decorators.vary import vary_on_cookie
-from django.views import generic
-from django.contrib.postgres.search import (
-    SearchVector,
-    SearchQuery,
-    SearchRank,
-)
-
-# Third Party Imports
-from ajax_datatable import AjaxDatatableView
-from braces import views
 
 # Core Monta Imports
-from monta_driver import models, forms
+from monta_driver import forms, models
 
 
 @method_decorator(require_safe, name="dispatch")
@@ -65,8 +55,8 @@ class DriverListView(
     Class to render the driver Index page.
     """
 
-    template_name = "monta_driver/index.html"
-    permission_required = "monta_driver.view_driver"
+    template_name: str = "monta_driver/index.html"
+    permission_required: str = "monta_driver.view_driver"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         """
@@ -94,15 +84,15 @@ class DriverCreateView(
 
     model: Type[models.Driver] = models.Driver
     form_class: Type[forms.AddDriverForm] = forms.AddDriverForm
-    permission_required = "monta_driver.add_driver"
-    success_url = "/driver/"
-    template_name = "monta_driver/index.html"
+    permission_required: str = "monta_driver.add_driver"
+    success_url: str = "/driver/"
+    template_name: str = "monta_driver/index.html"
 
     def post(
-        self,
-        request: ASGIRequest,
-        *args: Any,
-        **kwargs: Any,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Method to handle the POST request.
@@ -157,8 +147,8 @@ class DriverEditView(
     """
 
     model: Type[models.Driver] = models.Driver
-    template_name = "monta_driver/edit.html"
-    permission_required = "monta_driver.change_driver"
+    template_name: str = "monta_driver/edit.html"
+    permission_required: str = "monta_driver.change_driver"
 
     def get_queryset(self) -> QuerySet[models.Driver] | None:
         """
@@ -189,10 +179,10 @@ class DriverUpdateView(
     form_class: Type[forms.UpdateDriverForm] = forms.UpdateDriverForm
 
     def post(
-        self,
-        request: ASGIRequest,
-        *args: Any,
-        **kwargs: Any,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Overwrites the post method to check if the form is valid. If the form is valid, request the user's organization
@@ -449,10 +439,8 @@ def validate_license_number(request: ASGIRequest) -> HttpResponse:
 
     If the license number is not already in use then return a success response. Otherwise, return an error response.
 
-    **********************************************************************************************************************
     * NOTE: Ensure that you implement client side debouncing & Rate Limiting to prevent this function from being called
      on every keystroke *
-    **********************************************************************************************************************
 
     :param request
     :type request: ASGIRequest
@@ -471,8 +459,8 @@ def validate_license_number(request: ASGIRequest) -> HttpResponse:
                 "license_number"
             ]
             if models.Driver.objects.filter(
-                profile__license_number=license_number,
-                organization=request.user.profile.organization,
+                    profile__license_number=license_number,
+                    organization=request.user.profile.organization,
             ).exists():
                 return HttpResponse(
                     "<div class='text-danger ease_in_5' id='license_error'>License is already "

@@ -26,14 +26,13 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 from localflavor.us.models import USStateField
 
 # Monta Imports
 from monta_driver.models import Driver
-from monta_user.models import Organization, MontaUser
+from monta_user.models import MontaUser, Organization
 
 
 class EquipmentType(TimeStampedModel):
@@ -86,7 +85,7 @@ class EquipmentType(TimeStampedModel):
         """
         return f"{self.equip_type_id} - {self.name}"
 
-    def save(self, *args: Any, **kwargs: Any) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Equipment Type Model Save Method
 
@@ -346,8 +345,8 @@ class EquipmentPermit(TimeStampedModel):
         :return: None
         :rtype: None
         """
-        self.permit_file_size = self.permit_file.size / (1024**2)
-        super(EquipmentPermit, self).save(**kwargs)
+        self.permit_file_size = self.permit_file.size / (1024 ** 2)
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """

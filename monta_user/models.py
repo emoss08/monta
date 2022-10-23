@@ -22,15 +22,14 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 import uuid
 from typing import Any
 
+from django.conf import settings
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 # Core Django Imports
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils import timezone
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
-from django.conf import settings
-
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 from localflavor.us.models import USStateField, USZipCodeField
@@ -86,7 +85,7 @@ class MontaUser(AbstractBaseUser, PermissionsMixin):
         :return: The username of the user
         :rtype: str
         """
-        return self.username
+        return str(self.username)
 
     def get_absolute_url(self) -> str:
         """
@@ -206,19 +205,17 @@ class Profile(TimeStampedModel):
         """
         return self.user.username
 
-    def save(self, *args: Any, **kwargs: Any) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Save the profile instance to the database
 
-        :param args: The arguments
-        :type args: list
         :param kwargs: The keyword arguments
-        :type kwargs: dict
+        :type kwargs: Any
         :return: None
         :rtype: None
         """
         self.full_clean()
-        return super(Profile, self).save(**kwargs)
+        return super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """
@@ -380,7 +377,7 @@ class JobTitle(TimeStampedModel):
         :return: The name of the job title
         :rtype: str
         """
-        return self.name
+        return str(self.name)
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         """
@@ -396,7 +393,7 @@ class JobTitle(TimeStampedModel):
         self.full_clean()
         if not self.title_id:
             self.title_id = slugify(self.name)
-        return super(JobTitle, self).save(**kwargs)
+        return super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """
@@ -456,7 +453,7 @@ class Organization(TimeStampedModel):
         :return: The name of the organization
         :rtype: str
         """
-        return self.name
+        return str(self.name)
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         """
@@ -472,7 +469,7 @@ class Organization(TimeStampedModel):
         self.full_clean()
         if not self.org_id:
             self.org_id = uuid.uuid4()
-        return super(Organization, self).save(**kwargs)
+        return super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """

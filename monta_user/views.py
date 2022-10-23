@@ -21,11 +21,9 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 # Standard Library Imports
 from typing import Any, Type
 
-# Core Django Imports
-from django.views.generic import UpdateView, ListView
-from django.db.models import QuerySet
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
+from django.db.models import QuerySet
 from django.http import (
     JsonResponse,
 )
@@ -33,12 +31,13 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_POST, require_safe
 from django.views.decorators.vary import vary_on_cookie
-
+# Core Django Imports
+from django.views.generic import ListView, UpdateView
 # Third Party Imports
 from django_extensions.auth.mixins import ModelUserFieldPermissionMixin
 
 # Core Monta Imports
-from monta_user import models, forms
+from monta_user import forms, models
 
 
 @method_decorator(require_safe, name="dispatch")
@@ -59,9 +58,10 @@ class UserProfileView(LoginRequiredMixin, ModelUserFieldPermissionMixin, ListVie
         :return: Queryset for the view.
         :rtype: QuerySet[models.Profile]
         """
-        return models.Profile.objects.filter(user=self.request.user).select_related(
-            "user"
-        )
+        queryset: QuerySet[models.Profile] = models.Profile.objects.filter(
+            user=self.request.user
+        ).select_related("user")
+        return queryset
 
 
 @method_decorator(require_safe, name="dispatch")
@@ -82,9 +82,10 @@ class UserProfileSettings(LoginRequiredMixin, ModelUserFieldPermissionMixin, Lis
         :return: Queryset for the view.
         :rtype: QuerySet[models.Profile]
         """
-        return models.Profile.objects.filter(user=self.request.user).select_related(
-            "user"
-        )
+        queryset: QuerySet[models.Profile] = models.Profile.objects.filter(
+            user=self.request.user
+        ).select_related("user")
+        return queryset
 
 
 @method_decorator(require_POST, name="dispatch")
@@ -97,7 +98,7 @@ class UpdateUserProfile(LoginRequiredMixin, UpdateView):
     form_class: Type[
         forms.UpdateProfileGeneralInformationForm
     ] = forms.UpdateProfileGeneralInformationForm
-    success_url = "/"
+    success_url: str = "/"
 
     def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
