@@ -24,11 +24,11 @@ from typing import Any
 # Core Django Imports
 from django.db import models
 from django.urls import reverse
-from django_extensions.db.models import TimeStampedModel
 from django.utils.translation import gettext_lazy as _
+from django_extensions.db.models import TimeStampedModel
 
 # Monta Imports
-from monta_user.models import Organization, MontaUser
+from monta_user.models import MontaUser, Organization
 
 
 class Fleet(TimeStampedModel):
@@ -115,7 +115,7 @@ class Fleet(TimeStampedModel):
                 int(Fleet.objects.count() + 1)
             )
         self.fleet_id = self.fleet_id.upper()
-        super(Fleet, self).save(**kwargs)
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """

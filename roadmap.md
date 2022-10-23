@@ -1,4 +1,5 @@
 ### 2022/2023 Roadmap
+
 - [x] Monta Authentication
     - [x] Login
     - [x] Logout
@@ -86,5 +87,5 @@
 - [ ] Monta Safety
     - [ ] Safety Management
     - [ ] Incident Management
--  [ ] Monta General Ledger
-  - 
+- [ ] Monta General Ledger
+-

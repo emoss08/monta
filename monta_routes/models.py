@@ -18,13 +18,12 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Standard Python Libraries
-from typing import final, Any
+from typing import Any, final
 
-# Core Django Imports
-from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.urls import reverse
-
+# Core Django Imports
+from django.utils.translation import gettext_lazy as _
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 
@@ -130,7 +129,7 @@ class Route(TimeStampedModel):
         if self.origin == self.destination:
             self.distance = 0
             self.duration = 0
-        super(Route, self).save(**kwargs)
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """
@@ -140,7 +139,6 @@ class Route(TimeStampedModel):
         :rtype: str
         """
         return reverse("route_detail", kwargs={"pk": self.pk})
-
 
 # class RouteConfiguration(TimeStampedModel):
 #     organization = models.OneToOneField(

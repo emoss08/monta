@@ -39,16 +39,16 @@ class DriverProfileInline(admin.StackedInline[models.DriverProfile]):
     """Driver Profile Inline"""
 
     model: Type[models.DriverProfile] = models.DriverProfile
-    can_delete = False
-    verbose_name_plural = "Driver Profile"
+    can_delete: bool = False
+    verbose_name_plural: str = "Driver Profile"
 
 
 class DriverContactInline(admin.TabularInline[models.DriverContact]):
     """Driver Contact Inline"""
 
     model: Type[models.DriverContact] = models.DriverContact
-    verbose_name_plural = "Driver Contact"
-    list_select_related = True
+    verbose_name_plural: str = "Driver Contact"
+    list_select_related: bool = True
     extra: int = 0
 
 
@@ -56,7 +56,7 @@ class DriverQualificationInline(admin.TabularInline[models.DriverQualification])
     """Driver Qualification Inline"""
 
     model: Type[models.DriverQualification] = models.DriverQualification
-    verbose_name_plural = "Driver Qualifications"
+    verbose_name_plural: str = "Driver Qualifications"
     extra: int = 0
 
 
@@ -64,15 +64,15 @@ class DriverCommentInline(admin.TabularInline[models.DriverComment]):
     """Driver Comment Inline"""
 
     model: Type[models.DriverComment] = models.DriverComment
-    verbose_name_plural = "Driver Comments"
+    verbose_name_plural: str = "Driver Comments"
     extra: int = 0
 
 
 @admin.register(models.Driver)
-class DriverInline(admin.ModelAdmin):
+class DriverInline(admin.ModelAdmin[models.Driver]):
     """Driver Admin"""
 
-    list_display = ("driver_id", "first_name", "last_name")
+    list_display: tuple[str, str, str] = ("driver_id", "first_name", "last_name")
     inlines: tuple[
         Type[DriverProfileInline],
         Type[DriverContactInline],

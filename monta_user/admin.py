@@ -45,7 +45,7 @@ class JobTitleInline(admin.ModelAdmin[models.JobTitle]):
 class ProfileUserInline(admin.ModelAdmin[models.Profile]):
     """Profile Admin"""
 
-    list_display: tuple[str] = (
+    list_display: tuple[str, ...] = (
         "user",
         "organization",
         "address_line_1",

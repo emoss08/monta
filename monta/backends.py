@@ -18,11 +18,14 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Core Django Imports
-from django.db.models.base import ModelBase
+# Standard Python Libraries
+from typing import Any
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.base_user import AbstractBaseUser
+# Core Django Imports
+from django.db.models.base import ModelBase
 
 # Monta Imports
 from monta_user.models import MontaUser
@@ -36,7 +39,7 @@ class MontaBackend(BaseBackend):
     """
 
     def authenticate(
-        self, request, username: str = None, password: str = None, **kwargs: any
+            self, request, username: str | None = None, password: str | None = None, **kwargs: Any
     ) -> MontaUser | None:
         """
         Override the authenticate method to authenticate the user session
@@ -55,7 +58,7 @@ class MontaBackend(BaseBackend):
         if username is None or password is None:
             return
         try:
-            user: MontaUser = UserModel._default_manager.get_by_natural_key(username)
+            user: MontaUser = MontaUser.objects.get_by_natural_key(username)
         except MontaUser.DoesNotExist:
             return None
         else:
@@ -63,14 +66,11 @@ class MontaBackend(BaseBackend):
                 return user
 
     @staticmethod
-    def user_can_authenticate(user: MontaUser) -> bool:
+    def user_can_authenticate(user: MontaUser) -> bool | None:
         """
         Check if the user can authenticate.
 
         Taken from django.contrib.auth.backends.ModelBackend and modified to work with MontaUser
-
-        Reject users with is_active=False. Custom user models that don't have
-        that attribute are allowed.
 
         :param user: The user object
         :type user: AbstractBaseUser
@@ -92,7 +92,7 @@ class MontaBackend(BaseBackend):
         :rtype: AbstractBaseUser | None
         """
         try:
-            user: MontaUser = UserModel._default_manager.select_related(
+            user: MontaUser = MontaUser.objects.select_related(
                 "profile", "profile__title", "profile__organization"
             ).get(pk__exact=user_id)
         except MontaUser.DoesNotExist:

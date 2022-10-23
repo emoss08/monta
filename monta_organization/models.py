@@ -19,19 +19,18 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Standard Python Libraries
-from typing import final, Any
+from typing import Any, final
 
 # Core Django Imports
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 
+from monta_routes.models import GoogleRouteDistanceUnitChoices, GoogleRouteModelChoices
 # Monta Imports
 from monta_user.models import Organization
-from monta_routes.models import GoogleRouteDistanceUnitChoices, GoogleRouteModelChoices
 
 
 @final
@@ -130,7 +129,7 @@ class OrganizationSettings(TimeStampedModel):
         :rtype: None
         """
         self.full_clean()
-        return super(OrganizationSettings, self).save(**kwargs)
+        return super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """

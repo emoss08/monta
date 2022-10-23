@@ -17,22 +17,17 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-# Standard Python Libraries
 
 # Core Django Imports
 from django.contrib.auth.decorators import login_required
 from django.core.handlers.asgi import ASGIRequest
 from django.http import JsonResponse
-from django.db.models import Q
-
-# Third-Party Imports
-import googlemaps
 
 # Monta Imports
-from monta_locations.models import Location
-from monta_organization.models import Integration, OrganizationSettings
 from monta_routes import google_api
-from monta_routes.models import Route
+
+
+# Third-Party Imports
 
 
 @login_required
@@ -46,7 +41,6 @@ def geocode_locations(request: ASGIRequest) -> JsonResponse:
     :rtype: JsonResponse
     """
     return google_api.geocode_locations(request)
-
 
 # NOTE: May add back if requested ability to generate one off routes.
 # @login_required

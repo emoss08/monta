@@ -24,21 +24,18 @@ from __future__ import annotations
 from typing import Any
 
 from django.core.exceptions import ValidationError
-
 # Core Django Imports
 from django.db import models
-from django.db.models import functions, QuerySet
+from django.db.models import QuerySet, functions
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 from localflavor.us.models import USStateField, USZipCodeField
 
 from monta_customer.models import DocumentClassification
 from monta_fleet.models import Fleet
-
 # Monta Imports
 from monta_user.models import Organization
 
@@ -80,7 +77,7 @@ class Driver(TimeStampedModel):
         ordering: tuple[functions.Lower] = (functions.Lower("last_name"),)
         verbose_name: str = _("Driver")
         verbose_name_plural: str = _("Drivers")
-        indexes = [
+        indexes: list[models.Index] = [
             models.Index(fields=["-first_name"]),
         ]
         permissions = [
@@ -118,12 +115,12 @@ class Driver(TimeStampedModel):
         self.full_clean()
         if not self.driver_id:
             self.driver_id = (
-                self.first_name[:1].upper()
-                + self.last_name[:4].upper()
-                + str(int(Driver.objects.count() + 1))
+                    self.first_name[:1].upper()
+                    + self.last_name[:4].upper()
+                    + str(int(Driver.objects.count() + 1))
             )
         self.driver_id = self.driver_id.upper()
-        super(Driver, self).save(**kwargs)
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """
@@ -256,7 +253,7 @@ class DriverProfile(TimeStampedModel):
         """
         return f"Driver Profile for {self.driver}"
 
-    def save(self, *args, **kwargs) -> None:
+    def save(self, **kwargs) -> None:
         """
         Save the driver profile
 
@@ -268,7 +265,7 @@ class DriverProfile(TimeStampedModel):
         :rtype: None
         """
         self.full_clean()
-        super(DriverProfile, self).save(**kwargs)
+        super().save(**kwargs)
 
     @property
     def get_driver_full_address(self) -> str:
@@ -331,7 +328,7 @@ class DriverContact(TimeStampedModel):
         ordering: list[str] = ["driver", "contact_name"]
         verbose_name: str = _("Driver Contact")
         verbose_name_plural: str = _("Driver Contacts")
-        indexes = [
+        indexes: list[models.Index] = [
             models.Index(fields=["driver", "contact_name"]),
         ]
 
@@ -430,7 +427,7 @@ class DriverQualification(TimeStampedModel):
         ordering: list[str] = ["driver", "doc_class"]
         verbose_name: str = _("Driver Qualification")
         verbose_name_plural: str = _("Driver Qualifications")
-        indexes = [
+        indexes: list[models.Index] = [
             models.Index(fields=["driver", "doc_class"]),
         ]
 
@@ -544,7 +541,7 @@ class DriverComment(TimeStampedModel):
         ordering: list[str] = ["driver", "comment_type"]
         verbose_name: str = _("Driver Comment")
         verbose_name_plural: str = _("Driver Comments")
-        indexes = [models.Index(fields=["driver", "comment_type"])]
+        indexes: list[models.Index] = [models.Index(fields=["driver", "comment_type"])]
 
     def __str__(self) -> str:
         """

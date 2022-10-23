@@ -21,16 +21,15 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 # Standard library imports
 from typing import Any, Optional
 
+from django.core.exceptions import ValidationError
+from django.db import models
 # Core Django Models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
-from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
-
+from django_extensions.db.models import TimeStampedModel
 # Third Party Imports
 from localflavor.us.models import USStateField, USZipCodeField
-from django_extensions.db.models import TimeStampedModel
 
 # Monta Imports
 from monta_user.models import Organization
@@ -60,9 +59,9 @@ class DocumentClassification(TimeStampedModel):
         Document Classification Model Meta
         """
 
-        ordering = ["name"]
-        verbose_name = _("Document Classification")
-        verbose_name_plural = _("Document Classifications")
+        ordering: list[str] = ["name"]
+        verbose_name: str = _("Document Classification")
+        verbose_name_plural: str = _("Document Classifications")
 
     def __str__(self) -> str:
         """
@@ -132,10 +131,10 @@ class Customer(TimeStampedModel):
         Customer Model Metaclass
         """
 
-        ordering = ["customer_id"]
-        verbose_name = _("Customer")
-        verbose_name_plural = _("Customers")
-        indexes = [
+        ordering: list[str] = ["customer_id"]
+        verbose_name: str = _("Customer")
+        verbose_name_plural: str = _("Customers")
+        indexes: list[models.Index] = [
             models.Index(fields=["customer_id"]),
         ]
 
@@ -213,10 +212,10 @@ class CustomerBillingProfile(TimeStampedModel):
         Metaclass for the CustomerBillingProfile model
         """
 
-        ordering = ["name"]
-        verbose_name = _("Customer Billing Profile")
-        verbose_name_plural = _("Customer Billing Profiles")
-        indexes = [
+        ordering: list[str] = ["name"]
+        verbose_name: str = _("Customer Billing Profile")
+        verbose_name_plural: str = _("Customer Billing Profiles")
+        indexes: list[models.Index] = [
             models.Index(fields=["name"]),
         ]
 
@@ -342,7 +341,7 @@ class CustomerContact(TimeStampedModel):
         :return: The string representation of the CustomerContact model
         :rtype: str
         """
-        return self.contact_name
+        return str(self.contact_name)
 
     def get_absolute_url(self) -> str:
         """

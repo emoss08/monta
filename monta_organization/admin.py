@@ -32,9 +32,8 @@ admin.site.register(models.OrganizationSettings)
 
 @admin.register(models.Integration)
 class Integration(admin.ModelAdmin[models.Integration]):
-    list_display: tuple[str] = ("organization", "name", "api_key")
-    list_filter: tuple[str] = ("organization", "name")
-    search_fields: tuple[str] = ("organization", "name", "api_key")
-    ordering: tuple[str] = ("organization", "name")
-    filter_horizontal: tuple[None] = ()
+    list_display: tuple[str, str, str] = ("organization", "name", "api_key")
+    list_filter: tuple[str, str] = ("organization", "name")
+    search_fields: tuple[str, str, str] = ("organization", "name", "api_key")
+    ordering: tuple[str, str] = ("organization", "name")
     list_per_page: Literal[25] = 25

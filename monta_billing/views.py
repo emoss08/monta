@@ -19,34 +19,33 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Standard Python Libraries
-from typing import Type, Any
+from typing import Any, Type
 
+from ajax_datatable import AjaxDatatableView
+# Third Party Imports
+from braces import views
+from django.contrib.auth import mixins
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from django.core.handlers.asgi import ASGIRequest
+from django.core.mail import send_mail
+from django.db.models import QuerySet
 # Core Django Imports
-from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.views import View, generic
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_safe
-from django.contrib.auth.decorators import login_required, permission_required
-from django.core.handlers.asgi import ASGIRequest
-from django.core.mail import send_mail
 from django.views.decorators.vary import vary_on_cookie
-from django.views import generic, View
-from django.contrib.auth import mixins
-from django.db.models import QuerySet
-from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 
-# Third Party Imports
-from braces import views
-from ajax_datatable import AjaxDatatableView
-
+from monta_billing import forms, models
+from monta_customer.models import CustomerBillingProfile, CustomerContact
 # Monta Imports
 from monta_driver.forms import SearchForm
 from monta_order.models import Order
-from monta_billing import models, forms
-from monta_customer.models import CustomerBillingProfile, CustomerContact
 
 
 @method_decorator(require_safe, name="dispatch")
@@ -59,7 +58,7 @@ class InteractiveBillingView(
     View for Interactive Billing
     """
 
-    template_name = "monta_billing/interactive/index.html"
+    template_name: str = "monta_billing/interactive/index.html"
     permission_required: str = "monta_billing.view_billingqueue"
     http_method_names: list[str] = ["get"]
 
@@ -110,7 +109,7 @@ class ChargeTypeListView(
         >>> ChargeTypeListView.as_view()
     """
 
-    template_name = "monta_billing/charge_types/index.html"
+    template_name: str = "monta_billing/charge_types/index.html"
     permission_required: str = "monta_billing.view_chargetype"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
@@ -290,10 +289,10 @@ class ChargeTypeUpdateView(
     form_class: Type[forms.AddChargeTypeForm] = forms.AddChargeTypeForm
 
     def post(
-        self,
-        request: ASGIRequest,
-        *args: Any,
-        **kwargs: Any,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Method to update a Charge Type
@@ -432,14 +431,14 @@ class OrderTransferView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin
         for order in orders:
             if order.transferred_to_billing:
                 continue
-            else:
-                models.BillingQueue.objects.create(
-                    order=order,
-                    organization=request.user.profile.organization,
-                )
-                order.transferred_to_billing = True
-                order.billing_transfer_date = timezone.now()
-                order.save()
+            models.BillingQueue.objects.create(
+                order=order,
+                organization=request.user.profile.organization,
+            )
+            order.transferred_to_billing = True
+            order.billing_transfer_date = timezone.now()
+            order.save()
+
         return JsonResponse(
             {"result": "success", "message": "Orders transferred to billing queue."},
             status=201,
@@ -462,8 +461,8 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
     :return: JsonResponse
     :rtype: JsonResponse
     """
-    order_document = []
-    billing_requirements = []
+    order_document: list[Any] = []
+    billing_requirements: list[Any] = []
     billing_queue: QuerySet[models.BillingQueue] = models.BillingQueue.objects.filter(
         organization=request.user.profile.organization,
     )
@@ -480,7 +479,7 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
             is_billing=True,
         ).first()
         for requirement in customer_billing_profile.values_list(
-            "document_class", flat=True
+                "document_class", flat=True
         ):
             billing_requirements.append(requirement)
         for document in order.order.order_documentation.all():
@@ -509,9 +508,9 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
             )
             for requirement in missing_requirements:
                 if not models.BillingException.objects.filter(
-                    order=order.order,
-                    organization=request.user.profile.organization,
-                    exception_type="PAPERWORK",
+                        order=order.order,
+                        organization=request.user.profile.organization,
+                        exception_type="PAPERWORK",
                 ):
                     billing_exception: models.BillingException = (
                         models.BillingException.objects.create(
