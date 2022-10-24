@@ -21,13 +21,12 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 # Standard Library Imports
 from typing import Any, Type
 
+# Third Party Imports
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Div, Field, Layout
 # Core Django Imports
 from django import forms
 from django.utils.translation import gettext_lazy as _
-
-# Third Party Imports
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Div, Field
 
 # Monta Imports
 from monta_billing import models
@@ -122,7 +121,7 @@ class AddChargeTypeForm(forms.ModelForm):
         """
         Save the form.
         """
-        charge_type = super(AddChargeTypeForm, self).save(commit=False)
+        charge_type = super().save(commit=False)
         charge_type.name = self.cleaned_data["name"]
         charge_type.description = self.cleaned_data["description"]
         if commit:

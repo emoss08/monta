@@ -21,12 +21,11 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 # Standard library imports
 from typing import Any, final
 
+from django.core.exceptions import ValidationError
 # Core Django Imports
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
-
 # Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 

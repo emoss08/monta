@@ -18,35 +18,32 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Python Libraries
-from typing import Type, Any
+from typing import Any, Type
 
-# Core Django Imports
-from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render, get_object_or_404
+from ajax_datatable import AjaxDatatableView
+from braces import views
+from django.contrib.auth import mixins
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.postgres.search import (SearchQuery, SearchRank,
+                                            SearchVector)
+from django.core.handlers.asgi import ASGIRequest
+from django.core.mail import send_mail
+from django.db.models import QuerySet
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.views import View, generic
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_safe
-from django.contrib.auth.decorators import login_required, permission_required
-from django.core.handlers.asgi import ASGIRequest
-from django.core.mail import send_mail
 from django.views.decorators.vary import vary_on_cookie
-from django.views import generic, View
-from django.contrib.auth import mixins
-from django.db.models import QuerySet
-from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 
-# Third Party Imports
-from braces import views
-from ajax_datatable import AjaxDatatableView
-
-# Monta Imports
+from core.views import MontaCreateView, MontaDeleteView, MontaUpdateView
+from monta_billing import forms, models
+from monta_customer.models import CustomerBillingProfile, CustomerContact
 from monta_driver.forms import SearchForm
 from monta_order.models import Order
-from monta_billing import models, forms
-from monta_customer.models import CustomerBillingProfile, CustomerContact
 
 
 @method_decorator(require_safe, name="dispatch")
@@ -236,9 +233,7 @@ class ChargeTypeOverviewListView(AjaxDatatableView, mixins.LoginRequiredMixin):
         return row
 
 
-class ChargeTypeCreateView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.CreateView
-):
+class ChargeTypeCreateView(MontaCreateView):
     """
     Class to create the Charge Type
 
@@ -248,40 +243,9 @@ class ChargeTypeCreateView(
 
     permission_required: str = "monta_billing.add_chargetype"
     form_class: Type[forms.AddChargeTypeForm] = forms.AddChargeTypeForm
-    success_url: str = "/charge_type/"
-    template_name: str = "monta_billing/charge_types/index.html"
-
-    def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
-        """
-        Method to create a new Charge Type
-
-        :param request
-        :type request: ASGIRequest
-        :param args
-        :type args: Any
-        :param kwargs
-        :type kwargs: Any
-        :return: JsonResponse
-        :rtype: JsonResponse
-        """
-        form: forms.AddChargeTypeForm = self.form_class(data=request.POST)
-        if form.is_valid():
-            charge_type = form.save(commit=False)
-            charge_type.organization = request.user.profile.organization
-            charge_type.save()
-            return JsonResponse(
-                {"result": "success", "message": "Charge Type Posted Successfully"},
-                status=201,
-            )
-        return JsonResponse(
-            {"result": "error", "message": form.errors},
-            status=400,
-        )
 
 
-class ChargeTypeUpdateView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.UpdateView
-):
+class ChargeTypeUpdateView(MontaUpdateView):
     """
     Class to update the Charge Type
     """
@@ -289,71 +253,14 @@ class ChargeTypeUpdateView(
     permission_required: str = "monta_billing.change_chargetype"
     form_class: Type[forms.AddChargeTypeForm] = forms.AddChargeTypeForm
 
-    def post(
-        self,
-        request: ASGIRequest,
-        *args: Any,
-        **kwargs: Any,
-    ) -> JsonResponse:
-        """
-        Method to update a Charge Type
 
-        :param request
-        :type request: ASGIRequest
-        :param args
-        :type args: Any
-        :param kwargs
-        :type kwargs: Any
-        :return: JsonResponse
-        :rtype: JsonResponse
-        """
-        charge_type: models.ChargeType = get_object_or_404(
-            models.ChargeType, pk=kwargs["pk"]
-        )
-        form: forms.AddChargeTypeForm = self.form_class(
-            data=request.POST, instance=charge_type
-        )
-        if form.is_valid():
-            form.save()
-            return JsonResponse(
-                {"result": "success", "message": "Charge Type Updated Successfully"},
-                status=201,
-            )
-        return JsonResponse(
-            {"result": "error", "message": form.errors},
-            status=400,
-        )
-
-
-class ChargeTypeDeleteView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.DeleteView
-):
+class ChargeTypeDeleteView(MontaDeleteView):
     """
     Class to delete the Charge Type
     """
 
     model: Type[models.ChargeType] = models.ChargeType
     permission_required: str = "monta_billing.delete_chargetype"
-
-    def get(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
-        """
-        Delete the charge type
-
-        :param request
-        :type request: ASGIRequest
-        :param args
-        :type args: Any
-        :param kwargs
-        :type kwargs: Any
-        :return: JsonResponse
-        :rtype: JsonResponse
-        """
-        charge_type: models.ChargeType = self.get_object()
-        charge_type.delete()
-        return JsonResponse(
-            {"result": "success", "message": "Charge Type Deleted Successfully"},
-            status=204,
-        )
 
 
 class ChargeTypeSearchView(
@@ -480,7 +387,7 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
             is_billing=True,
         ).first()
         for requirement in customer_billing_profile.values_list(
-            "document_class", flat=True
+                "document_class", flat=True
         ):
             billing_requirements.append(requirement)
         for document in order.order.order_documentation.all():
@@ -509,9 +416,9 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
             )
             for requirement in missing_requirements:
                 if not models.BillingException.objects.filter(
-                    order=order.order,
-                    organization=request.user.profile.organization,
-                    exception_type="PAPERWORK",
+                        order=order.order,
+                        organization=request.user.profile.organization,
+                        exception_type="PAPERWORK",
                 ):
                     billing_exception: models.BillingException = (
                         models.BillingException.objects.create(
