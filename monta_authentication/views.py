@@ -18,8 +18,7 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Core Django Import
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.core.handlers.asgi import ASGIRequest
 from django.http import (
@@ -27,12 +26,9 @@ from django.http import (
     JsonResponse,
 )
 from django.views.decorators.debug import sensitive_post_parameters
-from django.contrib.auth import login as auth_login
-from django.contrib.auth import logout as auth_logout
 from django.views.decorators.http import require_POST
 
-# Monta Imports
-from monta_authentication.exceptions import AuthenticationError
+from core.exceptions import AuthenticationError
 
 
 @require_POST
@@ -59,7 +55,7 @@ def monta_authenticate_user(request: ASGIRequest) -> JsonResponse:
             return JsonResponse({"message": "Invalid username or password"}, status=400)
 
     except AuthenticationError as login_error:
-        return JsonResponse(login_error, status=400)
+        raise login_error
 
 
 def monta_logout_user(request: ASGIRequest) -> HttpResponseRedirect | JsonResponse:
@@ -75,4 +71,4 @@ def monta_logout_user(request: ASGIRequest) -> HttpResponseRedirect | JsonRespon
         auth_logout(request)
         return HttpResponseRedirect("/")
     except AuthenticationError as logout_error:
-        return JsonResponse(logout_error, status=400)
+        raise logout_error

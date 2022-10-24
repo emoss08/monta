@@ -27,7 +27,7 @@ from monta_driver import models
 class DriverSitemap(Sitemap):
     """Driver Site Map"""
 
-    change_freq = "monthly"
+    change_freq: str = "monthly"
     priority = 0.9
 
     def items(self):
