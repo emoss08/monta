@@ -23,7 +23,6 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_safe
 from django.views.decorators.vary import vary_on_cookie
-# Core Django Imports
 from django.views.generic import TemplateView
 
 

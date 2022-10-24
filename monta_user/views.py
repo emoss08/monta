@@ -18,7 +18,6 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Library Imports
 from typing import Any, Type
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -31,12 +30,9 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_POST, require_safe
 from django.views.decorators.vary import vary_on_cookie
-# Core Django Imports
 from django.views.generic import ListView, UpdateView
-# Third Party Imports
 from django_extensions.auth.mixins import ModelUserFieldPermissionMixin
 
-# Core Monta Imports
 from monta_user import forms, models
 
 

@@ -18,23 +18,19 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Python Libraries
 import uuid
 from typing import Any
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-# Core Django Imports
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-# Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 from localflavor.us.models import USStateField, USZipCodeField
 
-# Monta Imports
 from monta_user.managers import MontaUserManager
 
 """
@@ -205,18 +201,6 @@ class Profile(TimeStampedModel):
         """
         return self.user.username
 
-    def save(self, **kwargs: Any) -> None:
-        """
-        Save the profile instance to the database
-
-        :param kwargs: The keyword arguments
-        :type kwargs: Any
-        :return: None
-        :rtype: None
-        """
-        self.full_clean()
-        return super().save(**kwargs)
-
     def get_absolute_url(self) -> str:
         """
         Get the absolute url of the profile
@@ -226,6 +210,7 @@ class Profile(TimeStampedModel):
         """
         return reverse("user_profile_overview", args=[self.user.id])
 
+    @property
     def get_user_profile_pic(self) -> str:
         """
         Get the profile picture of the user
@@ -237,6 +222,7 @@ class Profile(TimeStampedModel):
             return self.profile_picture.url
         return "/static/media/avatars/blank.avif"
 
+    @property
     def get_user_org_name(self) -> str:
         """
         Get the organization name of the user
@@ -248,6 +234,7 @@ class Profile(TimeStampedModel):
             return self.organization.name
         return ""
 
+    @property
     def get_user_phone(self) -> str:
         """
         Get the phone number of the user
@@ -259,6 +246,7 @@ class Profile(TimeStampedModel):
             return self.phone
         return ""
 
+    @property
     def get_user_zip_code(self) -> USZipCodeField | str:
         """
         Get the zip code of the user
@@ -270,6 +258,7 @@ class Profile(TimeStampedModel):
             return self.zip_code
         return ""
 
+    @property
     def get_user_city(self) -> str:
         """
         Get the city of the user
@@ -281,6 +270,7 @@ class Profile(TimeStampedModel):
             return self.city
         return ""
 
+    @property
     def get_user_state(self) -> USStateField | str:
         """
         Get the state of the user
@@ -292,6 +282,7 @@ class Profile(TimeStampedModel):
             return self.state
         return ""
 
+    @property
     def get_user_address(self) -> str:
         """
         Get the address of the user
@@ -303,6 +294,7 @@ class Profile(TimeStampedModel):
             return self.address_line_1
         return ""
 
+    @property
     def get_user_city_state(self) -> str:
         """
         Get the city and state of the user
@@ -314,6 +306,7 @@ class Profile(TimeStampedModel):
             return f"{self.city}, {self.state}"
         return ""
 
+    @property
     def get_user_email_verification(self) -> bool:
         """
         Get the email verification status of the user
@@ -323,6 +316,7 @@ class Profile(TimeStampedModel):
         """
         return self.email_verified
 
+    @property
     def get_full_name(self) -> str:
         """
         Get the full name of the user
@@ -336,10 +330,6 @@ class Profile(TimeStampedModel):
 class JobTitle(TimeStampedModel):
     """
     Job Title Model Fields
-
-    title_id: The id of the job title
-    name: The name of the job title
-    description: The description of the job title
     """
 
     organization = models.ForeignKey(
@@ -356,11 +346,6 @@ class JobTitle(TimeStampedModel):
     class Meta:
         """
         Metaclass for the JobTitle model
-
-        verbose_name: The verbose name of the model
-        verbose_name_plural: The plural verbose name of the model
-        ordering: The default ordering of the model
-        indexes: The indexes of the model
         """
 
         ordering: list[str] = ["name"]
@@ -393,7 +378,7 @@ class JobTitle(TimeStampedModel):
         self.full_clean()
         if not self.title_id:
             self.title_id = slugify(self.name)
-        return super().save(**kwargs)
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """
@@ -408,11 +393,6 @@ class JobTitle(TimeStampedModel):
 class Organization(TimeStampedModel):
     """
     Organization Model Fields
-
-    org_id: The id of the organization
-    name: The name of the organization
-    description: The description of the organization
-    profile_picture: The profile picture of the organization
     """
 
     name = models.CharField(_("Organization Name"), max_length=255, unique=True)
@@ -432,11 +412,6 @@ class Organization(TimeStampedModel):
     class Meta:
         """
         Metaclass for the Organization model
-
-        verbose_name: The verbose name of the model
-        verbose_name_plural: The plural verbose name of the model
-        ordering: The default ordering of the model
-        indexes: The indexes of the model
         """
 
         ordering: list[str] = ["name"]

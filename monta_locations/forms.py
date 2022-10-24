@@ -18,17 +18,12 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Library Imports
 from typing import Type
 
-# Core Django Imports
 from django import forms
 from django.utils.translation import gettext_lazy as _
-
-# Third Party Imports
 from localflavor.us.forms import USStateSelect, USZipCodeField
 
-# Monta Imports
 from monta_locations import models
 
 
@@ -83,7 +78,7 @@ class AddLocationForm(forms.ModelForm):
         """
 
         model: Type[models.Location] = models.Location
-        fields = (
+        fields: tuple[str, ...] = (
             "name",
             "description",
             "address_line_1",

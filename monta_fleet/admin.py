@@ -17,7 +17,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-from typing import Literal
 
 from django.contrib import admin
 
@@ -30,4 +29,4 @@ class FleetAdmin(admin.ModelAdmin[models.Fleet]):
     """Fleet Admin"""
 
     list_display: list[str] = ("name", "description")
-    list_select_related: Literal[True] = True
+    list_select_related: bool = True

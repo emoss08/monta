@@ -18,16 +18,13 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Python Libraries
 from typing import Any
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.base_user import AbstractBaseUser
-# Core Django Imports
 from django.db.models.base import ModelBase
 
-# Monta Imports
 from monta_user.models import MontaUser
 
 UserModel: ModelBase = get_user_model()

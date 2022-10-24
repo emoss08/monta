@@ -18,20 +18,16 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard library imports
 from typing import Any, Optional
 
 from django.core.exceptions import ValidationError
 from django.db import models
-# Core Django Models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
-# Third Party Imports
 from localflavor.us.models import USStateField, USZipCodeField
 
-# Monta Imports
 from monta_user.models import Organization
 
 
@@ -83,7 +79,7 @@ class DocumentClassification(TimeStampedModel):
         """
         self.full_clean()
         self.name = self.name.upper()
-        return super().save(**kwargs)
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """
@@ -152,6 +148,7 @@ class Customer(TimeStampedModel):
         Save the customer object
         :param kwargs
         :type kwargs: Any
+        :return: None
         :rtype: None
         """
         if not self.customer_id:

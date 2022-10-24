@@ -37,7 +37,8 @@ from monta_driver.models import Driver
 from monta_equipment.models import Equipment, EquipmentType
 from monta_hazardous_material.models import HazardousMaterial
 from monta_locations.models import Location
-from monta_organization.models import Integration, Organization, OrganizationSettings
+from monta_organization.models import (Integration, Organization,
+                                       OrganizationSettings)
 from monta_routes.models import Route
 from monta_user.models import MontaUser
 

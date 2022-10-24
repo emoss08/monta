@@ -18,15 +18,25 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from typing import Any
+
 from django.db.models.signals import post_save
-# Core Django Imports
 from django.dispatch import receiver
 
-# Monta Imports
 from monta_order import models
 
 
 @receiver(post_save, sender=models.Stop)
-def sequence_stops(sender, instance, created, **kwargs) -> None:
+def sequence_stops(instance: models.Stop, created: bool, **kwargs: Any) -> None:
+    """
+     Sequence stop signal
+
+    :param instance: instance
+    :param created: created
+    :param kwargs: kwargs
+    :return: None
+    :returns: None
+
+    """
     if created:
         instance.movement.sequence_stops()

@@ -31,11 +31,11 @@ class ChargeTypeAdmin(admin.ModelAdmin[models.ChargeType]):
     ChargeType Admin
     """
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "name",
         "description",
     )
-    search_fields = (
+    search_fields: tuple[str, ...] = (
         "name",
         "description",
     )
@@ -47,13 +47,13 @@ class AdditionalChargeAdmin(admin.ModelAdmin[models.AdditionalCharge]):
     Admin for AdditionalCharge model
     """
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "order",
         "charge_type",
         "amount",
         "description",
     )
-    search_fields = (
+    search_fields: tuple[str, ...] = (
         "order",
         "charge_type",
         "amount",
@@ -67,8 +67,8 @@ class BillingQueueAdmin(admin.ModelAdmin[models.BillingQueue]):
     Admin for BillingQueue
     """
 
-    list_display = ("order",)
-    search_fields = ("order",)
+    list_display: tuple[str] = ("order",)
+    search_fields: tuple[str] = ("order",)
 
 
 @admin.register(models.BillingHistory)
@@ -77,11 +77,11 @@ class BillingHistoryAdmin(admin.ModelAdmin[models.BillingHistory]):
     Billing History Admin
     """
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "batch_name",
         "order",
     )
-    search_fields = (
+    search_fields: tuple[str, ...] = (
         "batch_name",
         "order",
     )
@@ -93,12 +93,12 @@ class BillingExceptionAdmin(admin.ModelAdmin[models.BillingException]):
     Admin for BillingException
     """
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "order",
         "exception_type",
         "exception_message",
     )
-    search_fields = (
+    search_fields: tuple[str, ...] = (
         "order",
         "exception_type",
         "exception_message",

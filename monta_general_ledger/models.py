@@ -33,10 +33,8 @@ from monta_user.models import Organization
 
 @final
 class GeneralLeader(TimeStampedModel):
-    """_summary_
-
-    Args:
-        TimeStampedModel (_type_): _description_
+    """
+    General Ledger Model
     """
 
     organization = models.ForeignKey(

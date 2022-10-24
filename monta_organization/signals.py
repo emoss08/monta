@@ -17,17 +17,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+from typing import Any
 
-# Core Django Libraries
-from django.dispatch import receiver
 from django.db.models.signals import post_save
+from django.dispatch import receiver
 
-# Monta Imports
 from monta_organization import models
 
 
 @receiver(post_save, sender=models.Organization)
-def create_settings(sender, instance, created, **kwargs) -> None:
+def create_settings(instance: models.Organization, created: bool, **kwargs: Any) -> None:
     """
     Create Organization settings for an organization
     """

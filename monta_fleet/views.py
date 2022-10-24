@@ -18,26 +18,24 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard library imports
 from __future__ import annotations
-from typing import Type, Any
 
-# Core Django Imports
+from typing import Any, Type
+
 from ajax_datatable import AjaxDatatableView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
 from django.db.models import QuerySet
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_safe
 from django.views.decorators.vary import vary_on_cookie
-from django.views.generic import TemplateView, CreateView, DetailView
+from django.views.generic import CreateView, DetailView, TemplateView
 
-# Monta Imports
-from monta_fleet import models, forms
 from monta_driver.models import Driver
+from monta_fleet import forms, models
 
 
 @method_decorator(require_safe, name="dispatch")
@@ -55,7 +53,7 @@ class CreateFleet(LoginRequiredMixin, CreateView):
     form_class: Type[forms.AddFleetForm] = forms.AddFleetForm
 
     def post(
-        self, request: ASGIRequest, *args: Any, **kwargs: Any
+            self, request: ASGIRequest, *args: Any, **kwargs: Any
     ) -> JsonResponse | None:
         """
         :param request
@@ -67,7 +65,7 @@ class CreateFleet(LoginRequiredMixin, CreateView):
         :return: JsonResponse
         :rtype: JsonResponse | None
         """
-        form: forms.AddFleetForm = forms.AddFleetForm(request.POST)
+        form: forms.AddFleetForm = self.form_class(request.POST)
         if form.is_valid():
             form.save()
             return JsonResponse(
@@ -85,7 +83,7 @@ class FleetEditView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self) -> QuerySet[models.Fleet]:
         return (
-            super(FleetEditView, self)
+            super()
             .get_queryset()
             .filter(
                 pk__exact=self.kwargs["pk"],
@@ -96,7 +94,7 @@ class FleetEditView(LoginRequiredMixin, DetailView):
 
 
 def fleet_by_manager(
-    request: ASGIRequest, manager_id: int, fleet_id: int
+        request: ASGIRequest, manager_id: int, fleet_id: int
 ) -> HttpResponse | JsonResponse:
     if request.user.id == manager_id:
         fleet: models.Fleet = models.Fleet.objects.get(
@@ -144,7 +142,7 @@ class FleetOverviewList(AjaxDatatableView, LoginRequiredMixin):
 
     model: Type[Driver] = models.Fleet
     title: str = "Fleet Table"
-    initial_order: list[list[str]] = [["first_name", "desc"]]
+    initial_order: list[list[str, ...]] = [["first_name", "desc"]]
     column_defs: list[dict[str, str | bool]] = [
         {
             "name": "name",

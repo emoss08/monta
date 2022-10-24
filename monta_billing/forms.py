@@ -18,17 +18,13 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Library Imports
 from typing import Any, Type
 
-# Third Party Imports
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout
-# Core Django Imports
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-# Monta Imports
 from monta_billing import models
 
 
@@ -68,7 +64,7 @@ class AddChargeTypeForm(forms.ModelForm):
         """
 
         model: Type[models.ChargeType] = models.ChargeType
-        fields = ("name", "description")
+        fields: tuple[str, ...] = ("name", "description")
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(AddChargeTypeForm, self).__init__(*args, **kwargs)
@@ -156,7 +152,7 @@ class AdditionalChargeForm(forms.ModelForm):
         """
 
         model: Type[models.ChargeType] = models.ChargeType
-        fields = (
+        fields: tuple[str, ...] = (
             "order",
             "name",
             "description",

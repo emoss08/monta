@@ -18,18 +18,13 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard library imports
 from typing import Any, final
 
-# Core Django Imports
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
-# Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 
-# Monta Imports
 from monta_user.models import Organization
 
 

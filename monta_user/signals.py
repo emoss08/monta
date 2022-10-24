@@ -17,17 +17,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+from typing import Any
 
-# Core Django Imports
-from django.dispatch import receiver
 from django.db.models.signals import post_save
+from django.dispatch import receiver
 
-# Monta Imports
 from monta_user import models
 
 
 @receiver(post_save, sender=models.Profile)
-def create_profile(sender, instance, created, **kwargs) -> None:
+def create_profile(instance: models.Profile, created: bool, **kwargs: Any) -> None:
     """
     Create a profile for the user
     """

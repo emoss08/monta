@@ -18,14 +18,11 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Library Imports
 from typing import Type
 
-# Core Djagno Imports
 from django import forms
 
-# Core Monta Imports
-from monta_user.models import Profile, MontaUser
+from monta_user.models import MontaUser, Profile
 
 
 class UpdateProfileGeneralInformationForm(forms.ModelForm):
@@ -52,7 +49,7 @@ class UpdateProfileGeneralInformationForm(forms.ModelForm):
         """Update User General Information META"""
 
         model: Type[Profile] = Profile
-        fields = [
+        fields: list[str, ...] = [
             "profile_picture",
             "first_name",
             "last_name",
@@ -74,7 +71,7 @@ class UpdateUserEmailForm(forms.ModelForm):
         """Update User Email META"""
 
         model: Type[MontaUser] = MontaUser
-        fields = ["email"]
+        fields: list[str] = ["email"]
 
 
 class UpdateUserPasswordForm(forms.ModelForm):
@@ -89,4 +86,4 @@ class UpdateUserPasswordForm(forms.ModelForm):
         """Update User Password META"""
 
         model: Type[MontaUser] = MontaUser
-        fields = ["current_password", "password"]
+        fields: list[str] = ["current_password", "password"]

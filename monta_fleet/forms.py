@@ -17,14 +17,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-# Core Django Imports
+
 from typing import Type
 
 from django import forms
 
-# Monta Imports
-from monta_user.models import Organization, MontaUser
 from monta_fleet import models
+from monta_user.models import MontaUser, Organization
 
 
 class AddFleetForm(forms.ModelForm):
@@ -38,4 +37,4 @@ class AddFleetForm(forms.ModelForm):
 
     class Meta:
         model: Type[models.Fleet] = models.Fleet
-        fields = ("organization", "name", "description", "fleet_manager", "is_active")
+        fields: tuple[str, ...] = ("organization", "name", "description", "fleet_manager", "is_active")

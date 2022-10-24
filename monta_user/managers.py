@@ -18,12 +18,11 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Library Imports
 from __future__ import annotations
-from typing import Any
-import unicodedata
 
-# Core Django Imports
+import unicodedata
+from typing import Any
+
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
@@ -34,7 +33,7 @@ class MontaUserManager(BaseUserManager):
     for authentication instead of usernames.
     """
 
-    def create_user(self, user_name: str, email: str, password: str, **extra_fields):
+    def create_user(self, user_name: str, email: str, password: str, **extra_fields: Any):
         """
         Create and save a User with the given email and password.
         """
@@ -48,7 +47,7 @@ class MontaUserManager(BaseUserManager):
         return user
 
     def create_superuser(
-        self, username: str, email: str, password: str, **extra_fields: Any
+            self, username: str, email: str, password: str, **extra_fields: Any
     ):
         """
         Create and save a SuperUser with the given email and password.

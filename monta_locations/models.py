@@ -18,21 +18,17 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Python library imports
 from typing import Any
 
-# Core Django Imports
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
-# Third Party Imports
 from localflavor.us.models import USStateField, USZipCodeField
 
 from monta_driver.models import CommentType
-# Monta Imports
 from monta_user.models import Organization
 
 
@@ -125,7 +121,7 @@ class Location(TimeStampedModel):
 
         verbose_name: str = _("Location")
         verbose_name_plural: str = _("Locations")
-        ordering: tuple[str, str] = ("location_id", "name")
+        ordering: tuple[str, ...] = ("location_id", "name")
         indexes: list[models.Index] = [
             models.Index(fields=["location_id", "name"]),
         ]
@@ -148,6 +144,8 @@ class Location(TimeStampedModel):
         """
         if not self.location_id:
             self.location_id = slugify(self.name)
+            
+        self.full_clean()
         super().save(**kwargs)
 
     def get_absolute_url(self) -> str:

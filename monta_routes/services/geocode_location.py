@@ -18,16 +18,11 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Core Django Imports
+import googlemaps
+from asgiref.sync import async_to_sync
 from django.core.handlers.asgi import ASGIRequest
 from django.http import JsonResponse
 
-
-# Third Party Imports
-import googlemaps
-from asgiref.sync import async_to_sync
-
-# Monta Imports
 from monta_locations.models import Location
 from monta_organization.models import Integration
 
@@ -77,7 +72,6 @@ async def geocode_locations(request: ASGIRequest) -> JsonResponse:
                 batch_size=100,
             )
     return JsonResponse({"message": "Locations Geocoded"}, status=200)
-
 
 # def reverse_geocode_locations(request: ASGIRequest) -> JsonResponse:
 #     """ Process to reverse geocode locations """

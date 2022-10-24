@@ -17,12 +17,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+
 from typing import Type
 
-# Core Django Imports
 from django.contrib import admin
 
-# Monta Imports
 from monta_order import models
 
 
@@ -30,7 +29,7 @@ from monta_order import models
 class MovementAdmin(admin.ModelAdmin[models.Movement]):
     """Movement Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "id",
         "status",
         "order",
@@ -43,7 +42,7 @@ class MovementAdmin(admin.ModelAdmin[models.Movement]):
 class ServiceIncidentAdmin(admin.ModelAdmin[models.ServiceIncident]):
     """ServiceIncident Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "id",
         "stop",
         "created",
@@ -55,7 +54,6 @@ class OrderDocumentationAdmin(admin.TabularInline[models.OrderDocumentation]):
     """OrderDocumentation Admin"""
 
     model: Type[models.OrderDocumentation] = models.OrderDocumentation
-    verbose_name_plural = "Order Documentation"
     extra: int = 0
 
 
@@ -63,7 +61,7 @@ class OrderDocumentationAdmin(admin.TabularInline[models.OrderDocumentation]):
 class StopAdmin(admin.ModelAdmin[models.Stop]):
     """Stop Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "id",
         "sequence",
         "status",
@@ -77,7 +75,7 @@ class StopAdmin(admin.ModelAdmin[models.Stop]):
 class OrderTypeAdmin(admin.ModelAdmin[models.OrderType]):
     """Order Type Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "name",
         "description",
         "created",
@@ -89,7 +87,7 @@ class OrderTypeAdmin(admin.ModelAdmin[models.OrderType]):
 class DelayCodeAdmin(admin.ModelAdmin[models.DelayCode]):
     """Delay Code Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "name",
         "description",
         "created",
@@ -101,7 +99,7 @@ class DelayCodeAdmin(admin.ModelAdmin[models.DelayCode]):
 class CommodityAdmin(admin.ModelAdmin[models.Commodity]):
     """Commodity Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "name",
         "description",
         "created",
@@ -115,11 +113,11 @@ class RevenueCodeAdmin(admin.ModelAdmin[models.RevenueCode]):
     Revenue Code Admin
     """
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "code",
         "description",
     )
-    search_fields = (
+    search_fields: tuple[str, ...] = (
         "code",
         "description",
     )
@@ -129,7 +127,7 @@ class RevenueCodeAdmin(admin.ModelAdmin[models.RevenueCode]):
 class OrderAdmin(admin.ModelAdmin[models.Order]):
     """Order Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "order_id",
         "status",
         "order_type",

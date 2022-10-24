@@ -18,18 +18,18 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Core Django imports
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 
-def validate_file_extension(value) -> None:
+def validate_file_extension(value: str) -> None:
     """
     Validate file extension
     """
-    if not value.name.endswith(".csv"):
+    valid_extensions: list[str, ...] = [".csv", ".xls", ".xlsx"]
+    if not value.endswith(tuple(valid_extensions)):
         raise ValidationError(
-            _("%(value)s is not a valid file extension"),
+            _("%(value)s is not a valid file type. Valid file types are: .csv, .xls, .xlsx"),
             params={"value": value},
         )
 
@@ -38,9 +38,9 @@ def validate_file_size(value) -> None:
     """
     Validate file size
     """
-    limit: int = 2 * 1024 * 1024
-    if value.size > limit:
+    max_size: int = 10485760
+    if value.size > max_size:
         raise ValidationError(
-            _("%(value)s file too large. Size should not exceed 2 MiB."),
+            _("%(value)s is too large. Maximum file size is 10MB"),
             params={"value": value},
         )

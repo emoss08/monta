@@ -18,18 +18,14 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard library imports
 from typing import Any, final
 
 from django.core.exceptions import ValidationError
-# Core Django Imports
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-# Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 
-# Monta Imports
 from monta_order.models import Order, StatusChoices
 from monta_user.models import Organization
 
@@ -278,7 +274,7 @@ class BillingQueue(TimeStampedModel):
         indexes: list[models.Index] = [
             models.Index(fields=["order"]),
         ]
-        permissions: list[tuple[str, str]] = [
+        permissions: list[tuple[str, ...]] = [
             ("transfer_to_billing", "Can Transfer to Billing"),
             ("bill_orders", "Can Bill Orders"),
             ("re_bill_orders", "Can Re Bill Orders"),
@@ -368,6 +364,7 @@ class BillingException(TimeStampedModel):
 
         verbose_name: str = _("Billing Exception")
         verbose_name_plural: str = _("Billing Exceptions")
+        ordering: list[str] = ["order"]
 
     def __str__(self) -> str:
         """
@@ -427,9 +424,6 @@ class BillingHistory(TimeStampedModel):
         verbose_name: str = _("Billing History")
         verbose_name_plural: str = _("Billing Histories")
         ordering: list[str] = ["batch_name"]
-        indexes: list[models.Index] = [
-            models.Index(fields=["batch_name"]),
-        ]
 
     def clean(self) -> None:
         """

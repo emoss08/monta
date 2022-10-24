@@ -17,10 +17,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-# Core Django imports
+
 from django.contrib import admin
 
-# Monta Imports
 from monta_hazardous_material import models
 
 
@@ -28,7 +27,7 @@ from monta_hazardous_material import models
 class HazardousClassAdmin(admin.ModelAdmin[models.HazardousMaterial]):
     """Hazardous Class Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "name",
         "description",
         "created",

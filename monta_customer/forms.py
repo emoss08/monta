@@ -18,13 +18,10 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Python Imports
 from typing import Type
 
-# Core Django Imports
 from django import forms
 
-# Monta Imports
 from monta_customer import models
 
 
@@ -48,4 +45,4 @@ class AddDocumentClassificationsForm(forms.ModelForm):
         """
 
         model: Type[models.DocumentClassification] = models.DocumentClassification
-        fields = ["name", "description"]
+        fields: list[str, ...] = ["name", "description"]

@@ -18,19 +18,17 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Python Libraries
 from typing import Any, Type
 
 from ajax_datatable import AjaxDatatableView
-# Third Party Imports
 from braces import views
 from django.contrib.auth import mixins
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from django.contrib.postgres.search import (SearchQuery, SearchRank,
+                                            SearchVector)
 from django.core.handlers.asgi import ASGIRequest
 from django.core.mail import send_mail
 from django.db.models import QuerySet
-# Core Django Imports
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -43,7 +41,6 @@ from django.views.decorators.vary import vary_on_cookie
 
 from monta_billing import forms, models
 from monta_customer.models import CustomerBillingProfile, CustomerContact
-# Monta Imports
 from monta_driver.forms import SearchForm
 from monta_order.models import Order
 
@@ -60,7 +57,6 @@ class InteractiveBillingView(
 
     template_name: str = "monta_billing/interactive/index.html"
     permission_required: str = "monta_billing.view_billingqueue"
-    http_method_names: list[str] = ["get"]
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         """
@@ -104,9 +100,6 @@ class ChargeTypeListView(
 ):
     """
     Class to render the Charge Type List View
-
-    Typical Usage Example:
-        >>> ChargeTypeListView.as_view()
     """
 
     template_name: str = "monta_billing/charge_types/index.html"
@@ -129,9 +122,6 @@ class ChargeTypeListView(
 class ChargeTypeOverviewListView(AjaxDatatableView, mixins.LoginRequiredMixin):
     """
     Class to render the Charge Type overview page.
-
-    Typical Usage Example:
-        >>> ChargeTypeOverviewListView.as_view()
     """
 
     model: Type[models.ChargeType] = models.ChargeType
@@ -172,7 +162,7 @@ class ChargeTypeOverviewListView(AjaxDatatableView, mixins.LoginRequiredMixin):
         """
         return qs.order_by("-name")
 
-    def customize_row(self, row: dict[Any, Any], obj: models.ChargeType) -> dict:
+    def customize_row(self, row: dict[str, str], obj: models.ChargeType) -> dict:
         """
         Customize the row by adding the driver information, license number, license state, license expiration, and
         actions.
@@ -240,9 +230,6 @@ class ChargeTypeCreateView(
 ):
     """
     Class to create the Charge Type
-
-    Typical Usage Example:
-        >>> ChargeTypeCreateView.as_view()
     """
 
     permission_required: str = "monta_billing.add_chargetype"
@@ -389,7 +376,7 @@ class ChargeTypeSearchView(
                     search=search_vector, rank=SearchRank(search_vector, search_query)
                 )
                 .filter(
-                    search=search_query, organization=request.user.profile.organization
+                    search=search_query, organization=self.request.user.profile.organization
                 )
                 .select_related("profile")
                 .order_by("-rank")

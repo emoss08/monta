@@ -18,14 +18,11 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Core Django Imports
 from django.urls import include, path
 from django.contrib import admin
 
-# Monta Imports
 from monta import views
 
-# Monta Core URLs
 urlpatterns = [
     path("", views.HomePage.as_view(), name="index"),
 ]

@@ -18,13 +18,12 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Core Django Imports
-from django.core.management.base import BaseCommand, CommandParser
 from django.conf import settings
 from django.core.cache import caches
+from django.core.management.base import BaseCommand, CommandParser
 
 
-def clear_cache(cache_name: str):
+def clear_cache(cache_name: str) -> None:
     """Clears the cache"""
     assert settings.CACHES
     caches[cache_name].clear()
@@ -33,7 +32,7 @@ def clear_cache(cache_name: str):
 class Command(BaseCommand):
     help = "Clears the cache"
 
-    def add_arguments(self, parser: CommandParser):
+    def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("cache_name", nargs="?", type=str)
 
     def handle(self, *args, **options) -> None:

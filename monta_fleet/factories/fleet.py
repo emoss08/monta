@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from typing import Type
+
 import factory
 
 from monta_fleet.models import Fleet
@@ -10,13 +12,13 @@ class FleetFactory(factory.django.DjangoModelFactory):
     """
 
     class Meta:
-        model = Fleet
+        model: Type[Fleet] = Fleet
 
-    organization = factory.SubFactory(
+    organization: factory.SubFactory = factory.SubFactory(
         "monta_user.factories.organization.OrganizationFactory"
     )
-    name = factory.Faker("name")
-    fleet_id = factory.Faker("pyint")
-    description = factory.Faker("text")
-    fleet_manager = factory.SubFactory("monta_user.factories.user.MontaUserFactory")
-    is_active = factory.Faker("boolean")
+    name: factory.Faker = factory.Faker("name")
+    fleet_id: factory.Faker = factory.Faker("pyint")
+    description: factory.Faker = factory.Faker("text")
+    fleet_manager: factory.Faker = factory.SubFactory("monta_user.factories.user.MontaUserFactory")
+    is_active: factory.Faker = factory.Faker("boolean")

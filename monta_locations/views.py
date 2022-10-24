@@ -18,21 +18,16 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Library Imports
 from typing import Any, Type
 
-# Core Django Imports
+from braces import views
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
 from django.db import transaction
 from django.http import JsonResponse
-from django.views.generic import TemplateView, CreateView, UpdateView
+from django.views.generic import CreateView, TemplateView, UpdateView
 
-# Third Party Imports
-from braces import views
-
-# Monta Imports
-from monta_locations import models, forms
+from monta_locations import forms, models
 
 
 class LocationListView(LoginRequiredMixin, views.PermissionRequiredMixin, TemplateView):
@@ -71,10 +66,10 @@ class LocationCreateView(LoginRequiredMixin, views.PermissionRequiredMixin, Crea
 
     @transaction.atomic
     def post(
-        self,
-        request: ASGIRequest,
-        *args: Any,
-        **kwargs: Any,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Method to handle the POST request.
@@ -112,10 +107,10 @@ class LocationUpdateView(LoginRequiredMixin, views.PermissionRequiredMixin, Upda
 
     @transaction.atomic
     def post(
-        self,
-        request: ASGIRequest,
-        *args: Any,
-        **kwargs: Any,
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any,
     ) -> JsonResponse:
         """
         Overwrites the post method to check if the form is valid. If the form is valid, request the user's organization

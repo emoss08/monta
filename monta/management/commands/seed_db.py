@@ -19,13 +19,9 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 from typing import Any
 
-# Create tests data for the application
-
-# Core Django Imports
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-# Monta Imports
 from monta_organization.models import Organization
 from monta_user.models import JobTitle
 from monta_customer.models import (

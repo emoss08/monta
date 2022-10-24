@@ -18,13 +18,10 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Python Libraries
 from typing import Type
 
-# Core Django imports
 from django.contrib import admin
 
-# Monta Imports
 from monta_customer import models
 
 
@@ -50,7 +47,7 @@ class CustomerAdmin(admin.ModelAdmin[models.Customer]):
     CustomerAdmin class
     """
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "customer_id",
         "name",
         "address_line_1",
@@ -59,7 +56,7 @@ class CustomerAdmin(admin.ModelAdmin[models.Customer]):
         "state",
         "zip_code",
     )
-    list_filter = ("is_active", "state")
+    list_filter: tuple[str, ...] = ("is_active", "state")
     search_fields = (
         "customer_id",
         "name",
@@ -69,7 +66,7 @@ class CustomerAdmin(admin.ModelAdmin[models.Customer]):
         "state",
         "zip_code",
     )
-    ordering = ("customer_id",)
+    ordering: tuple[str] = ("customer_id",)
     inlines: tuple[Type[CustomerBillingProfileInline], Type[CustomerContactInline]] = (
         CustomerBillingProfileInline,
         CustomerContactInline,
@@ -82,6 +79,6 @@ class DocumentClassificationAdmin(admin.ModelAdmin[models.DocumentClassification
     DocumentClassificationAdmin class
     """
 
-    list_display = ("name", "description")
-    search_fields = ("name", "description")
-    ordering = ("name",)
+    list_display: tuple[str, ...] = ("name", "description")
+    search_fields: tuple[str, ...] = ("name", "description")
+    ordering: tuple[str] = ("name",)

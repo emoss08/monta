@@ -17,16 +17,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-# Core Django imports
 from django.contrib import admin
 
-# Monta Imports
 from monta_locations import models
 
 
 @admin.register(models.Location)
 class LocationAdmin(admin.ModelAdmin[models.Location]):
-    list_display = (
+    list_display: tuple[str, ...] = (
         "location_id",
         "name",
         "address_line_1",
@@ -37,12 +35,12 @@ class LocationAdmin(admin.ModelAdmin[models.Location]):
         "created",
         "modified",
     )
-    list_filter = (
+    list_filter: tuple[str, ...] = (
         "state",
         "city",
         "zip_code",
     )
-    search_fields = (
+    search_fields: tuple[str, ...] = (
         "location_id",
         "name",
         "address_line_1",
@@ -55,17 +53,17 @@ class LocationAdmin(admin.ModelAdmin[models.Location]):
 
 @admin.register(models.LocationContact)
 class LocationContactAdmin(admin.ModelAdmin[models.LocationContact]):
-    list_display = (
+    list_display: tuple[str, ...] = (
         "location",
         "name",
         "created",
         "modified",
     )
-    list_filter = (
+    list_filter: tuple[str, ...] = (
         "location",
         "name",
     )
-    search_fields = (
+    search_fields: tuple[str, ...] = (
         "location",
         "name",
     )

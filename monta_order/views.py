@@ -21,5 +21,4 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 
 -------------------------------------------------------------------------------
 
-This file contains the settings for the Django project.
 """
