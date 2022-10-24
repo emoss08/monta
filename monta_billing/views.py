@@ -106,7 +106,7 @@ class ChargeTypeListView(MontaTemplateView):
 
     template_name = "monta_billing/charge_types/index.html"
     permission_required: str = "monta_billing.view_chargetype"
-    context_data: set[str] = {"form": forms.AddChargeTypeForm(), "charge_types": models.Organization.objects.all()}
+    context_data: set[str] = {"form": forms.AddChargeTypeForm()}
 
 
 class ChargeTypeOverviewListView(AjaxDatatableView, mixins.LoginRequiredMixin):
