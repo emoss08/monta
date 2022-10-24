@@ -22,8 +22,11 @@ from typing import Any
 
 from braces import views
 from django.contrib.auth import mixins
+from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.core.handlers.asgi import ASGIRequest
 from django.http import JsonResponse
+from django.http.response import HttpResponse
+from django.shortcuts import render
 from django.views import generic
 
 
@@ -32,11 +35,15 @@ class MontaTemplateView(
     views.PermissionRequiredMixin,
     generic.TemplateView
 ):
+    """
+    A view that renders a template.
+    """
     template_name = None
     permission_required = None
     context_data = None
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        # Append organization filter to all context data
         context: dict = self.context_data or {}
         if context:
             context.update(kwargs)
@@ -125,7 +132,11 @@ class MontaUpdateView(
         }, status=400)
 
 
-class MontaDeleteView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.DeleteView):
+class MontaDeleteView(
+    mixins.LoginRequiredMixin,
+    views.PermissionRequiredMixin,
+    generic.DeleteView
+):
     """
     View for deleting an object, with a Json response.
     """
@@ -151,3 +162,65 @@ class MontaDeleteView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, 
             "result": "success",
             "message": "Record Deleted Successfully!",
         }, status=204)
+
+
+class MontaSearchView(
+    mixins.LoginRequiredMixin,
+    views.PermissionRequiredMixin,
+    generic.TemplateView
+):
+    """
+    View for searching an object, with a template response
+    """
+    permission_required = None
+    template_name = None
+    model = None
+    form_class = None
+    search_vector = None
+    filter_organization = True
+
+    def get(
+            self,
+            request: ASGIRequest,
+            *args: Any,
+            **kwargs: Any
+    ) -> HttpResponse:
+        """
+        Handle GET requests: search the object and return a HttpResponse.
+
+        :param request: The request object
+        :param args: The args
+        :param kwargs: The kwargs
+        :return: A HttpResponse
+        """
+        form = self.form_class(request.GET)
+        query = request.GET["query"] if "query" in request.GET else None
+        results = []
+        if query:
+            form = self.form_class({"query": query})
+            search_query: SearchQuery = SearchQuery(query)
+            if self.filter_organization:
+                results = (
+                    self.model.objects.annotate(
+                        search=self.search_vector, rank=SearchRank(self.search_vector, search_query)
+                    )
+                    .filter(search=search_query, organization=self.request.user.profile.organization)
+                    .order_by("-rank")
+                )
+            else:
+                results = (
+                    self.model.objects.annotate(
+                        search=self.search_vector, rank=SearchRank(self.search_vector, search_query)
+                    )
+                    .filter(search=search_query)
+                    .order_by("-rank")
+                )
+        return render(
+            self.request,
+            self.template_name,
+            {
+                "form": form,
+                "query": query,
+                "results": results,
+            },
+        )

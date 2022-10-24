@@ -34,7 +34,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.views import View, generic
+from django.views import View
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_safe
 from django.views.decorators.vary import vary_on_cookie
@@ -50,13 +50,13 @@ from monta_order.models import Order
 @method_decorator(cache_control(max_age=60 * 60 * 24), name="dispatch")
 @method_decorator(vary_on_cookie, name="dispatch")
 class InteractiveBillingView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.TemplateView
+    MontaTemplateView
 ):
     """
     View for Interactive Billing
     """
 
-    template_name = "monta_billing/interactive/index.html"
+    template_name: str = "monta_billing/interactive/index.html"
     permission_required: str = "monta_billing.view_billingqueue"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:

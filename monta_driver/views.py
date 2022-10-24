@@ -24,28 +24,26 @@ from ajax_datatable import AjaxDatatableView
 from braces import views
 from django.contrib.auth import mixins
 from django.contrib.auth.decorators import login_required
-from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from django.contrib.postgres.search import SearchVector
 from django.core.handlers.asgi import ASGIRequest
 from django.db import transaction
 from django.db.models import QuerySet
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.views import View, generic
+from django.views import generic
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_safe
 from django.views.decorators.vary import vary_on_cookie
 
+from core.views import MontaCreateView, MontaDeleteView, MontaSearchView, MontaTemplateView
 from monta_driver import forms, models
 
 
 @method_decorator(require_safe, name="dispatch")
 @method_decorator(cache_control(max_age=60 * 60 * 24), name="dispatch")
 @method_decorator(vary_on_cookie, name="dispatch")
-class DriverListView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.TemplateView
-):
+class DriverListView(MontaTemplateView):
     """
     Class to render the driver Index page.
     """
@@ -70,9 +68,7 @@ class DriverListView(
         return context
 
 
-class DriverCreateView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.CreateView
-):
+class DriverCreateView(MontaCreateView):
     """
     Class to render create driver page.
     """
@@ -205,35 +201,13 @@ class DriverUpdateView(
         )
 
 
-class DriverDeleteView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.DeleteView
-):
+class DriverDeleteView(MontaDeleteView):
     """
     Class to delete a driver.
     """
 
     model: Type[models.Driver] = models.Driver
     permission_required: str = "monta_driver.delete_driver"
-
-    def get(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
-        """
-        Method to handle the GET request.
-
-        :param request: The request object.
-        :type request: ASGIRequest
-        :param args: Any arguments.
-        :type args: Any
-        :param kwargs: Any keyword arguments.
-        :type kwargs: Any
-        :return: A JSON response with a success value.
-        :rtype: JsonResponse
-        """
-        driver: models.Driver = self.get_object()
-        driver.delete()
-        return JsonResponse(
-            {"result": "success", "message": "Driver Deleted Successfully"},
-            status=204,
-        )
 
 
 class DriverOverviewList(mixins.LoginRequiredMixin, AjaxDatatableView):
@@ -375,55 +349,23 @@ class DriverOverviewList(mixins.LoginRequiredMixin, AjaxDatatableView):
         return row
 
 
-class DriverSearchView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, View):
+class DriverSearchView(MontaSearchView):
     """
     Class to delete a driver.
     """
 
     permission_required: str = "monta_driver.search_drivers"
-
-    def get(self, request: ASGIRequest) -> HttpResponse:
-        """
-        Get request for getting results from the search with params.
-
-        :param request
-        :type request: ASGIRequest
-        :return HttpResponse of the Charge Type search form
-        :rtype HttpResponse
-        """
-        form: forms.SearchForm = forms.SearchForm()
-        query = request.GET["query"] if "query" in request.GET else None
-        results: QuerySet[models.Driver] | list = []
-        if query:
-            form: forms.SearchForm = forms.SearchForm({"query": query})
-            search_vector: SearchVector = SearchVector(
-                "organization__name",
-                "first_name",
-                "last_name",
-                "profile__license_state",
-                "profile__license_number",
-                "profile__license_expiration",
-            )
-            search_query: SearchQuery = SearchQuery(query)
-            results: QuerySet[models.Driver] = (
-                models.Driver.objects.annotate(
-                    search=search_vector, rank=SearchRank(search_vector, search_query)
-                )
-                .filter(
-                    search=search_query, organization=request.user.profile.organization
-                )
-                .select_related("profile")
-                .order_by("-rank")
-            )
-        return render(
-            request,
-            "monta_driver/search.html",
-            {
-                "form": form,
-                "query": query,
-                "results": results,
-            },
-        )
+    model: Type[models.Driver] = models.Driver
+    template_name = "monta_driver/search.html"
+    form_class = forms.SearchForm
+    search_vector = SearchVector(
+        "organization__name",
+        "first_name",
+        "last_name",
+        "profile__license_state",
+        "profile__license_number",
+        "profile__license_expiration",
+    )
 
 
 @login_required
