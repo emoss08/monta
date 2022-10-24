@@ -28,7 +28,9 @@ from django.views import generic
 
 
 class MontaTemplateView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.TemplateView
+    mixins.LoginRequiredMixin,
+    views.PermissionRequiredMixin,
+    generic.TemplateView
 ):
     template_name = None
     permission_required = None
