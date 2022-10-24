@@ -39,7 +39,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_safe
 from django.views.decorators.vary import vary_on_cookie
 
-from core.views import MontaCreateView, MontaDeleteView, MontaUpdateView
+from core.views import MontaCreateView, MontaDeleteView, MontaTemplateView, MontaUpdateView
 from monta_billing import forms, models
 from monta_customer.models import CustomerBillingProfile, CustomerContact
 from monta_driver.forms import SearchForm
@@ -58,7 +58,6 @@ class InteractiveBillingView(
 
     template_name = "monta_billing/interactive/index.html"
     permission_required: str = "monta_billing.view_billingqueue"
-    http_method_names: list[str] = ["get"]
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         """
@@ -97,9 +96,7 @@ class InteractiveBillingView(
 @method_decorator(require_safe, name="dispatch")
 @method_decorator(cache_control(max_age=60 * 60 * 24), name="dispatch")
 @method_decorator(vary_on_cookie, name="dispatch")
-class ChargeTypeListView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.TemplateView
-):
+class ChargeTypeListView(MontaTemplateView):
     """
     Class to render the Charge Type List View
 
@@ -109,19 +106,7 @@ class ChargeTypeListView(
 
     template_name = "monta_billing/charge_types/index.html"
     permission_required: str = "monta_billing.view_chargetype"
-
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        """
-        Get Context Data for Charge Type List View
-
-        :param kwargs: Keyword Arguments
-        :type kwargs: Any
-        :return: Context Data
-        """
-
-        context: dict = super().get_context_data(**kwargs)
-        context["form"] = forms.AddChargeTypeForm()
-        return context
+    context_data: set[str] = {"form": forms.AddChargeTypeForm(), "charge_types": models.Organization.objects.all()}
 
 
 class ChargeTypeOverviewListView(AjaxDatatableView, mixins.LoginRequiredMixin):

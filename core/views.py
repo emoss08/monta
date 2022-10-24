@@ -27,6 +27,22 @@ from django.http import JsonResponse
 from django.views import generic
 
 
+class MontaTemplateView(
+    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.TemplateView
+):
+    template_name = None
+    permission_required = None
+    context_data = None
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context: dict = self.context_data or {}
+        if context:
+            context.update(kwargs)
+        else:
+            context: dict = kwargs
+        return super().get_context_data(**context)
+
+
 class MontaCreateView(
     mixins.LoginRequiredMixin,
     views.PermissionRequiredMixin,
