@@ -18,18 +18,14 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Python Libraries
 from typing import final, Any
 
-# Core Django Imports
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-# Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 
-# Monta Imports
 from monta_user.models import Organization
 from monta_routes.models import GoogleRouteDistanceUnitChoices, GoogleRouteModelChoices
 
@@ -130,7 +126,7 @@ class OrganizationSettings(TimeStampedModel):
         :rtype: None
         """
         self.full_clean()
-        return super(OrganizationSettings, self).save(**kwargs)
+        return super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """
@@ -200,18 +196,6 @@ class Integration(TimeStampedModel):
         :rtype: str
         """
         return f"{self.name}"
-
-    def save(self, **kwargs: Any) -> None:
-        """
-        Save the Integration
-
-        :param kwargs: Keyword arguments
-        :type kwargs: Any
-        :return: None
-        :rtype: None
-        """
-        self.full_clean()
-        return super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """

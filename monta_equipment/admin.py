@@ -17,28 +17,30 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-# Standard Library Imports
-from typing import Literal
 
-# Core Django Imports
 from django.contrib import admin
 
-# Monta Imports
 from monta_equipment import models
 
 
 @admin.register(models.EquipmentType)
-class EquipmentTypeAdmin(admin.ModelAdmin[models.EquipmentType]):
+class EquipmentTypeAdmin(admin.ModelAdmin):
     """Equipment Type Admin"""
 
-    list_display = ("equip_type_id", "name", "description", "created", "modified")
+    list_display: tuple[str, ...] = (
+        "equip_type_id",
+        "name",
+        "description",
+        "created",
+        "modified",
+    )
 
 
 @admin.register(models.Equipment)
-class EquipmentAdmin(admin.ModelAdmin[models.Equipment]):
+class EquipmentAdmin(admin.ModelAdmin):
     """Equipment Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "equip_id",
         "equipment_type",
         "description",
@@ -51,9 +53,9 @@ class EquipmentAdmin(admin.ModelAdmin[models.Equipment]):
         "created",
         "modified",
     )
-    list_filter = (
+    list_filter: tuple[str, ...] = (
         "organization",
         "is_active",
     )
-    search_fields = ("equip_id", "description", "vin_number")
-    list_select_related: Literal[True] = True
+    search_fields: tuple[str, ...] = ("equip_id", "description", "vin_number")
+    list_select_related: bool = True

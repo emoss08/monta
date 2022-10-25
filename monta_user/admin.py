@@ -17,35 +17,32 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-# Standard Python Imports
-from typing import Literal, Type
+from typing import Type
 
-# Core Django Imports
 from django.contrib import admin
 
-# Monta Imports
 from monta_user import models
 
 
 @admin.register(models.Organization)
-class OrganizationInline(admin.ModelAdmin[models.Organization]):
+class OrganizationInline(admin.ModelAdmin):
     """Organization Admin"""
 
-    list_display: tuple[str] = ("name", "description", "created", "modified")
+    list_display: tuple[str, ...] = ("name", "description", "created", "modified")
 
 
 @admin.register(models.JobTitle)
-class JobTitleInline(admin.ModelAdmin[models.JobTitle]):
+class JobTitleInline(admin.ModelAdmin):
     """Job Title Admin"""
 
-    list_display: tuple[str] = ("name", "description", "created", "modified")
+    list_display: tuple[str, ...] = ("name", "description", "created", "modified")
 
 
 @admin.register(models.Profile)
-class ProfileUserInline(admin.ModelAdmin[models.Profile]):
+class ProfileUserInline(admin.ModelAdmin):
     """Profile Admin"""
 
-    list_display: tuple[str] = (
+    list_display: tuple[str, ...] = (
         "user",
         "organization",
         "address_line_1",
@@ -58,16 +55,16 @@ class ProfileUserInline(admin.ModelAdmin[models.Profile]):
     )
 
 
-class ProfileInline(admin.StackedInline[models.Profile]):
+class ProfileInline(admin.StackedInline):
     """User Info Inline"""
 
     model: Type[models.Profile] = models.Profile
-    can_delete: Literal[False] = False
+    can_delete: bool = False
     verbose_name_plural: str = "User Info"
 
 
 @admin.register(models.MontaUser)
-class UserInline(admin.ModelAdmin[models.MontaUser]):
+class UserInline(admin.ModelAdmin):
     """User Inline"""
 
     inlines: tuple[Type[ProfileInline]] = (ProfileInline,)

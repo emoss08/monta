@@ -18,7 +18,6 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard library imports
 from typing import Any, final
 
 from django.core.exceptions import ValidationError
@@ -373,7 +372,7 @@ class BillingException(TimeStampedModel):
         :return: Name of the Billing Exception
         :rtype: str
         """
-        return self.exception_type
+        return str(self.exception_type)
 
 
 class BillingHistory(TimeStampedModel):

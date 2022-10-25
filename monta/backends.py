@@ -18,14 +18,15 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Core Django Imports
+from typing import Any
+
 from django.db.models.base import ModelBase
 from django.contrib.auth import get_user_model
+from django.core.handlers.asgi import ASGIRequest
 from django.contrib.auth.backends import BaseBackend
-from django.contrib.auth.base_user import AbstractBaseUser
 
-# Monta Imports
 from monta_user.models import MontaUser
+from core.exceptions import UserNotFound
 
 UserModel: ModelBase = get_user_model()
 
@@ -36,7 +37,7 @@ class MontaBackend(BaseBackend):
     """
 
     def authenticate(
-        self, request, username: str = None, password: str = None, **kwargs: any
+        self, request: ASGIRequest, username: str, password: str, **kwargs: Any
     ) -> MontaUser | None:
         """
         Override the authenticate method to authenticate the user session
@@ -56,11 +57,12 @@ class MontaBackend(BaseBackend):
             return
         try:
             user: MontaUser = UserModel._default_manager.get_by_natural_key(username)
-        except MontaUser.DoesNotExist:
+        except UserNotFound:
             return None
         else:
             if user.check_password(password) and self.user_can_authenticate(user):
                 return user
+            return None
 
     @staticmethod
     def user_can_authenticate(user: MontaUser) -> bool:
@@ -95,6 +97,6 @@ class MontaBackend(BaseBackend):
             user: MontaUser = UserModel._default_manager.select_related(
                 "profile", "profile__title", "profile__organization"
             ).get(pk__exact=user_id)
-        except MontaUser.DoesNotExist:
+        except UserNotFound:
             return None
         return user if self.user_can_authenticate(user) else None

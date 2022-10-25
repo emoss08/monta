@@ -18,42 +18,40 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Core Django Imports
 from django.contrib import admin
 
-# Monta Imports
 from monta_billing import models
 
 
 @admin.register(models.ChargeType)
-class ChargeTypeAdmin(admin.ModelAdmin[models.ChargeType]):
+class ChargeTypeAdmin(admin.ModelAdmin):
     """
     ChargeType Admin
     """
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "name",
         "description",
     )
-    search_fields = (
+    search_fields: tuple[str, ...] = (
         "name",
         "description",
     )
 
 
 @admin.register(models.AdditionalCharge)
-class AdditionalChargeAdmin(admin.ModelAdmin[models.AdditionalCharge]):
+class AdditionalChargeAdmin(admin.ModelAdmin):
     """
     Admin for AdditionalCharge model
     """
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "order",
         "charge_type",
         "amount",
         "description",
     )
-    search_fields = (
+    search_fields: tuple[str, ...] = (
         "order",
         "charge_type",
         "amount",
@@ -62,43 +60,43 @@ class AdditionalChargeAdmin(admin.ModelAdmin[models.AdditionalCharge]):
 
 
 @admin.register(models.BillingQueue)
-class BillingQueueAdmin(admin.ModelAdmin[models.BillingQueue]):
+class BillingQueueAdmin(admin.ModelAdmin):
     """
     Admin for BillingQueue
     """
 
-    list_display = ("order",)
-    search_fields = ("order",)
+    list_display: tuple[str, ...] = ("order",)
+    search_fields: tuple[str, ...] = ("order",)
 
 
 @admin.register(models.BillingHistory)
-class BillingHistoryAdmin(admin.ModelAdmin[models.BillingHistory]):
+class BillingHistoryAdmin(admin.ModelAdmin):
     """
     Billing History Admin
     """
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "batch_name",
         "order",
     )
-    search_fields = (
+    search_fields: tuple[str, ...] = (
         "batch_name",
         "order",
     )
 
 
 @admin.register(models.BillingException)
-class BillingExceptionAdmin(admin.ModelAdmin[models.BillingException]):
+class BillingExceptionAdmin(admin.ModelAdmin):
     """
     Admin for BillingException
     """
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "order",
         "exception_type",
         "exception_message",
     )
-    search_fields = (
+    search_fields: tuple[str, ...] = (
         "order",
         "exception_type",
         "exception_message",

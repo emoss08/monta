@@ -86,7 +86,7 @@ class EquipmentType(TimeStampedModel):
         """
         return f"{self.equip_type_id} - {self.name}"
 
-    def save(self, *args: Any, **kwargs: Any) -> None:
+    def save(self, **kwargs: Any) -> None:
         """
         Equipment Type Model Save Method
 
@@ -346,8 +346,8 @@ class EquipmentPermit(TimeStampedModel):
         :return: None
         :rtype: None
         """
-        self.permit_file_size = self.permit_file.size / (1024**2)
-        super(EquipmentPermit, self).save(**kwargs)
+        self.permit_file_size = self.permit_file.permit_file_size / (1024**2)
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """

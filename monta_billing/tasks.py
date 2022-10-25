@@ -18,17 +18,20 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Celery Import
 from celery import shared_task
 
 
 @shared_task
-def run_order_transfer():
-    # Create pipeline for orders transfer to billing
+def run_order_transfer() -> None:
+    """
+    Create pipeline for orders transfer to billing
+    """
     pass
 
 
 @shared_task
-def run_billing_queue():
-    # Create pipeline for billing
+def run_billing_queue() -> None:
+    """
+    Create pipeline for billing
+    """
     pass

@@ -19,18 +19,16 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 from typing import Type
 
-# Core Django Imports
 from django.contrib import admin
 
-# Monta Imports
 from monta_order import models
 
 
 @admin.register(models.Movement)
-class MovementAdmin(admin.ModelAdmin[models.Movement]):
+class MovementAdmin(admin.ModelAdmin):
     """Movement Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "id",
         "status",
         "order",
@@ -40,10 +38,10 @@ class MovementAdmin(admin.ModelAdmin[models.Movement]):
 
 
 @admin.register(models.ServiceIncident)
-class ServiceIncidentAdmin(admin.ModelAdmin[models.ServiceIncident]):
+class ServiceIncidentAdmin(admin.ModelAdmin):
     """ServiceIncident Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "id",
         "stop",
         "created",
@@ -51,19 +49,19 @@ class ServiceIncidentAdmin(admin.ModelAdmin[models.ServiceIncident]):
     )
 
 
-class OrderDocumentationAdmin(admin.TabularInline[models.OrderDocumentation]):
+class OrderDocumentationAdmin(admin.TabularInline):
     """OrderDocumentation Admin"""
 
     model: Type[models.OrderDocumentation] = models.OrderDocumentation
-    verbose_name_plural = "Order Documentation"
+    verbose_name_plural: str = "Order Documentation"
     extra: int = 0
 
 
 @admin.register(models.Stop)
-class StopAdmin(admin.ModelAdmin[models.Stop]):
+class StopAdmin(admin.ModelAdmin):
     """Stop Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "id",
         "sequence",
         "status",
@@ -74,10 +72,10 @@ class StopAdmin(admin.ModelAdmin[models.Stop]):
 
 
 @admin.register(models.OrderType)
-class OrderTypeAdmin(admin.ModelAdmin[models.OrderType]):
+class OrderTypeAdmin(admin.ModelAdmin):
     """Order Type Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "name",
         "description",
         "created",
@@ -86,10 +84,10 @@ class OrderTypeAdmin(admin.ModelAdmin[models.OrderType]):
 
 
 @admin.register(models.DelayCode)
-class DelayCodeAdmin(admin.ModelAdmin[models.DelayCode]):
+class DelayCodeAdmin(admin.ModelAdmin):
     """Delay Code Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "name",
         "description",
         "created",
@@ -98,10 +96,10 @@ class DelayCodeAdmin(admin.ModelAdmin[models.DelayCode]):
 
 
 @admin.register(models.Commodity)
-class CommodityAdmin(admin.ModelAdmin[models.Commodity]):
+class CommodityAdmin(admin.ModelAdmin):
     """Commodity Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "name",
         "description",
         "created",
@@ -110,26 +108,26 @@ class CommodityAdmin(admin.ModelAdmin[models.Commodity]):
 
 
 @admin.register(models.RevenueCode)
-class RevenueCodeAdmin(admin.ModelAdmin[models.RevenueCode]):
+class RevenueCodeAdmin(admin.ModelAdmin):
     """
     Revenue Code Admin
     """
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "code",
         "description",
     )
-    search_fields = (
+    search_fields: tuple[str, ...] = (
         "code",
         "description",
     )
 
 
 @admin.register(models.Order)
-class OrderAdmin(admin.ModelAdmin[models.Order]):
+class OrderAdmin(admin.ModelAdmin):
     """Order Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "order_id",
         "status",
         "order_type",

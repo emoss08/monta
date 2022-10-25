@@ -18,20 +18,16 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Library Imports
 from typing import Any, Type
 
-# Core Django Imports
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
 from django.db import transaction
 from django.http import JsonResponse
 from django.views.generic import TemplateView, CreateView, UpdateView
 
-# Third Party Imports
 from braces import views
 
-# Monta Imports
 from monta_locations import models, forms
 
 
@@ -118,8 +114,9 @@ class LocationUpdateView(LoginRequiredMixin, views.PermissionRequiredMixin, Upda
         **kwargs: Any,
     ) -> JsonResponse:
         """
-        Overwrites the post method to check if the form is valid. If the form is valid, request the user's organization
-        and save the form. If the form is not valid, return a JSON response with a success value of False.
+        Overwrites the post method to check if the form is valid. If the form is valid,
+        request the user's organization and save the form.
+        If the form is not valid, return a JSON response with a success value of False.
 
         :param request: The request object.
         :type request: ASGIRequest

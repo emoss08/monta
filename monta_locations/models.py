@@ -127,7 +127,7 @@ class Location(TimeStampedModel):
 
         verbose_name: str = _("Location")
         verbose_name_plural: str = _("Locations")
-        ordering: tuple[str] = ("location_id", "name")
+        ordering: tuple[str, ...] = ("location_id", "name")
         indexes: list[models.Index] = [
             models.Index(fields=["location_id", "name"]),
         ]
@@ -238,7 +238,7 @@ class LocationContact(TimeStampedModel):
         :return: String representation of the location contact.
         :rtype: str
         """
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self) -> str:
         """
@@ -288,7 +288,7 @@ class LocationComment(TimeStampedModel):
         verbose_name_plural: str = _("Location Comments")
         ordering: tuple[str] = ("comment_type",)
         indexes: list[models.Index] = [
-            models.Index(fields=["comment_type"]),
+            models.Index(fields=["comment"]),
         ]
 
     def __str__(self) -> str:

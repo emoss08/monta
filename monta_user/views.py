@@ -18,10 +18,8 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Library Imports
 from typing import Any, Type
 
-# Core Django Imports
 from django.views.generic import UpdateView, ListView
 from django.db.models import QuerySet
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -34,10 +32,8 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_POST, require_safe
 from django.views.decorators.vary import vary_on_cookie
 
-# Third Party Imports
 from django_extensions.auth.mixins import ModelUserFieldPermissionMixin
 
-# Core Monta Imports
 from monta_user import models, forms
 
 
@@ -73,7 +69,7 @@ class UserProfileSettings(LoginRequiredMixin, ModelUserFieldPermissionMixin, Lis
 
     model: Type[models.Profile] = models.Profile
     template_name: str = "user_profile/settings.html"
-    model_permission_user_field = "user"
+    model_permission_user_field: str = "user"
 
     def get_queryset(self) -> QuerySet[models.Profile]:
         """
@@ -97,7 +93,7 @@ class UpdateUserProfile(LoginRequiredMixin, UpdateView):
     form_class: Type[
         forms.UpdateProfileGeneralInformationForm
     ] = forms.UpdateProfileGeneralInformationForm
-    success_url = "/"
+    success_url: str = "/"
 
     def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """

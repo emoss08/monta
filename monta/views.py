@@ -17,7 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-# Core Django Imports
+
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
@@ -36,4 +36,4 @@ class HomePage(LoginRequiredMixin, TemplateView):
     # TODO: Pop the cache if something changes.
     """
 
-    template_name = "homepage/index.html"
+    template_name: str = "homepage/index.html"

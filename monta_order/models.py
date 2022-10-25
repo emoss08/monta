@@ -18,12 +18,10 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Python Libraries
 from __future__ import annotations
 from typing import Any, final
 import decimal
 
-# Core Django Imports
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.aggregates import Sum
@@ -31,12 +29,11 @@ from django.urls import reverse
 from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
 
-# Third Party Imports
 from django_extensions.db.models import TimeStampedModel
+
 import googlemaps
 from googlemaps.exceptions import ApiError
 
-# Monta Imports
 from monta_customer.models import Customer, DocumentClassification
 from monta_driver.models import Driver
 from monta_hazardous_material.models import HazardousMaterial
@@ -134,10 +131,10 @@ class DelayCode(TimeStampedModel):
         Metaclass for DelayCode model
         """
 
-        verbose_name = _("Delay Code")
-        verbose_name_plural = _("Delay Codes")
-        ordering = ("delay_code_id", "name")
-        indexes = [
+        verbose_name: str = _("Delay Code")
+        verbose_name_plural: str = _("Delay Codes")
+        ordering: tuple[str, ...] = ("delay_code_id", "name")
+        indexes: list[models.Index] = [
             models.Index(fields=["delay_code_id", "name"]),
         ]
 
@@ -163,7 +160,7 @@ class DelayCode(TimeStampedModel):
         if not self.delay_code_id:
             self.delay_code_id = slugify(self.name)
         self.name = self.name.upper()
-        super(DelayCode, self).save(**kwargs)
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """
@@ -224,7 +221,7 @@ class Commodity(TimeStampedModel):
 
         verbose_name: str = _("Commodity")
         verbose_name_plural: str = _("Commodities")
-        ordering: tuple[str] = ("commodity_id", "name")
+        ordering: tuple[str, ...] = ("commodity_id", "name")
         indexes: list[models.Index] = [
             models.Index(fields=["commodity_id", "name"]),
         ]
@@ -318,7 +315,7 @@ class OrderType(TimeStampedModel):
         self.full_clean()
         if not self.order_type_id:
             self.order_type_id = slugify(self.name)
-        super(OrderType, self).save(**kwargs)
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """
@@ -649,6 +646,7 @@ class Order(TimeStampedModel):
         """
         Function to get or create route for the order.
 
+        # TODO: Move this to a service.
         **********************************************************************************************************************
         * NOTE: If the Organization does not have generated routes active, and a Google api key is not provided, the
         function will not create a route. *
@@ -828,7 +826,7 @@ class Order(TimeStampedModel):
             if self.mileage is None:
                 # If the mileage is none, get the distance between the two stops.
                 self.mileage = self.get_or_create_route()
-        super(Order, self).save(**kwargs)
+        super().save(**kwargs)
         if not self.movements.exists():
             self.create_movement()
 
@@ -1004,7 +1002,7 @@ class Movement(TimeStampedModel):
                     _("The primary driver and the secondary driver cannot be the same.")
                 )
 
-        super(Movement, self).clean()
+        super().clean()
 
     def save(self, **kwargs: Any) -> None:
         """
@@ -1022,7 +1020,7 @@ class Movement(TimeStampedModel):
 
         if self.assigned_driver:
             self.equipment = self.assigned_driver.equipments.first()
-        super(Movement, self).save(**kwargs)
+        super().save(**kwargs)
 
         if self.status == StatusChoices.COMPLETED:
             if not self.order.movements.filter(
@@ -1120,6 +1118,9 @@ class ServiceIncident(TimeStampedModel):
 class Stop(TimeStampedModel):
     """
     Stop model fields
+
+    # TODO: Refactor this model
+
     """
 
     organization = models.ForeignKey(
@@ -1325,7 +1326,7 @@ class Stop(TimeStampedModel):
                     raise ValidationError(
                         _("Stop departure time cannot be before the stop arrival time")
                     )
-        super(Stop, self).clean()
+        super().clean()
 
     def save(self, **kwargs: Any) -> None:
         """
@@ -1416,10 +1417,10 @@ class OrderDocumentation(TimeStampedModel):
         Metaclass for OrderDocumentation
         """
 
-        verbose_name = _("Order Documentation")
-        verbose_name_plural = _("Order Documentation")
-        ordering = ["order"]
-        indexes = [
+        verbose_name: str = _("Order Documentation")
+        verbose_name_plural: str = _("Order Documentation")
+        ordering: list[str] = ["order"]
+        indexes: list[models.Index] = [
             models.Index(fields=["order"]),
         ]
 
@@ -1431,17 +1432,6 @@ class OrderDocumentation(TimeStampedModel):
         :rtype: str
         """
         return f"{self.order} - {self.document_class}"
-
-    def save(self, **kwargs: Any) -> None:
-        """
-        Save the OrderDocumentation object
-
-        :param kwargs: Keyword arguments
-        :type kwargs: Any
-        :return: None
-        :rtype: None
-        """
-        super(OrderDocumentation, self).save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """
@@ -1510,4 +1500,4 @@ class RevenueCode(TimeStampedModel):
         """
         if self.code:
             self.code = self.code.upper()
-        super(RevenueCode, self).save(**kwargs)
+        super().save(**kwargs)

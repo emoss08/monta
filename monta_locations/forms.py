@@ -83,7 +83,7 @@ class AddLocationForm(forms.ModelForm):
         """
 
         model: Type[models.Location] = models.Location
-        fields = (
+        fields: tuple[str, ...] = (
             "name",
             "description",
             "address_line_1",

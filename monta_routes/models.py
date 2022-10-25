@@ -17,18 +17,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-# Standard Python Libraries
+
 from typing import final, Any
 
-# Core Django Imports
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.urls import reverse
 
-# Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 
-# Monta Imports
 from monta_user.models import Organization
 
 
@@ -102,8 +99,8 @@ class Route(TimeStampedModel):
         Metaclass for Route model
         """
 
-        verbose_name = "Route"
-        verbose_name_plural = "Routes"
+        verbose_name: str = "Route"
+        verbose_name_plural: str = "Routes"
         ordering: list[str] = ["-created"]
         indexes: list[models.Index] = [
             models.Index(fields=["-created"]),
@@ -130,7 +127,7 @@ class Route(TimeStampedModel):
         if self.origin == self.destination:
             self.distance = 0
             self.duration = 0
-        super(Route, self).save(**kwargs)
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """

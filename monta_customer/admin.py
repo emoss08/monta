@@ -18,24 +18,21 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Python Libraries
 from typing import Type
 
-# Core Django imports
 from django.contrib import admin
 
-# Monta Imports
 from monta_customer import models
 
 
-class CustomerBillingProfileInline(admin.StackedInline[models.CustomerBillingProfile]):
+class CustomerBillingProfileInline(admin.StackedInline):
     """CustomerBillingProfile Inline"""
 
     model: Type[models.CustomerBillingProfile] = models.CustomerBillingProfile
     extra: int = 0
 
 
-class CustomerContactInline(admin.TabularInline[models.CustomerContact]):
+class CustomerContactInline(admin.TabularInline):
     """
     CustomerContactInline class
     """
@@ -45,12 +42,12 @@ class CustomerContactInline(admin.TabularInline[models.CustomerContact]):
 
 
 @admin.register(models.Customer)
-class CustomerAdmin(admin.ModelAdmin[models.Customer]):
+class CustomerAdmin(admin.ModelAdmin):
     """
     CustomerAdmin class
     """
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "customer_id",
         "name",
         "address_line_1",
@@ -59,8 +56,8 @@ class CustomerAdmin(admin.ModelAdmin[models.Customer]):
         "state",
         "zip_code",
     )
-    list_filter = ("is_active", "state")
-    search_fields = (
+    list_filter: tuple[str, ...] = ("is_active", "state")
+    search_fields: tuple[str, ...] = (
         "customer_id",
         "name",
         "address_line_1",
@@ -69,7 +66,7 @@ class CustomerAdmin(admin.ModelAdmin[models.Customer]):
         "state",
         "zip_code",
     )
-    ordering = ("customer_id",)
+    ordering: tuple[str, ...] = ("customer_id",)
     inlines: tuple[Type[CustomerBillingProfileInline], Type[CustomerContactInline]] = (
         CustomerBillingProfileInline,
         CustomerContactInline,
@@ -77,11 +74,11 @@ class CustomerAdmin(admin.ModelAdmin[models.Customer]):
 
 
 @admin.register(models.DocumentClassification)
-class DocumentClassificationAdmin(admin.ModelAdmin[models.DocumentClassification]):
+class DocumentClassificationAdmin(admin.ModelAdmin):
     """
     DocumentClassificationAdmin class
     """
 
-    list_display = ("name", "description")
-    search_fields = ("name", "description")
-    ordering = ("name",)
+    list_display: tuple[str, ...] = ("name", "description")
+    search_fields: tuple[str, ...] = ("name", "description")
+    ordering: tuple[str] = ("name",)

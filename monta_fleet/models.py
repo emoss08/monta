@@ -18,16 +18,14 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard library imports
 from typing import Any
 
-# Core Django Imports
 from django.db import models
 from django.urls import reverse
-from django_extensions.db.models import TimeStampedModel
 from django.utils.translation import gettext_lazy as _
 
-# Monta Imports
+from django_extensions.db.models import TimeStampedModel
+
 from monta_user.models import Organization, MontaUser
 
 
@@ -115,7 +113,7 @@ class Fleet(TimeStampedModel):
                 int(Fleet.objects.count() + 1)
             )
         self.fleet_id = self.fleet_id.upper()
-        super(Fleet, self).save(**kwargs)
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """

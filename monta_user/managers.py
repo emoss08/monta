@@ -18,12 +18,10 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Library Imports
 from __future__ import annotations
 from typing import Any
 import unicodedata
 
-# Core Django Imports
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
@@ -38,7 +36,7 @@ class MontaUserManager(BaseUserManager):
         """
         Create and save a User with the given email and password.
         """
-        username = user_name.lower()
+        username: str = user_name.lower()
         if not email:
             raise ValueError(_("The Email must be set"))
         email: str = self.normalize_email(email)

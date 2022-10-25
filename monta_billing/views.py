@@ -104,9 +104,9 @@ class ChargeTypeListView(MontaTemplateView):
         >>> ChargeTypeListView.as_view()
     """
 
-    template_name = "monta_billing/charge_types/index.html"
+    template_name: str = "monta_billing/charge_types/index.html"
     permission_required: str = "monta_billing.view_chargetype"
-    context_data: set[str] = {"form": forms.AddChargeTypeForm()}
+    context_data: dict[str, Any] = {"form": forms.AddChargeTypeForm()}
 
 
 class ChargeTypeOverviewListView(AjaxDatatableView, mixins.LoginRequiredMixin):
@@ -324,14 +324,13 @@ class OrderTransferView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin
         for order in orders:
             if order.transferred_to_billing:
                 continue
-            else:
-                models.BillingQueue.objects.create(
-                    order=order,
-                    organization=request.user.profile.organization,
-                )
-                order.transferred_to_billing = True
-                order.billing_transfer_date = timezone.now()
-                order.save()
+            models.BillingQueue.objects.create(
+                order=order,
+                organization=request.user.profile.organization,
+            )
+            order.transferred_to_billing = True
+            order.billing_transfer_date = timezone.now()
+            order.save()
         return JsonResponse(
             {"result": "success", "message": "Orders transferred to billing queue."},
             status=201,
@@ -344,10 +343,11 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
     """
     Bill Orders out to customers
 
-    For each order validate that the OrderDocument doucment_class matches the CustomerBillingProfile document_class
-    choices. If it does match, bill the order out to customer primary contact email. If it does not match then
-    keep the order in the billing queue, and create a billing exception based on the BillingExceptionChoices(PAPERWORK,
-    CHARGE, CREDIT, OTHER)
+    For each order validate that the OrderDocument doucment_class matches the
+    CustomerBillingProfile document_class choices. If it does match, bill the
+    order out to customer primary contact email. If it does not match then keep the order in
+    the billing queue, and create a billing exception based on the BillingExceptionChoices
+    (PAPERWORK, CHARGE, CREDIT, OTHER)
 
     :param request
     :type request: ASGIRequest
@@ -390,9 +390,9 @@ def bill_orders(request: ASGIRequest) -> JsonResponse:
             billing_history.save()
             order.delete()
             send_mail(
-                "Invoice for Order: " + order.order.order_id,
-                "Please see attached invoice for order: " + order.order.order_id,
-                "" + request.user.email,
+                f"Invoice for Order: {order.order.order_id}",
+                f"Please see attached invoice for order: {order.order.order_id}",
+                f"{request.user.email}",
                 [customer_contact.contact_email],
             )
         else:

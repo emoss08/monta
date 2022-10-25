@@ -40,7 +40,7 @@ documentation for the API. If you add docstrings to this file, they will be
 included in the documentation.
 """
 
-api = NinjaAPI(csrf=True, version="1.0.0")
+api: NinjaAPI = NinjaAPI(csrf=True, version="1.0.0")
 
 
 @decorators.check_organization(models.ChargeType)
@@ -54,7 +54,7 @@ def create_charge_type(
     Note:
     - **Organization** is set to the organization of the user making the request
     """
-    charge_type = models.ChargeType.objects.create(
+    charge_type: models.ChargeType = models.ChargeType.objects.create(
         organization=request.user.profile.organization, **payload.dict()
     )
     return schema.ChargeTypeIn.from_orm(charge_type)
@@ -83,10 +83,10 @@ def list_charge_types(request: ASGIRequest) -> QuerySet[models.ChargeType] | Que
     - **Organization** is set to the organization of the user making the request
     - **Charge Types** are paginated
     """
-    qs: QuerySet[models.ChargeType] = models.ChargeType.objects.filter(
+    queryset: QuerySet[models.ChargeType] = models.ChargeType.objects.filter(
         organization=request.user.profile.organization
     )
-    return qs
+    return queryset
 
 
 @decorators.check_organization(models.ChargeType)

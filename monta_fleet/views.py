@@ -18,11 +18,9 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard library imports
 from __future__ import annotations
 from typing import Type, Any
 
-# Core Django Imports
 from ajax_datatable import AjaxDatatableView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -35,7 +33,6 @@ from django.views.decorators.http import require_safe
 from django.views.decorators.vary import vary_on_cookie
 from django.views.generic import TemplateView, CreateView, DetailView
 
-# Monta Imports
 from monta_fleet import models, forms
 from monta_driver.models import Driver
 

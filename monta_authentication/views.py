@@ -43,32 +43,31 @@ def monta_authenticate_user(request: ASGIRequest) -> JsonResponse:
     :rtype: JsonResponse
     """
     try:
-        username = request.POST["username"]
-        password = request.POST["password"]
+        username: str = request.POST["username"]
+        password: str = request.POST["password"]
         user: AbstractBaseUser | None = authenticate(
             username=username, password=password
         )
         if user is not None and user.is_active:
             auth_login(request, user)
             return JsonResponse({"message": "User logged in successfully"}, status=200)
-        else:
-            return JsonResponse({"message": "Invalid username or password"}, status=400)
+        return JsonResponse({"message": "Invalid username or password"}, status=400)
 
     except AuthenticationError as login_error:
         raise login_error
 
 
-def monta_logout_user(request: ASGIRequest) -> HttpResponseRedirect | JsonResponse:
+def monta_logout_user(request: ASGIRequest) -> HttpResponseRedirect | None:
     """
     Function to log out user.
 
     :param request: The request object
     :type request: ASGIRequest
     :return: The user object or None if the user does not exist
-    :rtype: HttpResponseRedirect | JsonResponse
+    :rtype: HttpResponseRedirect | None
     """
     try:
         auth_logout(request)
         return HttpResponseRedirect("/")
-    except AuthenticationError as logout_error:
-        raise logout_error
+    except AuthenticationError:
+        return None

@@ -33,8 +33,8 @@ class MontaCoreException(Exception):
         :param status_code: The status code
         :type status_code: int
         """
-        self.message = message
-        self.status_code = status_code
+        self.message: str = message
+        self.status_code: int = status_code
         super().__init__(self.message, self.status_code)
 
     def __str__(self) -> str:
@@ -51,7 +51,12 @@ class ApplicationError(MontaCoreException):
     """
     Base class for all application errors.
     """
-    pass
+
+    def __init__(self) -> None:
+        """
+        This is the constructor for the AuthenticationError class.
+        """
+        super().__init__("Application Error", 500)
 
 
 class AuthenticationError(MontaCoreException):
@@ -59,7 +64,7 @@ class AuthenticationError(MontaCoreException):
     This is the error class for the monta_authentication app.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         This is the constructor for the AuthenticationError class.
         """
@@ -71,7 +76,7 @@ class UserNotFound(MontaCoreException):
     Exception to raise when a user is not found.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         This is the constructor for the UserNotFound class.
         """
@@ -83,7 +88,7 @@ class UserAlreadyExists(MontaCoreException):
     Exception to raise when a user already exists.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         This is the constructor for the UserAlreadyExists class.
         """
@@ -95,7 +100,7 @@ class UserIsLastAdmin(MontaCoreException):
     Exception to raise if the user is the last admin.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         This is the constructor for the UserIsLastAdmin class.
         """

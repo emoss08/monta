@@ -18,13 +18,10 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard library imports
 from typing import Type
 
-# Django Ninja Imports
 from ninja import ModelSchema, Schema
 
-# Monta Imports
 from monta_billing import models
 
 

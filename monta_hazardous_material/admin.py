@@ -25,10 +25,10 @@ from monta_hazardous_material import models
 
 
 @admin.register(models.HazardousMaterial)
-class HazardousClassAdmin(admin.ModelAdmin[models.HazardousMaterial]):
+class HazardousClassAdmin(admin.ModelAdmin):
     """Hazardous Class Admin"""
 
-    list_display = (
+    list_display: tuple[str, ...] = (
         "name",
         "description",
         "created",
