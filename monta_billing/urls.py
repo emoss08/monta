@@ -24,6 +24,7 @@ from django.urls import path
 # Monta Core Imports
 from monta_billing import views
 
+app_name = "monta_billing"
 urlpatterns = [
     path(
         "interactive/",

@@ -21,8 +21,9 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 from django.urls import path
 
 # Monta Core Imports
-from monta_driver import views, feeds
+from monta_driver import feeds, views
 
+app_name = 'monta_driver'
 urlpatterns = [
     path("", views.DriverListView.as_view(), name="driver_overview"),
     path("table/", views.DriverOverviewList.as_view(), name="driver_table"),

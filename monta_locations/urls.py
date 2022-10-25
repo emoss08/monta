@@ -23,6 +23,7 @@ from django.urls import path
 # Monta Imports
 from monta_locations import views
 
+app_name = "monta_locations"
 urlpatterns = [
     path("", views.LocationListView.as_view(), name="location_overview"),
 ]

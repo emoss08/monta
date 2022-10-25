@@ -18,16 +18,17 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Core Django Imports
-from django.urls import include, path
 from django.contrib import admin
+from django.urls import include, path
 
-# Monta Imports
 from monta import views
 
 # Monta Core URLs
+app_name = 'monta'
 urlpatterns = [
     path("", views.HomePage.as_view(), name="index"),
+    path('hijack/', include('hijack.urls')),
+
 ]
 
 urlpatterns += [path("accounts/", include("django.contrib.auth.urls"))]
