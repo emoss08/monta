@@ -22,10 +22,9 @@ import uuid
 
 # Third Party Libraries
 import httpx
-from httpx import Response
-
 # Django Imports
 from django.conf import settings
+from httpx import Response
 
 
 def download_image_from_url(url: str) -> None | str:

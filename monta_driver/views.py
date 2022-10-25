@@ -36,7 +36,8 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_safe
 from django.views.decorators.vary import vary_on_cookie
 
-from core.views import MontaCreateView, MontaDeleteView, MontaSearchView, MontaTemplateView
+from core.views import (MontaCreateView, MontaDeleteView, MontaSearchView,
+                        MontaTemplateView)
 from monta_driver import forms, models
 
 
@@ -48,8 +49,8 @@ class DriverListView(MontaTemplateView):
     Class to render the driver Index page.
     """
 
-    template_name = "monta_driver/index.html"
-    permission_required = "monta_driver.view_driver"
+    template_name: str = "monta_driver/index.html"
+    permission_required: str = "monta_driver.view_driver"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         """
@@ -134,11 +135,13 @@ class DriverEditView(
 ):
     """
     Class to render the driver edit page.
+    
+    # TODO: Use the MontaUpdateView class.
     """
 
     model: Type[models.Driver] = models.Driver
     template_name = "monta_driver/edit.html"
-    permission_required = "monta_driver.change_driver"
+    permission_required: str = "monta_driver.change_driver"
 
     def get_queryset(self) -> QuerySet[models.Driver]:
         """
@@ -356,9 +359,9 @@ class DriverSearchView(MontaSearchView):
 
     permission_required: str = "monta_driver.search_drivers"
     model: Type[models.Driver] = models.Driver
-    template_name = "monta_driver/search.html"
-    form_class = forms.SearchForm
-    search_vector = SearchVector(
+    template_name: str = "monta_driver/search.html"
+    form_class: Type[forms.SearchForm] = forms.SearchForm
+    search_vector: SearchVector = SearchVector(
         "organization__name",
         "first_name",
         "last_name",

@@ -17,10 +17,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-# Core Django imports
 from django.contrib.sitemaps import Sitemap
 
-# Monta imports
 from monta_driver import models
 
 
@@ -28,7 +26,7 @@ class DriverSitemap(Sitemap):
     """Driver Site Map"""
 
     change_freq: str = "monthly"
-    priority = 0.9
+    priority: float = 0.9
 
     def items(self):
         """Return list of drivers"""

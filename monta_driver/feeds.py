@@ -18,24 +18,25 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Core Django Imports
+import markdown
 from django.contrib.syndication.views import Feed
+from django.db.models import QuerySet
 from django.template.defaultfilters import truncatewords_html
 from django.urls import reverse_lazy
 
-# Third Party Imports
-import markdown
-
-# Monta Imports
 from monta_driver import models
 
 
 class LatestDriverFeed(Feed):
-    title = "Latest Drivers"
-    link = reverse_lazy("driver_overview")
-    description = "Latest Drivers"
+    """
+    Latest Driver Feed
+    """
 
-    def items(self):
+    title: str = "Latest Drivers"
+    link = reverse_lazy("driver_overview")
+    description: str = "Latest Drivers"
+
+    def items(self) -> QuerySet[models.Driver]:
         """Return the last 5 published posts."""
         return models.Driver.objects.all()[:5]
 

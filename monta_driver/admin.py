@@ -17,54 +17,51 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-# Standard Python Libraries
+
 from typing import Type
 
-# Core Django imports
 from django.contrib import admin
 
-# Monta Imports
 from monta_driver import models
 
 
-# Register your models here.
 @admin.register(models.CommentType)
-class CommentTypeInline(admin.ModelAdmin[models.CommentType]):
+class CommentTypeInline(admin.ModelAdmin):
     """Comment Type Admin"""
 
-    list_display = ("name", "description", "created", "modified")
+    list_display: tuple[str, ...] = ("name", "description", "created", "modified")
 
 
-class DriverProfileInline(admin.StackedInline[models.DriverProfile]):
+class DriverProfileInline(admin.StackedInline):
     """Driver Profile Inline"""
 
     model: Type[models.DriverProfile] = models.DriverProfile
-    can_delete = False
-    verbose_name_plural = "Driver Profile"
+    can_delete: bool = False
+    verbose_name_plural: str = "Driver Profile"
 
 
-class DriverContactInline(admin.TabularInline[models.DriverContact]):
+class DriverContactInline(admin.TabularInline):
     """Driver Contact Inline"""
 
     model: Type[models.DriverContact] = models.DriverContact
-    verbose_name_plural = "Driver Contact"
-    list_select_related = True
+    verbose_name_plural: str = "Driver Contact"
+    list_select_related: bool = True
     extra: int = 0
 
 
-class DriverQualificationInline(admin.TabularInline[models.DriverQualification]):
+class DriverQualificationInline(admin.TabularInline):
     """Driver Qualification Inline"""
 
     model: Type[models.DriverQualification] = models.DriverQualification
-    verbose_name_plural = "Driver Qualifications"
+    verbose_name_plural: str = "Driver Qualifications"
     extra: int = 0
 
 
-class DriverCommentInline(admin.TabularInline[models.DriverComment]):
+class DriverCommentInline(admin.TabularInline):
     """Driver Comment Inline"""
 
     model: Type[models.DriverComment] = models.DriverComment
-    verbose_name_plural = "Driver Comments"
+    verbose_name_plural: str = "Driver Comments"
     extra: int = 0
 
 
@@ -72,7 +69,7 @@ class DriverCommentInline(admin.TabularInline[models.DriverComment]):
 class DriverInline(admin.ModelAdmin):
     """Driver Admin"""
 
-    list_display = ("driver_id", "first_name", "last_name")
+    list_display: tuple[str, ...] = ("driver_id", "first_name", "last_name")
     inlines: tuple[
         Type[DriverProfileInline],
         Type[DriverContactInline],

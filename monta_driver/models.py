@@ -18,28 +18,21 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Python Libraries
 from __future__ import annotations
 
 from typing import Any
 
 from django.core.exceptions import ValidationError
-
-# Core Django Imports
 from django.db import models
-from django.db.models import functions, QuerySet
+from django.db.models import QuerySet, functions
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
-# Third Party Imports
 from django_extensions.db.models import TimeStampedModel
 from localflavor.us.models import USStateField, USZipCodeField
 
 from monta_customer.models import DocumentClassification
 from monta_fleet.models import Fleet
-
-# Monta Imports
 from monta_user.models import Organization
 
 
@@ -80,7 +73,7 @@ class Driver(TimeStampedModel):
         ordering: tuple[functions.Lower] = (functions.Lower("last_name"),)
         verbose_name: str = _("Driver")
         verbose_name_plural: str = _("Drivers")
-        indexes = [
+        indexes: list[models.Index] = [
             models.Index(fields=["-first_name"]),
         ]
         permissions = [
@@ -122,8 +115,8 @@ class Driver(TimeStampedModel):
                 + self.last_name[:4].upper()
                 + str(int(Driver.objects.count() + 1))
             )
-        self.driver_id = self.driver_id.upper()
-        super(Driver, self).save(**kwargs)
+        self.driver_id: str = self.driver_id.upper()
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """
@@ -132,7 +125,7 @@ class Driver(TimeStampedModel):
         :return: The absolute url for the driver
         :rtype: str
         """
-        return reverse("driver_edit", kwargs={"pk": self.pk})
+        return reverse("monta_driver:driver_edit", kwargs={"pk": self.pk})
 
     @property
     def get_full_name(self) -> str:
@@ -148,6 +141,7 @@ class Driver(TimeStampedModel):
         """
         Create a driver profile for the driver
 
+        # TODO: Move this to a service class
         :param kwargs: Arbitrary keyword arguments
         :type kwargs: Any
         :return: The driver profile for the driver
@@ -256,20 +250,6 @@ class DriverProfile(TimeStampedModel):
         """
         return f"Driver Profile for {self.driver}"
 
-    def save(self, *args, **kwargs) -> None:
-        """
-        Save the driver profile
-
-        :param args: Arbitrary positional arguments
-        :type args: Any
-        :param kwargs: Arbitrary keyword arguments
-        :type kwargs: Any
-        :return: None
-        :rtype: None
-        """
-        self.full_clean()
-        super(DriverProfile, self).save(**kwargs)
-
     @property
     def get_driver_full_address(self) -> str:
         """
@@ -331,7 +311,7 @@ class DriverContact(TimeStampedModel):
         ordering: list[str] = ["driver", "contact_name"]
         verbose_name: str = _("Driver Contact")
         verbose_name_plural: str = _("Driver Contacts")
-        indexes = [
+        indexes: list[models.Index] = [
             models.Index(fields=["driver", "contact_name"]),
         ]
 
@@ -430,7 +410,7 @@ class DriverQualification(TimeStampedModel):
         ordering: list[str] = ["driver", "doc_class"]
         verbose_name: str = _("Driver Qualification")
         verbose_name_plural: str = _("Driver Qualifications")
-        indexes = [
+        indexes: list[models.Index] = [
             models.Index(fields=["driver", "doc_class"]),
         ]
 
@@ -485,7 +465,7 @@ class CommentType(TimeStampedModel):
         ordering: list[str] = ["name"]
         verbose_name: str = _("Comment Type")
         verbose_name_plural: str = _("Comment Types")
-        indexes = [
+        indexes: list[models.Index] = [
             models.Index(fields=["name"]),
         ]
 
@@ -544,7 +524,7 @@ class DriverComment(TimeStampedModel):
         ordering: list[str] = ["driver", "comment_type"]
         verbose_name: str = _("Driver Comment")
         verbose_name_plural: str = _("Driver Comments")
-        indexes = [models.Index(fields=["driver", "comment_type"])]
+        indexes: list[models.Index] = [models.Index(fields=["driver", "comment_type"])]
 
     def __str__(self) -> str:
         """

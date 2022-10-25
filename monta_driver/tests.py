@@ -21,10 +21,11 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 # Core Django Imports
 from django.test import TestCase
 
+from monta_driver.factories.driver import DriverFactory, DriverProfileFactory
+from monta_driver.forms import (AddDriverContactForm, AddDriverForm,
+                                AddDriverProfileForm)
 # Monta Imports
 from monta_user.models import Organization
-from monta_driver.forms import AddDriverForm, AddDriverProfileForm, AddDriverContactForm
-from monta_driver.factories.driver import DriverFactory, DriverProfileFactory
 
 
 class DriverTest(TestCase):

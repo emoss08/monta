@@ -18,17 +18,12 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Library Imports
 from typing import Type
 
-# Core Django Imports
 from django import forms
-
-# Third Party Imports
 from localflavor.us.forms import USStateSelect, USZipCodeField
 
-# Core Monta Imports
-from monta_driver.models import Driver, DriverProfile, DriverContact
+from monta_driver.models import Driver, DriverContact, DriverProfile
 
 
 class AddDriverForm(forms.ModelForm):
@@ -63,7 +58,7 @@ class AddDriverForm(forms.ModelForm):
         """
 
         model: Type[Driver] = Driver
-        fields = ("first_name", "last_name")
+        fields: tuple[str, ...] = ("first_name", "last_name")
 
 
 class AddDriverProfileForm(forms.ModelForm):
@@ -103,7 +98,7 @@ class AddDriverProfileForm(forms.ModelForm):
         """
 
         model: Type[DriverProfile] = DriverProfile
-        fields = (
+        fields: tuple[str, ...] = (
             "driver",
             "profile_picture",
             "address_line_1",
@@ -143,24 +138,24 @@ class AddDriverContactForm(forms.ModelForm):
         """
 
         model: Type[DriverContact] = DriverContact
-        fields = [
+        fields: tuple[str, ...] = (
             "driver",
             "contact_name",
             "contact_email",
             "contact_phone",
             "is_primary",
             "is_emergency",
-        ]
+        )
 
 
-DriverContactFormset = forms.inlineformset_factory(
+DriverContactFormset: Type[forms.BaseInlineFormSet] = forms.inlineformset_factory(
     Driver,
     DriverContact,
     form=AddDriverContactForm,
     extra=2,
 )
 
-DriverProfileFormset = forms.inlineformset_factory(
+DriverProfileFormset: Type[forms.BaseInlineFormSet] = forms.inlineformset_factory(
     Driver,
     DriverProfile,
     form=AddDriverProfileForm,
