@@ -204,7 +204,7 @@ class ChargeTypeOverviewListView(AjaxDatatableView, mixins.LoginRequiredMixin):
         </svg>
         </span>
         </a>
-        <a href="{reverse('charge_type_delete', kwargs={'pk': obj.id})}"
+        <a href="{reverse('monta_billing:charge_type_delete', kwargs={'pk': obj.id})}"
         class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm delete-record">
         <span class="svg-icon svg-icon-3">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

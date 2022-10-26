@@ -20,23 +20,30 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 
 # If you use anything less than python 3.11 you will have to change
 # the import to >>> from typing import Any, Type
-from typing import Any
+
+from typing import Any, Type
 
 from braces import views
 from django.contrib.auth import mixins
 from django.contrib.postgres.search import SearchQuery, SearchRank
+from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.asgi import ASGIRequest
-from django.db.models import QuerySet
-from django.db.models.base import Model
+from django.db.models import Model, QuerySet
+from django.forms import Form
+from django.forms.forms import BaseForm
+from django.forms.models import ModelForm
 from django.http import JsonResponse
+from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.views import generic
 
-from core import exceptions
-
-
-# Monta Core views that can be used on any project to inherit from.
+from core.generic import (
+    MontaGenericCreateView,
+    MontaGenericDeleteView,
+    MontaGenericDetailView,
+    MontaGenericUpdateView,
+)
 
 
 class MontaTemplateView(
@@ -46,10 +53,16 @@ class MontaTemplateView(
     A view that renders a template.
     """
 
-    permission_required = None
+    permission_required: str
     context_data = None
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        """
+        Get the context for this view.
+        :param kwargs: Any keyword arguments.
+        :type kwargs: Any
+        :return: A dictionary of context data.
+        """
         context: dict = self.context_data or {}
         if context:
             context.update(kwargs)
@@ -58,18 +71,13 @@ class MontaTemplateView(
         return super().get_context_data(**context)
 
 
-class MontaCreateView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.CreateView
-):
+class MontaCreateView(MontaGenericCreateView):
     """
     View for creating a new object, with a Json response.
     """
-
-    permission_required = None
-    form_class = None
     filter_organization: bool = True
 
-    def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
         Handle POST requests: instantiate a form instance with the passed
         POST variables and then check if it's valid.
@@ -79,13 +87,14 @@ class MontaCreateView(
         :param kwargs: The kwargs
         :return: A JsonResponse
         """
-        if self.form_class.is_valid():
-            self.form_class.save(commit=False)
+        form: ModelForm[Model] = self.form_class(request.POST)
+        if form.is_valid():
+            form.save(commit=False)
             if self.filter_organization:
-                self.form_class.instance.organization = (
+                form.instance.organization = (
                     self.request.user.profile.organization
                 )
-            self.form_class.save()
+            form.save()
             return JsonResponse(
                 {
                     "result": "success",
@@ -96,23 +105,18 @@ class MontaCreateView(
         return JsonResponse(
             {
                 "result": "error",
-                "message": self.form_class.errors,
+                "message": form.errors,
             },
             status=400,
         )
 
 
-class MontaUpdateView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.UpdateView
-):
+class MontaUpdateView(MontaGenericUpdateView):
     """
     View for updating an object, with a Json response.
     """
 
-    permission_required = None
-    form_class = None
-
-    def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
+    def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:  # type: ignore
         """
         Handle POST requests: instantiate a form instance with the passed
         POST variables and then check if it's valid.
@@ -141,51 +145,38 @@ class MontaUpdateView(
         )
 
 
-class MontaDetailView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.DetailView
-):
+class MontaDetailView(MontaGenericDetailView):
     """
     View for displaying an object, return a queryset.
     """
-    model: type[Model] = None  # I WAS RIGHT
-    template_name: str = None
-    permission_required: str | None = None
     organization_filter: bool = True
-    select_related: list[str] | None = None
+    select_related: bool = False
+    select_related_fields: list[str] | tuple[str, ...]
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self) -> QuerySet[Model]:
         """
         Method to get the queryset for the driver edit page.
 
         :return: The queryset for the driver edit page.
         :rtype: QuerySet | None
         """
-        queryset = (
-            super()
-            .get_queryset()
-            .filter(pk__exact=self.kwargs["pk"])
-        )
+        queryset = super().get_queryset().filter(pk__exact=self.kwargs["pk"])
         if self.organization_filter:
             queryset = queryset.filter(
                 organization__exact=self.request.user.profile.organization
             )
-        if self.select_related:
-            queryset = queryset.select_related(*self.select_related)
+        if self.select_related is not None:
+            queryset = queryset.select_related(*self.select_related_fields)
         return queryset
 
 
-class MontaDeleteView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.DeleteView
-):
+class MontaDeleteView(MontaGenericDeleteView):
     """
     View for deleting an object, with a Json response.
     """
-
-    model = None
-    permission_required = None
     form_class = None
 
-    def get(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
+    def get(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:  # type: ignore
         """
         Handle DELETE requests: delete the object and return a JsonResponse.
 
@@ -203,16 +194,6 @@ class MontaDeleteView(
             status=204,
         )
 
-    def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> None:
-        """
-
-        :param request: The request object
-        :param args: The args
-        :param kwargs: The kwargs
-        :return: None
-        """
-        raise exceptions.MethodNotAllowed
-
 
 class MontaSearchView(
     mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.TemplateView
@@ -221,14 +202,25 @@ class MontaSearchView(
     View for searching an object, with a template response
     """
 
-    permission_required: None = None
-    template_name = None
-    model: None = None
-    form_class: None = None
-    search_vector: None = None
-    filter_organization: bool = True
+    permission_required: str
+    template_name: str
+    model: Type[Model]
+    form_class: Type[Form]
+    search_vector: str
+    filter_organization: bool
 
-    def get(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+    def __init__(self) -> None:
+        """
+        If the form class is not an instance of ModelForm, raise an exception.
+        """
+        super().__init__()
+        if self.form_class is not None:
+            if not issubclass(self.form_class, BaseForm):
+                raise ImproperlyConfigured(
+                    "MontaSearchView.form_class must be a subclass of BaseForm."
+                )
+
+    def get(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> HttpResponse:  # type: ignore
         """
         Handle GET requests: search the object and return a HttpResponse.
 
@@ -237,14 +229,14 @@ class MontaSearchView(
         :param kwargs: The kwargs
         :return: A HttpResponse
         """
-        form = self.form_class(request.GET)
         query = request.GET["query"] if "query" in request.GET else None
-        results = []
+        form: Form = self.form_class(request.GET)
+        results: QuerySet[Model] = self.model.objects.none()
         if query:
-            form = self.form_class({"query": query})
+            form: Form = self.form_class({"query": query})
             search_query: SearchQuery = SearchQuery(query)
             if self.filter_organization:
-                results = (
+                results: QuerySet[Model] = (
                     self.model.objects.annotate(
                         search=self.search_vector,
                         rank=SearchRank(self.search_vector, search_query),
@@ -256,7 +248,7 @@ class MontaSearchView(
                     .order_by("-rank")
                 )
             else:
-                results = (
+                results: QuerySet[Model] = (
                     self.model.objects.annotate(
                         search=self.search_vector,
                         rank=SearchRank(self.search_vector, search_query),
