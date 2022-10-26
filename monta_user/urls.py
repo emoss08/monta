@@ -21,7 +21,7 @@ from django.urls import path
 
 from monta_user import views
 
-app_name = 'monta_user'
+app_name = "monta_user"
 urlpatterns = [
     path(
         "profile/<int:pk>/overview/",

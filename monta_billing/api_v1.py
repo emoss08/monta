@@ -18,20 +18,16 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard library imports
 from typing import List
 
 from django.core.handlers.asgi import ASGIRequest
-# Core Django imports
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
-# Django Ninja Imports
 from ninja import NinjaAPI
 from ninja.pagination import paginate
 from ninja.responses import Response
 
 from monta import decorators
-# Monta Imports
 from monta_billing import models, schema
 
 """
@@ -46,7 +42,7 @@ api: NinjaAPI = NinjaAPI(csrf=True, version="1.0.0")
 @decorators.check_organization(models.ChargeType)
 @api.post("/charge_types", tags=["Charge Types"])
 def create_charge_type(
-    request: ASGIRequest, payload: schema.ChargeTypeIn
+        request: ASGIRequest, payload: schema.ChargeTypeIn
 ) -> schema.ChargeTypeIn:
     """
     Create a new charge type
@@ -92,7 +88,7 @@ def list_charge_types(request: ASGIRequest) -> QuerySet[models.ChargeType] | Que
 @decorators.check_organization(models.ChargeType)
 @api.put("/charge_types/{charge_id}", tags=["Charge Types"])
 def update_charge_type(
-    request: ASGIRequest, charge_id: int, payload: schema.ChargeTypeSchema
+        request: ASGIRequest, charge_id: int, payload: schema.ChargeTypeSchema
 ) -> Response | schema.ChargeTypeSchema:
     """
     Update a charge type

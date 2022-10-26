@@ -71,6 +71,18 @@ class AuthenticationError(MontaCoreException):
         super().__init__("Authentication failed.", 401)
 
 
+class MethodNotAllowed(MontaCoreException):
+    """
+    This is the error class for raising Method not allowed errors.
+    """
+
+    def __init__(self) -> None:
+        """
+        This is the constructor for the MethodNotAllowed class.
+        """
+        super().__init__("Method not allowed", 405)
+
+
 class UserNotFound(MontaCoreException):
     """
     Exception to raise when a user is not found.

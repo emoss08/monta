@@ -36,8 +36,12 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_safe
 from django.views.decorators.vary import vary_on_cookie
 
-from core.views import (MontaCreateView, MontaDeleteView, MontaSearchView,
-                        MontaTemplateView)
+from core.views import (
+    MontaCreateView,
+    MontaDeleteView,
+    MontaDetailView, MontaSearchView,
+    MontaTemplateView,
+)
 from monta_driver import forms, models
 
 
@@ -130,35 +134,15 @@ class DriverCreateView(MontaCreateView):
 
 
 @method_decorator(require_safe, name="dispatch")
-class DriverEditView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.DetailView
-):
+class DriverEditView(MontaDetailView):
     """
     Class to render the driver edit page.
-    
-    # TODO: Use the MontaUpdateView class.
     """
 
     model: Type[models.Driver] = models.Driver
     template_name = "monta_driver/edit.html"
     permission_required: str = "monta_driver.change_driver"
-
-    def get_queryset(self) -> QuerySet[models.Driver]:
-        """
-        Method to get the queryset for the driver edit page.
-
-        :return: The queryset for the driver edit page.
-        :rtype: QuerySet[models.Driver] | None
-        """
-        return (
-            super()
-            .get_queryset()
-            .filter(
-                pk__exact=self.kwargs["pk"],
-                organization=self.request.user.profile.organization,
-            )
-            .select_related("profile")
-        )
+    select_related: list[str] = ["profile"]
 
 
 class DriverUpdateView(
@@ -335,7 +319,7 @@ class DriverOverviewList(mixins.LoginRequiredMixin, AjaxDatatableView):
         </svg>
         </span>
         </a>
-        <a href="{reverse('driver_delete', kwargs={'pk': obj.id})}"
+        <a href="{reverse('monta_driver:driver_delete', kwargs={'pk': obj.id})}"
         class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm delete-record">
         <span class="svg-icon svg-icon-3">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -26,7 +26,9 @@ from monta_user.models import Profile, MontaUser
 
 
 class UpdateProfileGeneralInformationForm(forms.ModelForm):
-    """Update User General Information form validation."""
+    """
+    Update User General Information form validation.
+    """
 
     first_name = forms.CharField(max_length=255, help_text="First name of the user")
     last_name = forms.CharField(max_length=255, help_text="Last name of the user")
@@ -46,7 +48,9 @@ class UpdateProfileGeneralInformationForm(forms.ModelForm):
     )
 
     class Meta:
-        """Update User General Information META"""
+        """
+        Update User General Information META
+        """
 
         model: Type[Profile] = Profile
         fields: tuple[str, ...] = (
@@ -62,20 +66,26 @@ class UpdateProfileGeneralInformationForm(forms.ModelForm):
 
 
 class UpdateUserEmailForm(forms.ModelForm):
-    """Update User Email form validation."""
+    """
+    Update User Email form validation.
+    """
 
     email = forms.EmailField(max_length=255, help_text="Email for the user")
     password = forms.CharField(max_length=255, help_text="Password for the user")
 
     class Meta:
-        """Update User Email META"""
+        """
+        Update User Email META
+        """
 
         model: Type[MontaUser] = MontaUser
         fields: list[str] = ["email"]
 
 
 class UpdateUserPasswordForm(forms.ModelForm):
-    """Update User password form validation."""
+    """
+    Update User password form validation.
+    """
 
     current_password = forms.CharField(
         max_length=255, help_text="Password for the user"
@@ -83,7 +93,9 @@ class UpdateUserPasswordForm(forms.ModelForm):
     password = forms.CharField(max_length=255, help_text="New password for the user")
 
     class Meta:
-        """Update User Password META"""
+        """
+        Update User Password META
+        """
 
         model: Type[MontaUser] = MontaUser
         fields: list[str] = ["current_password", "password"]

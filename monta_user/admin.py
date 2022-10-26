@@ -17,6 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
+
 from typing import Type
 
 from django.contrib import admin
@@ -26,21 +27,27 @@ from monta_user import models
 
 @admin.register(models.Organization)
 class OrganizationInline(admin.ModelAdmin):
-    """Organization Admin"""
+    """
+    Organization Admin
+    """
 
     list_display: tuple[str, ...] = ("name", "description", "created", "modified")
 
 
 @admin.register(models.JobTitle)
 class JobTitleInline(admin.ModelAdmin):
-    """Job Title Admin"""
+    """
+    Job Title Admin
+    """
 
     list_display: tuple[str, ...] = ("name", "description", "created", "modified")
 
 
 @admin.register(models.Profile)
 class ProfileUserInline(admin.ModelAdmin):
-    """Profile Admin"""
+    """
+    Profile Admin
+    """
 
     list_display: tuple[str, ...] = (
         "user",

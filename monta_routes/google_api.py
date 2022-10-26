@@ -18,16 +18,13 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Core Django Imports
 from django.core.handlers.asgi import ASGIRequest
 from django.http import JsonResponse
+from django.db.models import QuerySet
 
-
-# Third Party Imports
 import googlemaps
 from asgiref.sync import async_to_sync
 
-# Monta Imports
 from monta_locations.models import Location
 from monta_organization.models import Integration
 
@@ -54,7 +51,7 @@ async def geocode_locations(request: ASGIRequest) -> JsonResponse:
     gmaps: googlemaps.Client = googlemaps.Client(key=google_api.api_key)
 
     # Query the database for all locations that need to be geocoded
-    locations = Location.objects.filter(
+    locations: QuerySet[Location] = Location.objects.filter(
         organization=request.user.profile.organization, is_geocoded=False
     )
     if locations is None:

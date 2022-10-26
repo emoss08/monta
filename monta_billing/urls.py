@@ -58,11 +58,11 @@ urlpatterns += [
 
 # Billing Action Urls
 urlpatterns += [
-    path(
-        "transfer/orders/",
-        views.OrderTransferView.as_view(),
-        name="transfer_orders_to_billing",
-    ),
+    # path(
+    #     "transfer/orders/",
+    #     views.transfer_to_billing,
+    #     name="transfer_orders_to_billing",
+    # ),
     path("bill/orders/", views.bill_orders, name="bill_orders"),
-    path("re-bill/order/<str:order_id>/", views.re_bill_order, name="re_bill_order"),
+    # path("re-bill/order/<str:order_id>/", views.re_bill_order, name="re_bill_order"),
 ]

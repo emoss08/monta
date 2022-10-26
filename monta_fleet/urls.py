@@ -23,7 +23,7 @@ from django.urls import path
 # Monta Core Imports
 from monta_fleet import views
 
-app_name = 'monta_fleet'
+app_name = "monta_fleet"
 urlpatterns = [
     path("", views.FleetListView.as_view(), name="fleet_overview"),
     path("create/", views.CreateFleet.as_view(), name="fleet_create"),

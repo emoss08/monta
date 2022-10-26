@@ -20,10 +20,9 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 
 from typing import Any, Type
 
-from django.views.generic import UpdateView, ListView
-from django.db.models import QuerySet
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
+from django.db.models import QuerySet
 from django.http import (
     JsonResponse,
 )
@@ -31,10 +30,10 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_POST, require_safe
 from django.views.decorators.vary import vary_on_cookie
-
+from django.views.generic import ListView, UpdateView
 from django_extensions.auth.mixins import ModelUserFieldPermissionMixin
 
-from monta_user import models, forms
+from monta_user import forms, models
 
 
 @method_decorator(require_safe, name="dispatch")

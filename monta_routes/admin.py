@@ -30,7 +30,7 @@ class RouteAdmin(admin.ModelAdmin):
         "origin",
         "destination",
         "distance",
-        "duration",
+        # "duration",
         "created",
         "modified",
     )

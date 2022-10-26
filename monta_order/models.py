@@ -19,29 +19,33 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 from __future__ import annotations
-from typing import Any, final
-import decimal
 
+import decimal
+from typing import Any, final
+
+import googlemaps
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.aggregates import Sum
-from django.urls import reverse
 from django.template.defaultfilters import slugify
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 from django_extensions.db.models import TimeStampedModel
-
-import googlemaps
 from googlemaps.exceptions import ApiError
 
 from monta_customer.models import Customer, DocumentClassification
 from monta_driver.models import Driver
+from monta_equipment.models import Equipment, EquipmentType
 from monta_hazardous_material.models import HazardousMaterial
 from monta_locations.models import Location
-from monta_organization.models import Integration, OrganizationSettings, Organization
+from monta_organization.models import (
+    Integration,
+    IntegrationChoices,
+    Organization,
+    OrganizationSettings,
+)
 from monta_routes.models import Route
 from monta_user.models import MontaUser
-from monta_equipment.models import EquipmentType, Equipment
 
 
 def order_documentation_upload_to(instance: Order, filename: str) -> str:
@@ -646,7 +650,7 @@ class Order(TimeStampedModel):
         """
         Function to get or create route for the order.
 
-        # TODO: Move this to a service.
+        # TODO: Move this to a service. FUCK I REMEMBER I NEED TO FIX THE WAY THE GOOGLE API GIVES BACK DISTANCE AND DURATION
         **********************************************************************************************************************
         * NOTE: If the Organization does not have generated routes active, and a Google api key is not provided, the
         function will not create a route. *
@@ -676,7 +680,7 @@ class Order(TimeStampedModel):
                 integration_api = (
                     Integration.objects.filter(
                         organization=self.organization,
-                        name__exact="google_maps",
+                        name__exact=IntegrationChoices.GOOGLE_MAPS,
                         is_active=True,
                     )
                     .first()
@@ -700,8 +704,12 @@ class Order(TimeStampedModel):
                         traffic_model=organization_settings.traffic_model,
                     )
 
-                    print(direction_result)
-                    # Create the route and return the distance.
+                    print(
+                        "Im Here",
+                        direction_result["rows"][0]["elements"][0]["duration"][
+                            "text"
+                        ].split(" ")[0],
+                    )
                     created_route = Route.objects.create(
                         organization=self.organization,
                         origin=self.origin_location.location_id,
@@ -709,9 +717,9 @@ class Order(TimeStampedModel):
                         distance=direction_result["rows"][0]["elements"][0]["distance"][
                             "text"
                         ].split(" ")[0],
-                        # duration=direction_result["rows"][0]["elements"][0]["duration"][
-                        #     "text"
-                        # ].split(" ")[0],
+                        duration=direction_result["rows"][0]["elements"][0]["duration"][
+                            "text"
+                        ].split(" ")[0],
                     )
                     return created_route.distance
 
@@ -731,7 +739,7 @@ class Order(TimeStampedModel):
         if self.rate_method == RateMethodChoices.PER_MILE:
             if self.other_charge_amount:
                 self.sub_total = (
-                    self.freight_charge_amount * self.mileage + self.other_charge_amount
+                        self.freight_charge_amount * self.mileage + self.other_charge_amount
                 )
             else:
                 self.sub_total = self.freight_charge_amount * self.mileage
@@ -802,8 +810,6 @@ class Order(TimeStampedModel):
         if not self.order_id:
             # If the order ID is not set, generate one.
             self.order_id = self.generate_order_id()
-
-        self.full_clean()
 
         self.origin_address = f"{self.origin_location.get_address_combination}"
         self.destination_address = (
@@ -924,11 +930,11 @@ class Movement(TimeStampedModel):
         # If the sequence is not ordered currently order it.
         # add to fix maximum recursion depth exceeded in comparison
         if (
-            not self.stops.order_by("sequence")
-            .values_list("sequence", flat=True)
-            .distinct()
-            .count()
-            == self.stops.count()
+                not self.stops.order_by("sequence")
+                            .values_list("sequence", flat=True)
+                            .distinct()
+                            .count()
+                    == self.stops.count()
         ):
             stops = self.stops.order_by("created")
             for index, stop in enumerate(stops, start=1):
@@ -948,8 +954,8 @@ class Movement(TimeStampedModel):
                 old_status = Movement.objects.get(pk=self.pk).status
                 # If the movement status is changed from available to something else, raise an error.
                 if (
-                    old_status == StatusChoices.IN_PROGRESS
-                    or old_status == StatusChoices.COMPLETED
+                        old_status == StatusChoices.IN_PROGRESS
+                        or old_status == StatusChoices.COMPLETED
                 ):
                     raise ValidationError(
                         _("Movement status cannot be changed back to available")
@@ -1024,7 +1030,7 @@ class Movement(TimeStampedModel):
 
         if self.status == StatusChoices.COMPLETED:
             if not self.order.movements.filter(
-                status=StatusChoices.IN_PROGRESS
+                    status=StatusChoices.IN_PROGRESS
             ).exists():
                 self.order.status = StatusChoices.COMPLETED
                 self.order.save()
@@ -1234,10 +1240,7 @@ class Stop(TimeStampedModel):
             # If the stop is in progress or completed, the appointment time cannot be changed back to available.
             if self.status == StatusChoices.AVAILABLE:
                 old_status = Stop.objects.get(pk__exact=self.pk).status
-                if (
-                    old_status == StatusChoices.IN_PROGRESS
-                    or old_status == StatusChoices.COMPLETED
-                ):
+                if old_status in (StatusChoices.IN_PROGRESS, StatusChoices.COMPLETED):
                     raise ValidationError(
                         _("Stop status cannot be changed back to available")
                     )
@@ -1257,8 +1260,8 @@ class Stop(TimeStampedModel):
                     # If previous stop is in available or in progress, current stop cannot be completed or in progress
                     if previous_stop.status != StatusChoices.COMPLETED:
                         if (
-                            self.status == StatusChoices.IN_PROGRESS
-                            or self.status == StatusChoices.COMPLETED
+                                self.status == StatusChoices.IN_PROGRESS
+                                or self.status == StatusChoices.COMPLETED
                         ):
                             raise ValidationError(
                                 _(
@@ -1282,9 +1285,9 @@ class Stop(TimeStampedModel):
 
                     # If the next stop is in progress or completed, the current stop cannot be available
                     if self.status != StatusChoices.COMPLETED:
-                        if (
-                            next_stop.status == StatusChoices.IN_PROGRESS
-                            or next_stop.status == StatusChoices.COMPLETED
+                        if next_stop.status in (
+                                StatusChoices.COMPLETED,
+                                StatusChoices.IN_PROGRESS,
                         ):
                             raise ValidationError(
                                 _(
@@ -1295,10 +1298,7 @@ class Stop(TimeStampedModel):
 
             # If the movement has no driver or equipment ,but the status is in progress or completed, raise an error
             if self.movement.assigned_driver is None or self.movement.equipment is None:
-                if (
-                    self.status == StatusChoices.IN_PROGRESS
-                    or self.status == StatusChoices.COMPLETED
-                ):
+                if self.status in (StatusChoices.COMPLETED, StatusChoices.IN_PROGRESS):
                     raise ValidationError(
                         _(
                             "Movement must have a driver and equipment to be in progress or completed"
@@ -1345,8 +1345,8 @@ class Stop(TimeStampedModel):
         # if the last stop is completed, change the movement status to complete.
         if self.status == StatusChoices.COMPLETED:
             if (
-                self.movement.stops.filter(status=StatusChoices.COMPLETED).count()
-                == self.movement.stops.count()
+                    self.movement.stops.filter(status=StatusChoices.COMPLETED).count()
+                    == self.movement.stops.count()
             ):
                 self.movement.status = StatusChoices.COMPLETED
                 self.movement.save()
@@ -1369,7 +1369,7 @@ class Stop(TimeStampedModel):
                     delay_code=DelayCode.objects.filter(pk__exact=1).first(),
                     delay_time=self.arrival_time - self.appointment_time,
                 )
-        super(Stop, self).save(**kwargs)
+        super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         """

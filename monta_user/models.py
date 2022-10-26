@@ -21,14 +21,13 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 import uuid
 from typing import Any
 
+from django.conf import settings
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils import timezone
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
-from django.conf import settings
-
 from django_extensions.db.models import TimeStampedModel
 from localflavor.us.models import USStateField, USZipCodeField
 
@@ -209,7 +208,7 @@ class Profile(TimeStampedModel):
         :return: The absolute url of the profile
         :rtype: str
         """
-        return reverse("user_profile_overview", args=[self.user.id])
+        return reverse("monta_user:user_profile_overview", kwargs={"pk": self.pk})
 
     def get_user_profile_pic(self) -> str:
         """
@@ -219,7 +218,7 @@ class Profile(TimeStampedModel):
         :rtype: str
         """
         if self.profile_picture:
-            return self.profile_picture.url
+            return str(self.profile_picture)
         return "/static/media/avatars/blank.avif"
 
     def get_user_org_name(self) -> str:
@@ -409,7 +408,12 @@ class Organization(TimeStampedModel):
         blank=True,
         null=True,
     )
-    description = models.TextField(_("Organization Description"), null=True, blank=True)
+    description = models.TextField(
+        _("Organization Description"),
+        null=True,
+        blank=True,
+        help_text=_("The description of the organization"),
+    )
     profile_picture = models.ImageField(
         _("Profile Picture"), upload_to="organizations/", null=True, blank=True
     )
@@ -444,8 +448,6 @@ class Organization(TimeStampedModel):
         """
         Save the organization
 
-        :param args: The arguments
-        :type args: Any
         :param kwargs: The keyword arguments
         :type kwargs: Any
         :return: None

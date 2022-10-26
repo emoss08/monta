@@ -21,11 +21,11 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 from typing import Any, Type
 
 from ajax_datatable import AjaxDatatableView
+from asgiref.sync import async_to_sync
 from braces import views
 from django.contrib.auth import mixins
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.postgres.search import (SearchQuery, SearchRank,
-                                            SearchVector)
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.core.handlers.asgi import ASGIRequest
 from django.core.mail import send_mail
 from django.db.models import QuerySet
@@ -39,7 +39,12 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_safe
 from django.views.decorators.vary import vary_on_cookie
 
-from core.views import MontaCreateView, MontaDeleteView, MontaTemplateView, MontaUpdateView
+from core.views import (
+    MontaCreateView,
+    MontaDeleteView,
+    MontaTemplateView,
+    MontaUpdateView,
+)
 from monta_billing import forms, models
 from monta_customer.models import CustomerBillingProfile, CustomerContact
 from monta_driver.forms import SearchForm
@@ -49,9 +54,7 @@ from monta_order.models import Order
 @method_decorator(require_safe, name="dispatch")
 @method_decorator(cache_control(max_age=60 * 60 * 24), name="dispatch")
 @method_decorator(vary_on_cookie, name="dispatch")
-class InteractiveBillingView(
-    MontaTemplateView
-):
+class InteractiveBillingView(MontaTemplateView):
     """
     View for Interactive Billing
     """
@@ -299,47 +302,8 @@ class ChargeTypeSearchView(
         )
 
 
-class OrderTransferView(mixins.LoginRequiredMixin, views.PermissionRequiredMixin, View):
-    """
-    Class to list the Transfer Order
-    """
-
-    permission_required: str = "monta_billing.transfer_to_billing"
-
-    def post(self, request: ASGIRequest) -> JsonResponse:
-        """
-        Transfer the order to bill
-
-        :param request
-        :type request: ASGIRequest
-        :return: JsonResponse
-        :rtype: JsonResponse
-        """
-        orders: QuerySet[Order] = Order.objects.filter(
-            organization=request.user.profile.organization,
-            ready_to_bill=True,
-            billed=False,
-            status="COMPLETED",
-        )
-        for order in orders:
-            if order.transferred_to_billing:
-                continue
-            models.BillingQueue.objects.create(
-                order=order,
-                organization=request.user.profile.organization,
-            )
-            order.transferred_to_billing = True
-            order.billing_transfer_date = timezone.now()
-            order.save()
-        return JsonResponse(
-            {"result": "success", "message": "Orders transferred to billing queue."},
-            status=201,
-        )
-
-
-@login_required
-@permission_required("monta_billing.re_bill_orders", raise_exception=True)
-def bill_orders(request: ASGIRequest) -> JsonResponse:
+@async_to_sync
+async def bill_orders(request: ASGIRequest) -> JsonResponse:
     """
     Bill Orders out to customers
 
@@ -457,3 +421,34 @@ def re_bill_order(request: ASGIRequest, order_id: str) -> JsonResponse:
         {"result": "success", "message": "Order set back to ready to bill"},
         status=201,
     )
+
+
+def transfer_service(request: ASGIRequest) -> JsonResponse | None:
+    """
+    Transfer the order to bill
+
+    :param request
+    :type request: ASGIRequest
+    :return: JsonResponse
+    :rtype: JsonResponse
+    """
+    orders: QuerySet[Order] = Order.objects.filter(
+        organization=request.user.profile.organization,
+        ready_to_bill=True,
+        billed=False,
+        status="COMPLETED",
+    )
+    for order in orders:
+        if order.transferred_to_billing:
+            continue
+        models.BillingQueue.objects.create(
+            order=order,
+            organization=request.user.profile.organization,
+        )
+        order.transferred_to_billing = True
+        order.billing_transfer_date = timezone.now()
+        order.save()
+        return JsonResponse(
+            {"result": "success", "message": "Orders transferred to billing queue."},
+            status=201,
+        )
