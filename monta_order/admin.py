@@ -114,11 +114,11 @@ class RevenueCodeAdmin(admin.ModelAdmin):
     """
 
     list_display: tuple[str, ...] = (
-        "code",
+        "name",
         "description",
     )
     search_fields: tuple[str, ...] = (
-        "code",
+        "name",
         "description",
     )
 
