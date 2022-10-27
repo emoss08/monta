@@ -18,14 +18,31 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-# Standard Python Imports
 from typing import Type
 
-# Core Django Imports
 from django import forms
 
-# Monta Imports
 from monta_customer import models
+
+
+class AddCustomerForm(forms.ModelForm):
+    """
+    AddCustomerForm Class
+    """
+
+    class Meta:
+        model: Type[models.Customer] = models.Customer
+        fields: tuple[str, ...] = (
+            "organization",
+            "is_active",
+            "customer_id",
+            "name",
+            "address_line_1",
+            "address_line_2",
+            "city",
+            "state",
+            "zip_code"
+        )
 
 
 class AddDocumentClassificationsForm(forms.ModelForm):

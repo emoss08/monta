@@ -54,7 +54,7 @@ class MontaBackend(BaseBackend):
         :rtype: AbstractBaseUser | None
         """
         if username is None or password is None:
-            return
+            return None
         try:
             user: MontaUser = UserModel._default_manager.get_by_natural_key(username)
         except UserNotFound:

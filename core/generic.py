@@ -18,113 +18,127 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from typing import Any, Type
+from typing import Type, TypeVar
 
 from braces import views
 from django.contrib.auth import mixins
 from django.core.exceptions import ImproperlyConfigured
-from django.core.handlers.asgi import ASGIRequest
 from django.db.models.base import Model, ModelBase
 from django.forms.models import ModelForm, ModelFormMetaclass
 from django.views import generic
 
-from core import exceptions
+_T = TypeVar("_T", bound=str)
+
+
+class MontaGenericTemplateView(
+    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.TemplateView
+):
+    template_name: _T
+
+    def _check_template_attr(self):
+        if not isinstance(self.template_name, str):
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} requires the template_name to be an string. "
+                "Check your template_name attribute."
+            )
 
 
 class MontaGenericCreateView(
     mixins.LoginRequiredMixin, generic.CreateView, views.PermissionRequiredMixin
 ):
+    """
+    MontaGenericCreateView is a generic view that is used to create a model instance.
+    """
+
+    model: Model
     template_name: str
     form_class: Type[ModelForm]
     permission_required: str
 
-    def __init__(self) -> None:
-        """
-        Initialize the view.
-        """
-        super().__init__()
+    def _check_model_attr(self) -> None:
+        if not isinstance(self.model, ModelBase):
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} requires the model to be an instance of django.db.models.base.Model. "
+                "Check your model attribute."
+            )
+
+    def _check_form_attr(self) -> None:
         if not isinstance(self.form_class, ModelFormMetaclass):
             raise ImproperlyConfigured(
-                "{0} requires the form_class to be an instance of ModelForm. "
+                f"{self.__class__.__name__} requires the form_class to be an instance of ModelForm. "
                 "Check your form_class attribute. You may have forms.Form instead of "
-                "forms.ModelForm.".format(self.__class__.__name__)
+                "forms.ModelForm."
             )
-        if not isinstance(self.permission_required, str):
-            raise ImproperlyConfigured(
-                "{0} requires the permission_required to be a string. "
-                "Check your permission_required attribute.".format(self.__class__.__name__)
-            )
-        # Disable the ability to use the template_name attribute. This is because you can
-        # utilize generic.CreateView alone for the template_name attribute.
+
+    def _check_template_attr(self) -> None:
         if self.template_name:
             raise ImproperlyConfigured(
-                "{0} requires the template_name to be None. "
-                "Check your template_name attribute.".format(self.__class__.__name__)
+                f"{self.__class__.__name__} requires the template_name to be None. "
+                "Check your template_name attribute."
             )
 
 
 class MontaGenericUpdateView(MontaGenericCreateView):
-    pass
+    """
+    A generic view for updating a model instance.
+    """
 
 
 class MontaGenericDetailView(
     mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.DetailView
 ):
+    """
+    A generic view for getting details of a model instance.
+    """
+
     model: Type[Model]
     template_name: str
     permission_required: str
 
-    def __init__(self) -> None:
-        super().__init__()
+    def _check_model_attr(self) -> None:
+        if not isinstance(self.model, ModelBase):
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} requires the model to be an instance of django.db.models.base.Model. "
+                "Check your model attribute."
+            )
+
+    def _check_template_attr(self) -> None:
         if self.template_name:
-            if not isinstance(self.model, Model):
-                raise ImproperlyConfigured(
-                    "{0} requires the model to be an instance of Model. "
-                    "Check your model attribute.".format(self.__class__.__name__)
-                )
-        if self.permission_required:
-            if not isinstance(self.permission_required, str):
-                raise ImproperlyConfigured(
-                    "{0} requires the permission_required to be a string. "
-                    "Check your permission_required attribute.".format(self.__class__.__name__)
-                )
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} requires the template_name to be None. "
+                "Check your template_name attribute."
+            )
 
 
 class MontaGenericDeleteView(
     mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.DeleteView
 ):
+    """
+    MontaGenericDeleteView is a generic view that is used to create a model instance.
+    """
+
     model: Type[Model]
     template_name: str
     permission_required: str
     form_class: None
 
-    def __init__(self) -> None:
-        super().__init__()
-        if self.model:
-            if not isinstance(self.model, ModelBase):
-                raise ImproperlyConfigured(
-                    "{0} requires the model to be an instance of Model. "
-                    "Check your model attribute.".format(self.__class__.__name__)
-                )
-        if self.permission_required:
-            if not isinstance(self.permission_required, str):
-                raise ImproperlyConfigured(
-                    "{0} requires the permission_required to be a string. "
-                    "Check your permission_required attribute.".format(self.__class__.__name__)
-                )
-        if self.form_class:
+    def _check_model_attr(self) -> None:
+        if not isinstance(self.model, ModelBase):
             raise ImproperlyConfigured(
-                "{0} requires the form_class to be None. "
-                "Check your form_class attribute.".format(self.__class__.__name__)
+                f"{self.__class__.__name__} requires the model to be an instance of django.db.models.base.Model. "
+                "Check your model attribute."
             )
 
-    def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> None:
-        """
-        Handle POST requests: delete the object and return a JsonResponse.
+    def _check_form_attr(self) -> None:
+        if self.form_class:
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} requires the form_class to be None. "
+                "Check your form_class attribute."
+            )
 
-        :param request: The request object
-        :param args: The args
-        :param kwargs: The kwargs
-        :return: None
-        """
-        raise exceptions.MethodNotAllowed
+    def _check_template_attr(self) -> None:
+        if self.template_name:
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} requires the template_name to be None. "
+                "Check your template_name attribute."
+            )

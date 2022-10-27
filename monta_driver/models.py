@@ -469,7 +469,7 @@ class CommentType(TimeStampedModel):
             models.Index(fields=["name"]),
         ]
 
-    def __str__(self) -> str | None:
+    def __str__(self) -> str:
         """
         String representation of the comment type
 

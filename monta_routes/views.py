@@ -22,7 +22,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.handlers.asgi import ASGIRequest
 from django.http import JsonResponse
 
-from monta_routes import google_api
+from monta_routes.services import google_api
 
 
 @login_required

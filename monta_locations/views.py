@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from typing import Any, Type
+from typing import Any, Literal, Type
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
@@ -36,7 +36,7 @@ class LocationListView(LoginRequiredMixin, views.PermissionRequiredMixin, Templa
     Class to render the driver Index page.
     """
 
-    template_name: str = "monta_location/index.html"
+    template_name: Literal["monta_location/index.html"] = "monta_location/index.html"
     permission_required: str = "monta_driver.view_driver"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:

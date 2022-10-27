@@ -17,32 +17,31 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-from typing import Type
 
-from django.contrib import admin
+from django.urls import path
 
-from monta_locations import models
+from monta_customer import views
 
-
-class LocationContactAdmin(admin.TabularInline):
-    model: Type[models.LocationContact] = models.LocationContact
-    verbose_name_plural: str = "Location Contact"
-    extra: int = 0
-
-
-@admin.register(models.Location)
-class LocationInline(admin.ModelAdmin):
-    list_display: tuple[str, ...] = (
-        "location_id",
-        "name",
-        "address_line_1",
-        "address_line_2",
-        "city",
-        "state",
-        "zip_code",
-        "created",
-        "modified",
-    )
-    inlines: tuple[
-        Type[LocationContactAdmin],
-    ] = (LocationContactAdmin,)
+app_name = "monta_customer"
+urlpatterns = [
+    path(
+        "",
+        views.CustomerListView.as_view(),
+        name="customer_index",
+    ),
+    path(
+        "post/",
+        views.CustomerCreateView.as_view(),
+        name="customer_update",
+    ),
+    path(
+        "update/<int:pk>/",
+        views.CustomerUpdateView.as_view(),
+        name="customer_update",
+    ),
+    path(
+        "delete/<int:pk>/",
+        views.CustomerDeleteView.as_view(),
+        name="customer_delete",
+    ),
+]

@@ -139,7 +139,7 @@ class Customer(TimeStampedModel):
             models.Index(fields=["customer_id"]),
         ]
 
-    def __str__(self) -> Optional[str]:
+    def __str__(self) -> str:
         """
         Return the string representation of the customer
 

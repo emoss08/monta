@@ -42,19 +42,17 @@ from core.generic import (
     MontaGenericCreateView,
     MontaGenericDeleteView,
     MontaGenericDetailView,
-    MontaGenericUpdateView,
+    MontaGenericTemplateView, MontaGenericUpdateView,
 )
 
 
-class MontaTemplateView(
-    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.TemplateView
-):
+class MontaTemplateView(MontaGenericTemplateView):
     """
     A view that renders a template.
     """
 
     permission_required: str
-    context_data = None
+    context_data: dict[str, Any]
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         """
@@ -63,11 +61,9 @@ class MontaTemplateView(
         :type kwargs: Any
         :return: A dictionary of context data.
         """
-        context: dict = self.context_data or {}
+        context: dict[str, Any] = self.context_data or {}
         if context:
             context.update(kwargs)
-        else:
-            context: dict = kwargs
         return super().get_context_data(**context)
 
 
@@ -75,7 +71,8 @@ class MontaCreateView(MontaGenericCreateView):
     """
     View for creating a new object, with a Json response.
     """
-    filter_organization: bool = True
+
+    append_organization: bool = True
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
@@ -90,10 +87,8 @@ class MontaCreateView(MontaGenericCreateView):
         form: ModelForm[Model] = self.form_class(request.POST)
         if form.is_valid():
             form.save(commit=False)
-            if self.filter_organization:
-                form.instance.organization = (
-                    self.request.user.profile.organization
-                )
+            if self.append_organization:
+                form.instance.organization = self.request.user.profile.organization
             form.save()
             return JsonResponse(
                 {
@@ -116,7 +111,7 @@ class MontaUpdateView(MontaGenericUpdateView):
     View for updating an object, with a Json response.
     """
 
-    def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:  # type: ignore
+    def post(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
         Handle POST requests: instantiate a form instance with the passed
         POST variables and then check if it's valid.
@@ -126,7 +121,7 @@ class MontaUpdateView(MontaGenericUpdateView):
         :param kwargs: The kwargs
         :return: A JsonResponse
         """
-        form = self.form_class(request.POST, instance=self.get_object())
+        form: ModelForm = self.form_class(request.POST, instance=self.get_object())
         if form.is_valid():
             form.save()
             return JsonResponse(
@@ -149,7 +144,8 @@ class MontaDetailView(MontaGenericDetailView):
     """
     View for displaying an object, return a queryset.
     """
-    organization_filter: bool = True
+
+    filter_organization: bool = True
     select_related: bool = False
     select_related_fields: list[str] | tuple[str, ...]
 
@@ -160,8 +156,10 @@ class MontaDetailView(MontaGenericDetailView):
         :return: The queryset for the driver edit page.
         :rtype: QuerySet | None
         """
-        queryset = super().get_queryset().filter(pk__exact=self.kwargs["pk"])
-        if self.organization_filter:
+        queryset: QuerySet[Any] = (
+            super().get_queryset().filter(pk__exact=self.kwargs["pk"])
+        )
+        if self.filter_organization:
             queryset = queryset.filter(
                 organization__exact=self.request.user.profile.organization
             )
@@ -174,7 +172,8 @@ class MontaDeleteView(MontaGenericDeleteView):
     """
     View for deleting an object, with a Json response.
     """
-    form_class = None
+
+    form_class: None = None
 
     def get(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> JsonResponse:  # type: ignore
         """

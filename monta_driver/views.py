@@ -39,7 +39,8 @@ from django.views.decorators.vary import vary_on_cookie
 from core.views import (
     MontaCreateView,
     MontaDeleteView,
-    MontaDetailView, MontaSearchView,
+    MontaDetailView,
+    MontaSearchView,
     MontaTemplateView,
 )
 from monta_driver import forms, models

@@ -19,13 +19,10 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 from typing import Any
 
-# Create tests data for the application
 
-# Core Django Imports
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-# Monta Imports
 from monta_organization.models import Organization
 from monta_user.models import JobTitle
 from monta_customer.models import (
@@ -42,7 +39,7 @@ from monta_order.models import DelayCode, OrderType, RevenueCode, Commodity
 
 
 class Command(BaseCommand):
-    help = "Seeds the database with test data"
+    help: str = "Seeds the database with test data"
 
     def handle(self, *args: Any, **options: Any) -> None:
         """Seeds the database with test data"""
