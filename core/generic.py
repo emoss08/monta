@@ -115,7 +115,7 @@ class MontaGenericUpdateView(
     mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.UpdateView
 ):
     """
-    A generic view for updating a model instance.
+    MontaGenericUpdateView is a generic view that is used to update a model instance.
     """
 
     def _check_model_attr(self) -> None:
