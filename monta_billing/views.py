@@ -96,9 +96,6 @@ class InteractiveBillingView(MontaTemplateView):
         return context
 
 
-@method_decorator(require_safe, name="dispatch")
-@method_decorator(cache_control(max_age=60 * 60 * 24), name="dispatch")
-@method_decorator(vary_on_cookie, name="dispatch")
 class ChargeTypeListView(MontaTemplateView):
     """
     Class to render the Charge Type List View
@@ -228,8 +225,8 @@ class ChargeTypeCreateView(MontaCreateView):
     Typical Usage Example:
         >>> ChargeTypeCreateView.as_view()
     """
-    
-    model = models.ChargeType
+
+    model: Type[models.ChargeType] = models.ChargeType
     permission_required: str = "monta_billing.add_chargetype"
     form_class: Type[forms.AddChargeTypeForm] = forms.AddChargeTypeForm
 
@@ -239,8 +236,9 @@ class ChargeTypeUpdateView(MontaUpdateView):
     Class to update the Charge Type
     """
 
+    model: Type[models.ChargeType] = models.ChargeType
     permission_required: str = "monta_billing.change_chargetype"
-    form_class: Type[forms.AddChargeTypeForm] = forms.AddChargeTypeForm
+    form_class: Type[forms.UpdateChargeTypeForm] = forms.UpdateChargeTypeForm
 
 
 class ChargeTypeDeleteView(MontaDeleteView):

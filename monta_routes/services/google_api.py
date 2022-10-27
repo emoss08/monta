@@ -18,12 +18,11 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from django.core.handlers.asgi import ASGIRequest
-from django.http import JsonResponse
-from django.db.models import QuerySet
-
 import googlemaps
 from asgiref.sync import async_to_sync
+from django.core.handlers.asgi import ASGIRequest
+from django.db.models import QuerySet
+from django.http import JsonResponse
 
 from monta_locations.models import Location
 from monta_organization.models import Integration, IntegrationChoices

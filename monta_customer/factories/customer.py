@@ -3,9 +3,9 @@ import factory
 
 from monta_customer.models import (
     Customer,
-    DocumentClassification,
     CustomerBillingProfile,
     CustomerContact,
+    DocumentClassification,
 )
 
 

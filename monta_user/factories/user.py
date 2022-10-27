@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-import factory
-
-from monta_user.models import MontaUser, Profile, JobTitle
-
-from django.utils import timezone
 import datetime
+
+import factory
+from django.utils import timezone
+
+from monta_user.models import JobTitle, MontaUser, Profile
 
 
 class JobTitleFactory(factory.django.DjangoModelFactory):

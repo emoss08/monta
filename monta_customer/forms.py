@@ -41,7 +41,7 @@ class AddCustomerForm(forms.ModelForm):
             "address_line_2",
             "city",
             "state",
-            "zip_code"
+            "zip_code",
         )
 
 

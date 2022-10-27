@@ -23,9 +23,7 @@ from typing import Any, Type
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
 from django.db.models import QuerySet
-from django.http import (
-    JsonResponse,
-)
+from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_POST, require_safe

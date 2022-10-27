@@ -18,13 +18,12 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.core.handlers.asgi import ASGIRequest
-from django.http import (
-    HttpResponseRedirect,
-    JsonResponse,
-)
+from django.http import HttpResponseRedirect, JsonResponse
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_POST
 

@@ -20,7 +20,12 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 
 from typing import Any, Type
 
-from core.views import MontaCreateView, MontaDeleteView, MontaTemplateView, MontaUpdateView
+from core.views import (
+    MontaCreateView,
+    MontaDeleteView,
+    MontaTemplateView,
+    MontaUpdateView,
+)
 from monta_customer import forms, models
 
 
@@ -47,6 +52,7 @@ class CustomerCreateView(MontaCreateView):
     """
     View for creating a customer
     """
+
     model: Type[models.Customer] = models.Customer
     form_class: Type[forms.AddCustomerForm] = forms.AddCustomerForm
     permission_required = "monta_customer.create_customer"

@@ -40,7 +40,7 @@ urlpatterns += [
         name="charge_type_create",
     ),
     path(
-        "charge_type/update/<str:charge_type_name>/",
+        "charge_type/update/<int:pk>/",
         views.ChargeTypeUpdateView.as_view(),
         name="charge_type_update",
     ),

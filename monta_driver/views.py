@@ -32,7 +32,6 @@ from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import generic
-from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_safe
 from django.views.decorators.vary import vary_on_cookie
 
@@ -47,7 +46,6 @@ from monta_driver import forms, models
 
 
 @method_decorator(require_safe, name="dispatch")
-@method_decorator(cache_control(max_age=60 * 60 * 24), name="dispatch")
 @method_decorator(vary_on_cookie, name="dispatch")
 class DriverListView(MontaTemplateView):
     """

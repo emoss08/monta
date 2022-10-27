@@ -19,23 +19,22 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 from typing import Any
 
-
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from monta_organization.models import Organization
-from monta_user.models import JobTitle
+from monta_billing.models import ChargeType
 from monta_customer.models import (
     Customer,
     CustomerBillingProfile,
     CustomerContact,
     DocumentClassification,
 )
-from monta_billing.models import ChargeType
-from monta_driver.models import Driver, DriverProfile, CommentType
+from monta_driver.models import CommentType, Driver, DriverProfile
 from monta_equipment.models import Equipment, EquipmentType
 from monta_locations.models import Location
-from monta_order.models import DelayCode, OrderType, RevenueCode, Commodity
+from monta_order.models import Commodity, DelayCode, OrderType, RevenueCode
+from monta_organization.models import Organization
+from monta_user.models import JobTitle
 
 
 class Command(BaseCommand):
@@ -145,7 +144,7 @@ class Command(BaseCommand):
             organization=organization,
         )
         RevenueCode.objects.create(
-            code="test",
+            name="test",
             description="test revenue code - do not use in production",
             organization=organization,
         )

@@ -21,14 +21,16 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 # Standard Python Libraries
 from typing import final
 
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
 # Core Django Imports
 from django_extensions.db.models import TimeStampedModel
-from django.utils.translation import gettext_lazy as _
-from django.db import models
+
+from monta_order.models import Order, StatusChoices
 
 # Monta Imports
 from monta_user.models import Organization
-from monta_order.models import Order, StatusChoices
 
 
 @final

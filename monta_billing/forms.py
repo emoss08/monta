@@ -125,6 +125,45 @@ class AddChargeTypeForm(forms.ModelForm):
         return charge_type
 
 
+class UpdateChargeTypeForm(forms.ModelForm):
+    """
+    Form for updating a charge type.
+    """
+
+    name = forms.CharField(
+        max_length=100,
+        error_messages={
+            "required": _("Please enter a name for the Charge Type"),
+            "max_length": _("Charge Type name must be less than 100 characters"),
+            "unique": _("A Charge Type with this name already exists"),
+            "NON_FIELD_ERRORS": {
+                "unique": _("A Charge Type with this name already exists"),
+                "unique_together": _("A Charge Type with this name already exists"),
+                "duplicate_key": _("A Charge Type with this name already exists"),
+            },
+        },
+        widget=forms.TextInput(attrs={"placeholder": "Enter Name"}),
+    )
+    description = forms.CharField(
+        max_length=255,
+        required=False,
+        error_messages={
+            "max_length": _(
+                "Charge Type description must be less than 255 characters."
+            ),
+        },
+        widget=forms.Textarea(attrs={"placeholder": "Enter Description", "rows": 2}),
+    )
+
+    class Meta:
+        """
+        Metaclass for UpdateChargeTypeForm.
+        """
+
+        model: Type[models.ChargeType] = models.ChargeType
+        fields: tuple[str, ...] = ("name", "description")
+
+
 class AdditionalChargeForm(forms.ModelForm):
     """
     Form for adding a new additional charge.

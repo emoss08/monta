@@ -17,9 +17,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
-from django.utils.safestring import mark_safe, SafeString
 import markdown
 from django import template
+from django.utils.safestring import SafeString, mark_safe
 
 register = template.Library()
 

@@ -22,8 +22,8 @@ from typing import Type
 
 from django import forms
 
-from monta_user.models import Organization, MontaUser
 from monta_fleet import models
+from monta_user.models import MontaUser, Organization
 
 
 class AddFleetForm(forms.ModelForm):

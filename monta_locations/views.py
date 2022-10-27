@@ -20,15 +20,14 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 
 from typing import Any, Literal, Type
 
+from braces import views
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
 from django.db import transaction
 from django.http import JsonResponse
-from django.views.generic import TemplateView, CreateView, UpdateView
+from django.views.generic import CreateView, TemplateView, UpdateView
 
-from braces import views
-
-from monta_locations import models, forms
+from monta_locations import forms, models
 
 
 class LocationListView(LoginRequiredMixin, views.PermissionRequiredMixin, TemplateView):

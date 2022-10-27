@@ -19,22 +19,23 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 from __future__ import annotations
-from typing import Type, Any
+
+from typing import Any, Type
 
 from ajax_datatable import AjaxDatatableView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.handlers.asgi import ASGIRequest
 from django.db.models import QuerySet
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_safe
 from django.views.decorators.vary import vary_on_cookie
-from django.views.generic import TemplateView, CreateView, DetailView
+from django.views.generic import CreateView, DetailView, TemplateView
 
-from monta_fleet import models, forms
 from monta_driver.models import Driver
+from monta_fleet import forms, models
 
 
 @method_decorator(require_safe, name="dispatch")

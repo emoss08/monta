@@ -42,7 +42,8 @@ from core.generic import (
     MontaGenericCreateView,
     MontaGenericDeleteView,
     MontaGenericDetailView,
-    MontaGenericTemplateView, MontaGenericUpdateView,
+    MontaGenericTemplateView,
+    MontaGenericUpdateView,
 )
 
 
@@ -52,7 +53,7 @@ class MontaTemplateView(MontaGenericTemplateView):
     """
 
     permission_required: str
-    context_data: dict[str, Any]
+    context_data: dict[str, Any] | None = None
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         """
@@ -64,6 +65,8 @@ class MontaTemplateView(MontaGenericTemplateView):
         context: dict[str, Any] = self.context_data or {}
         if context:
             context.update(kwargs)
+        else:
+            context = kwargs
         return super().get_context_data(**context)
 
 
@@ -129,7 +132,7 @@ class MontaUpdateView(MontaGenericUpdateView):
                     "result": "success",
                     "message": "Record Updated Successfully!",
                 },
-                status=201,
+                status=200,
             )
         return JsonResponse(
             {

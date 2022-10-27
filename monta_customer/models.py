@@ -21,16 +21,17 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 # Standard library imports
 from typing import Any, Optional
 
+from django.core.exceptions import ValidationError
+from django.db import models
+
 # Core Django Models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
-from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
+from django_extensions.db.models import TimeStampedModel
 
 # Third Party Imports
 from localflavor.us.models import USStateField, USZipCodeField
-from django_extensions.db.models import TimeStampedModel
 
 # Monta Imports
 from monta_user.models import Organization

@@ -22,7 +22,7 @@ from typing import Type
 
 from django import forms
 
-from monta_user.models import Profile, MontaUser
+from monta_user.models import MontaUser, Profile
 
 
 class UpdateProfileGeneralInformationForm(forms.ModelForm):

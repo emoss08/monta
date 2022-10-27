@@ -18,69 +18,20 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from typing import Any
-
-from django.db.models.base import ModelBase
 from django.contrib.auth import get_user_model
-from django.core.handlers.asgi import ASGIRequest
-from django.contrib.auth.backends import BaseBackend
+from django.contrib.auth.backends import ModelBackend
+from django.db.models.base import ModelBase
 
-from monta_user.models import MontaUser
 from core.exceptions import UserNotFound
+from monta_user.models import MontaUser
 
 UserModel: ModelBase = get_user_model()
 
 
-class MontaBackend(BaseBackend):
+class MontaBackend(ModelBackend):
     """
     Class to authenticate the user session
     """
-
-    def authenticate(
-        self, request: ASGIRequest, username: str, password: str, **kwargs: Any
-    ) -> MontaUser | None:
-        """
-        Override the authenticate method to authenticate the user session
-
-        :param request: The request object
-        :type request: HttpRequest
-        :param username: The username of the user
-        :type username: str
-        :param password: The password of the user
-        :type password: str
-        :param kwargs: Any other keyword arguments
-        :type kwargs: dict
-        :return: The user object or None if the user does not exist
-        :rtype: AbstractBaseUser | None
-        """
-        if username is None or password is None:
-            return None
-        try:
-            user: MontaUser = UserModel._default_manager.get_by_natural_key(username)
-        except UserNotFound:
-            return None
-        else:
-            if user.check_password(password) and self.user_can_authenticate(user):
-                return user
-            return None
-
-    @staticmethod
-    def user_can_authenticate(user: MontaUser) -> bool:
-        """
-        Check if the user can authenticate.
-
-        Taken from django.contrib.auth.backends.ModelBackend and modified to work with MontaUser
-
-        Reject users with is_active=False. Custom user models that don't have
-        that attribute are allowed.
-
-        :param user: The user object
-        :type user: AbstractBaseUser
-        :return: True if the user can authenticate, False otherwise
-        :rtype: bool
-        """
-        is_active: bool = getattr(user, "is_active", None)
-        return is_active or is_active is None
 
     def get_user(self, user_id: int) -> MontaUser | None:
         """

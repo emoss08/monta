@@ -23,10 +23,9 @@ from typing import Any
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 from django_extensions.db.models import TimeStampedModel
 
-from monta_user.models import Organization, MontaUser
+from monta_user.models import MontaUser, Organization
 
 
 class Fleet(TimeStampedModel):

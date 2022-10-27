@@ -19,6 +19,7 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 from django.test import TestCase
+
 from monta_user.factories.organization import OrganizationFactory
 from monta_user.factories.user import MontaUserFactory
 

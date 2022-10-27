@@ -90,7 +90,7 @@ class MontaUser(AbstractBaseUser, PermissionsMixin):
         :return: The url to access a particular user instance
         :rtype: str
         """
-        return reverse("user_profile_overview", kwargs={"pk": self.pk})
+        return reverse("monta_user:user_profile_overview", kwargs={"pk": self.pk})
 
 
 class Profile(TimeStampedModel):

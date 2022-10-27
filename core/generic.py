@@ -26,6 +26,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.asgi import ASGIRequest
 from django.db.models.base import Model, ModelBase
 from django.forms.models import ModelForm, ModelFormMetaclass
+from django.http.response import HttpResponseBase
 from django.views import generic
 
 
@@ -41,13 +42,21 @@ class MontaGenericTemplateView(
                 "Check your template_name attribute."
             )
 
-    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> None:
+    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> HttpResponseBase:
         self._check_template_attr()
-        super().dispatch(request, *args, **kwargs)
+
+        # From django.views.generic.base.View
+        if request.method.lower() in self.http_method_names:
+            handler = getattr(
+                self, request.method.lower(), self.http_method_not_allowed
+            )
+        else:
+            handler = self.http_method_not_allowed
+        return handler(request, *args, **kwargs)
 
 
 class MontaGenericCreateView(
-    mixins.LoginRequiredMixin, generic.CreateView, views.PermissionRequiredMixin
+    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.CreateView
 ):
     """
     MontaGenericCreateView is a generic view that is used to create a model instance.
@@ -80,7 +89,7 @@ class MontaGenericCreateView(
                 "Check your template_name attribute."
             )
 
-    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> None:
+    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> HttpResponseBase:
         """
         :type kwargs: Any
         :type args: Any
@@ -90,13 +99,59 @@ class MontaGenericCreateView(
         self._check_model_attr()
         self._check_form_attr()
         self._check_template_attr()
-        super().dispatch(request, *args, **kwargs)
+
+        # From django.views.generic.base.View
+        if request.method.lower() in self.http_method_names:
+
+            handler = getattr(
+                self, request.method.lower(), self.http_method_not_allowed
+            )
+        else:
+            handler = self.http_method_not_allowed
+        return handler(request, *args, **kwargs)
 
 
-class MontaGenericUpdateView(MontaGenericCreateView):
+class MontaGenericUpdateView(
+    mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.UpdateView
+):
     """
     A generic view for updating a model instance.
     """
+
+    def _check_model_attr(self) -> None:
+        if not isinstance(self.model, ModelBase):
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} requires the model to be an instance of django.db.models.base.Model. "
+                "Check your model attribute."
+            )
+
+    def _check_form_attr(self) -> None:
+        if not isinstance(self.form_class, ModelFormMetaclass):
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} requires the form_class to be an instance of ModelForm. "
+                "Check your form_class attribute. You may have forms.Form instead of "
+                "forms.ModelForm."
+            )
+
+    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> HttpResponseBase:
+        """
+        :type kwargs: Any
+        :type args: Any
+        :type request: ASGIRequest
+
+        """
+        self._check_model_attr()
+        self._check_form_attr()
+
+        # From django.views.generic.base.View
+        if request.method.lower() in self.http_method_names:
+
+            handler = getattr(
+                self, request.method.lower(), self.http_method_not_allowed
+            )
+        else:
+            handler = self.http_method_not_allowed
+        return handler(request, *args, **kwargs)
 
 
 class MontaGenericDetailView(
@@ -124,7 +179,7 @@ class MontaGenericDetailView(
                 "Check your template_name attribute."
             )
 
-    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> None:
+    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> HttpResponseBase:
         """
         :type kwargs: Any
         :type args: Any
@@ -133,7 +188,16 @@ class MontaGenericDetailView(
         """
         self._check_model_attr()
         self._check_template_attr()
-        super().dispatch(request, *args, **kwargs)
+
+        # From django.views.generic.base.View
+        if request.method.lower() in self.http_method_names:
+
+            handler = getattr(
+                self, request.method.lower(), self.http_method_not_allowed
+            )
+        else:
+            handler = self.http_method_not_allowed
+        return handler(request, *args, **kwargs)
 
 
 class MontaGenericDeleteView(
@@ -169,7 +233,7 @@ class MontaGenericDeleteView(
                 "Check your template_name attribute."
             )
 
-    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> None:
+    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> HttpResponseBase:
         """
         :type kwargs: Any
         :type args: Any
@@ -179,4 +243,13 @@ class MontaGenericDeleteView(
         self._check_model_attr()
         self._check_form_attr()
         self._check_template_attr()
-        super().dispatch(request, *args, **kwargs)
+
+        # From django.views.generic.base.View
+        if request.method.lower() in self.http_method_names:
+
+            handler = getattr(
+                self, request.method.lower(), self.http_method_not_allowed
+            )
+        else:
+            handler = self.http_method_not_allowed
+        return handler(request, *args, **kwargs)

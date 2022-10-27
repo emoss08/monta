@@ -33,7 +33,7 @@ from localflavor.us.models import USStateField
 
 # Monta Imports
 from monta_driver.models import Driver
-from monta_user.models import Organization, MontaUser
+from monta_user.models import MontaUser, Organization
 
 
 class EquipmentType(TimeStampedModel):

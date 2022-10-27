@@ -22,9 +22,9 @@ along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 from django.test import TestCase
 
 from monta_customer.factories.customer import (
-    DocumentClassificationFactory,
-    CustomerFactory,
     CustomerBillingProfileFactory,
+    CustomerFactory,
+    DocumentClassificationFactory,
 )
 
 

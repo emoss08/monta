@@ -18,16 +18,15 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from typing import final, Any
+from typing import Any, final
 
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 from django_extensions.db.models import TimeStampedModel
 
-from monta_user.models import Organization
 from monta_routes.models import GoogleRouteDistanceUnitChoices, GoogleRouteModelChoices
+from monta_user.models import Organization
 
 
 @final

@@ -733,7 +733,7 @@ class Order(TimeStampedModel):
         elif self.rate_method == RateMethodChoices.PER_MILE:
             if self.other_charge_amount and self.mileage and self.freight_charge_amount:
                 return (
-                        self.freight_charge_amount + self.other_charge_amount + self.mileage
+                    self.freight_charge_amount + self.other_charge_amount + self.mileage
                 )
             if self.mileage and self.freight_charge_amount:
                 return self.freight_charge_amount + self.mileage
@@ -925,11 +925,11 @@ class Movement(TimeStampedModel):
         # If the sequence is not ordered currently order it.
         # add to fix maximum recursion depth exceeded in comparison
         if (
-                not self.stops.order_by("sequence")
-                            .values_list("sequence", flat=True)
-                            .distinct()
-                            .count()
-                    == self.stops.count()
+            not self.stops.order_by("sequence")
+            .values_list("sequence", flat=True)
+            .distinct()
+            .count()
+            == self.stops.count()
         ):
             stops = self.stops.order_by("created")
             for index, stop in enumerate(stops, start=1):
@@ -1023,7 +1023,7 @@ class Movement(TimeStampedModel):
 
         if self.status == StatusChoices.COMPLETED:
             if not self.order.movements.filter(
-                    status=StatusChoices.IN_PROGRESS
+                status=StatusChoices.IN_PROGRESS
             ).exists():
                 self.order.status = StatusChoices.COMPLETED
                 self.order.save()
@@ -1259,8 +1259,8 @@ class Stop(TimeStampedModel):
                         # completed or in progress
                         if previous_stop.status != StatusChoices.COMPLETED:
                             if self.status in (
-                                    StatusChoices.IN_PROGRESS,
-                                    StatusChoices.COMPLETED,
+                                StatusChoices.IN_PROGRESS,
+                                StatusChoices.COMPLETED,
                             ):
                                 raise ValidationError(
                                     _(
@@ -1285,8 +1285,8 @@ class Stop(TimeStampedModel):
                     # If the next stop is in progress or completed, the current stop cannot be available
                     if self.status != StatusChoices.COMPLETED:
                         if next_stop.status in (
-                                StatusChoices.COMPLETED,
-                                StatusChoices.IN_PROGRESS,
+                            StatusChoices.COMPLETED,
+                            StatusChoices.IN_PROGRESS,
                         ):
                             raise ValidationError(
                                 _(
@@ -1344,8 +1344,8 @@ class Stop(TimeStampedModel):
         # if the last stop is completed, change the movement status to complete.
         if self.status == StatusChoices.COMPLETED:
             if (
-                    self.movement.stops.filter(status=StatusChoices.COMPLETED).count()
-                    == self.movement.stops.count()
+                self.movement.stops.filter(status=StatusChoices.COMPLETED).count()
+                == self.movement.stops.count()
             ):
                 self.movement.status = StatusChoices.COMPLETED
                 self.movement.save()

@@ -18,12 +18,12 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_safe
 from django.views.decorators.vary import vary_on_cookie
-from django.views.decorators.cache import cache_control
+from django.views.generic import TemplateView
 
 
 @method_decorator(require_safe, name="dispatch")

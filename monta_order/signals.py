@@ -18,9 +18,10 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from django.db.models.signals import post_save
+
 # Core Django Imports
 from django.dispatch import receiver
-from django.db.models.signals import post_save
 
 # Monta Imports
 from monta_order import models
