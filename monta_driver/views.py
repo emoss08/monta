@@ -83,10 +83,10 @@ class DriverCreateView(MontaCreateView):
 
     @transaction.atomic
     def post(
-            self,
-            request: ASGIRequest,
-            *args: Any,
-            **kwargs: Any,
+        self,
+        request: ASGIRequest,
+        *args: Any,
+        **kwargs: Any,
     ) -> JsonResponse:
         """
         Method to handle the POST request.
@@ -156,10 +156,10 @@ class DriverUpdateView(
     permission_required: str = "monta_driver.change_driver"
 
     def post(
-            self,
-            request: ASGIRequest,
-            *args: Any,
-            **kwargs: Any,
+        self,
+        request: ASGIRequest,
+        *args: Any,
+        **kwargs: Any,
     ) -> JsonResponse:
         """
         Overwrites the post method to check if the form is valid. If the form is valid, request the user's organization
@@ -381,8 +381,8 @@ def validate_license_number(request: ASGIRequest) -> HttpResponse:
         )
         if form.is_valid():
             if models.Driver.objects.filter(
-                    profile__license_number=license_number,
-                    organization=request.user.profile.organization,
+                profile__license_number=license_number,
+                organization=request.user.profile.organization,
             ).exists():
                 return HttpResponse(
                     "<div class='text-danger ease_in_5' id='license_error'>License is already "

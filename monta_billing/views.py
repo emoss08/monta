@@ -335,7 +335,7 @@ async def bill_orders(request: ASGIRequest) -> JsonResponse:
             is_billing=True,
         ).first()
         for requirement in customer_billing_profile.values_list(
-                "document_class", flat=True
+            "document_class", flat=True
         ):
             billing_requirements.append(requirement)
         for document in order.order.order_documentation.all():
@@ -364,9 +364,9 @@ async def bill_orders(request: ASGIRequest) -> JsonResponse:
             )
             for requirement in missing_requirements:
                 if not models.BillingException.objects.filter(
-                        order=order.order,
-                        organization=request.user.profile.organization,
-                        exception_type="PAPERWORK",
+                    order=order.order,
+                    organization=request.user.profile.organization,
+                    exception_type="PAPERWORK",
                 ):
                     billing_exception: models.BillingException = (
                         models.BillingException.objects.create(

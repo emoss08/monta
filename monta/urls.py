@@ -24,7 +24,7 @@ from django.urls import include, path
 from monta import views
 
 # Monta Core URLs
-app_name = 'monta'
+app_name = "monta"
 urlpatterns = [
     path("", views.HomePage.as_view(), name="index"),
 ]

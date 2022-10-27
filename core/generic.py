@@ -42,7 +42,9 @@ class MontaGenericTemplateView(
                 "Check your template_name attribute."
             )
 
-    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> HttpResponseBase:
+    def dispatch(
+        self, request: ASGIRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponseBase:
         self._check_template_attr()
 
         # From django.views.generic.base.View
@@ -89,7 +91,9 @@ class MontaGenericCreateView(
                 "Check your template_name attribute."
             )
 
-    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> HttpResponseBase:
+    def dispatch(
+        self, request: ASGIRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponseBase:
         """
         :type kwargs: Any
         :type args: Any
@@ -133,7 +137,9 @@ class MontaGenericUpdateView(
                 "forms.ModelForm."
             )
 
-    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> HttpResponseBase:
+    def dispatch(
+        self, request: ASGIRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponseBase:
         """
         :type kwargs: Any
         :type args: Any
@@ -179,7 +185,9 @@ class MontaGenericDetailView(
                 "Check your template_name attribute."
             )
 
-    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> HttpResponseBase:
+    def dispatch(
+        self, request: ASGIRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponseBase:
         """
         :type kwargs: Any
         :type args: Any
@@ -233,7 +241,9 @@ class MontaGenericDeleteView(
                 "Check your template_name attribute."
             )
 
-    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> HttpResponseBase:
+    def dispatch(
+        self, request: ASGIRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponseBase:
         """
         :type kwargs: Any
         :type args: Any
