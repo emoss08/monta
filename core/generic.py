@@ -18,22 +18,21 @@ You should have received a copy of the GNU General Public License
 along with Monta.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from typing import Type, TypeVar
+from typing import Any, Type
 
 from braces import views
 from django.contrib.auth import mixins
 from django.core.exceptions import ImproperlyConfigured
+from django.core.handlers.asgi import ASGIRequest
 from django.db.models.base import Model, ModelBase
 from django.forms.models import ModelForm, ModelFormMetaclass
 from django.views import generic
-
-_T = TypeVar("_T", bound=str)
 
 
 class MontaGenericTemplateView(
     mixins.LoginRequiredMixin, views.PermissionRequiredMixin, generic.TemplateView
 ):
-    template_name: _T
+    template_name: str
 
     def _check_template_attr(self):
         if not isinstance(self.template_name, str):
@@ -41,6 +40,10 @@ class MontaGenericTemplateView(
                 f"{self.__class__.__name__} requires the template_name to be an string. "
                 "Check your template_name attribute."
             )
+
+    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> None:
+        self._check_template_attr()
+        super().dispatch(request, *args, **kwargs)
 
 
 class MontaGenericCreateView(
@@ -77,6 +80,18 @@ class MontaGenericCreateView(
                 "Check your template_name attribute."
             )
 
+    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> None:
+        """
+        :type kwargs: Any
+        :type args: Any
+        :type request: ASGIRequest
+
+        """
+        self._check_model_attr()
+        self._check_form_attr()
+        self._check_template_attr()
+        super().dispatch(request, *args, **kwargs)
+
 
 class MontaGenericUpdateView(MontaGenericCreateView):
     """
@@ -108,6 +123,17 @@ class MontaGenericDetailView(
                 f"{self.__class__.__name__} requires the template_name to be None. "
                 "Check your template_name attribute."
             )
+
+    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> None:
+        """
+        :type kwargs: Any
+        :type args: Any
+        :type request: ASGIRequest
+
+        """
+        self._check_model_attr()
+        self._check_template_attr()
+        super().dispatch(request, *args, **kwargs)
 
 
 class MontaGenericDeleteView(
@@ -142,3 +168,15 @@ class MontaGenericDeleteView(
                 f"{self.__class__.__name__} requires the template_name to be None. "
                 "Check your template_name attribute."
             )
+
+    def dispatch(self, request: ASGIRequest, *args: Any, **kwargs: Any) -> None:
+        """
+        :type kwargs: Any
+        :type args: Any
+        :type request: ASGIRequest
+
+        """
+        self._check_model_attr()
+        self._check_form_attr()
+        self._check_template_attr()
+        super().dispatch(request, *args, **kwargs)
